@@ -1,0 +1,4 @@
+project_id = "shipify"
+
+[functions.collect]
+verify_jwt = false

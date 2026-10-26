@@ -1,0 +1,5 @@
+supabase creds.txt
+supabase/.temp/
+.env
+.env.*
+!.env.example
