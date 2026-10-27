@@ -996,7 +996,7 @@ const cv=$('cv');
 function renderHome(){
  const plus='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>';
  $('grid').innerHTML=`<button class="new" id="add" aria-label="Create project">${plus}<span>Create project</span></button>`+
-  projects.map((p,i)=>`<div class="proj" data-i="${i}"><button class="pj-open"><div class="th"><i></i><i></i><i></i></div><div class="m"><b>${p.name.replace(/</g,'&lt;')}</b><span>${(p.pages||[p]).reduce((a,x)=>a+x.sections.length,0)} sections · ${(p.pages||[1]).length} pages</span></div></button><div class="pj-act">${hasProd(p)?'<button class="chip" data-pa="dashboard">Dashboard</button>':''}<button class="chip" data-pa="more" aria-label="More options">⋯</button></div></div>`).join('');
+  projects.map((p,i)=>`<div class="proj" data-i="${i}"><button class="pj-open"><div class="th"><i></i><i></i><i></i></div><div class="m"><b>${p.name.replace(/</g,'&lt;')}</b><span>${(p.pages||[p]).reduce((a,x)=>a+x.sections.length,0)} sections · ${(p.pages||[1]).length} pages</span></div></button><div class="pj-act"><button class="chip" data-pa="dashboard">Dashboard</button><button class="chip" data-pa="more" aria-label="More options">⋯</button></div></div>`).join('');
  $('add').onclick=()=>{$('modal').classList.add('on');document.querySelectorAll('#tpls .tin').forEach(i=>i.style.transform=`scale(${i.parentElement.clientWidth/1000})`)};
  document.querySelectorAll('.pj-open').forEach(b=>b.onclick=()=>open(projects[b.parentElement.dataset.i]));
 }
@@ -1185,7 +1185,6 @@ function design(b){dEl=b.querySelector('.s');dmr();$('dm').classList.add('on')}
 $('dm').onclick=e=>{const o=e.target.dataset.o;if(!o)return;if(o==='done')return $('dm').classList.remove('on');const q=o.split(':');if(q[1])dEl.dataset[q[0]]=q[1];else delete dEl.dataset[q[0]];sync();dmr()};
 addEventListener('keydown',e=>{if(e.key==='Escape')$('dm').classList.remove('on')});
 function fillProds(){if(!cur||!cur.products)return;cv.querySelectorAll('.prods .cols').forEach(g=>g.innerHTML=cur.products.some(x=>x.st!=='draft')?cur.products.filter(x=>x.st!=='draft').map(prodItem).join(''):'<p class="pe">No products yet. Add some from the Projects screen, under Products.</p>')}
-function hasProd(p){return (p.pages||[p]).some(g=>g.sections.some(h=>h.includes('s prods')))}
 let pcur=null,mi=-1;
 $('pr').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='rnin')$('pr').querySelector('[data-pm=rsave]').click()});
 $('pr').onclick=e=>{if(e.target.id==='pr')return $('pr').classList.remove('on');const t=e.target.closest('[data-pm]');if(!t)return;
