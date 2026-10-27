@@ -425,6 +425,10 @@ select option::checkmark{display:none}
 #docs{display:none;min-height:100%}
 #docs.on{display:block}
 #docs .top{border-bottom:1px solid var(--iline)}
+#docs.docs-enter .top{animation:docs-header-in .38s cubic-bezier(.2,.75,.25,1) both}
+#docs.docs-enter .dg>*{animation:docs-content-in .48s cubic-bezier(.2,.75,.25,1) both;animation-delay:var(--docs-delay,0ms)}
+@keyframes docs-header-in{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+@keyframes docs-content-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 .dg{max-width:780px;margin:0 auto;padding:56px 24px 120px;color:var(--fg);font-size:16px;line-height:1.65}
 .dg h1{font-size:38px;line-height:1.15;letter-spacing:-.025em;margin:0 0 12px}
 .dg .dg-lead{font-size:18px;color:var(--mut);margin:0 0 40px;max-width:60ch}
@@ -444,6 +448,7 @@ select option::checkmark{display:none}
 .dg td:first-child{white-space:nowrap}
 .dg td code{white-space:pre-wrap}
 @media(max-width:560px){.dg{padding:36px 18px 80px}.dg h1{font-size:30px}.dg h2{font-size:22px}.dg td:first-child{white-space:normal}}
+@media(prefers-reduced-motion:reduce){#docs.docs-enter .top,#docs.docs-enter .dg>*{animation:none}}
 
 #tb .tcl{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--mut)}
 #tb input[type=color]{flex-shrink:0}
@@ -1667,7 +1672,23 @@ addEventListener('keydown',e=>{const a=document.activeElement;
 
 
 /* ---------- Docs page ---------- */
-function docsShow(on){if(on&&$('editor').classList.contains('on'))return;$('docs').classList.toggle('on',on);$('home').style.display=on?'none':'';if(on)scrollTo(0,0);if(!on&&location.hash==='#docs')history.replaceState(null,'',location.pathname+location.search)}
+function docsShow(on){
+ if(on&&$('editor').classList.contains('on'))return;
+ const docs=$('docs'),home=$('home');
+ if(!on){
+  docs.classList.remove('on','docs-enter');
+  home.style.display='';
+  if(location.hash==='#docs')history.replaceState(null,'',location.pathname+location.search);
+  return;
+ }
+ docs.querySelectorAll('.dg>*').forEach((item,index)=>item.style.setProperty('--docs-delay',`${Math.min(index*35,420)}ms`));
+ docs.classList.remove('docs-enter');
+ docs.classList.add('on');
+ home.style.display='none';
+ void docs.offsetWidth;
+ docs.classList.add('docs-enter');
+ scrollTo(0,0);
+}
 document.addEventListener('click',e=>{if(e.target.closest('[data-nav="docs"]')){docsShow(true);try{history.replaceState(null,'','#docs')}catch(x){}}});
 $('docsBack').onclick=()=>docsShow(false);
 if(location.hash==='#docs')docsShow(true);
