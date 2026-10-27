@@ -33,7 +33,18 @@ button{font:inherit;cursor:pointer;color:inherit}
 /* modal */
 #modal,#cm,#ck,#db{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:20px;z-index:20}
 #modal.on,#cm.on,#ck.on,#db.on{display:flex}
-#db .card{max-width:980px;width:100%;max-height:92vh;overflow:auto}
+#db .db-card{max-width:1100px;width:100%;height:min(88vh,900px);padding:0;display:flex;flex-direction:column;overflow:hidden}
+#db .db-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 24px 16px;border-bottom:1px solid var(--line)}
+#db .db-head h2{margin:0;font-size:22px}
+#db .db-head p{margin:0;color:var(--mut)}
+#db .db-head .db-eyebrow{font-size:11px;letter-spacing:.1em;font-weight:700;margin-bottom:3px}
+#db .db-tabs{display:flex;gap:4px;padding:0 24px;border-bottom:1px solid var(--line)}
+#db .db-tab{padding:12px 14px;border:0;border-bottom:2px solid transparent;background:transparent;color:var(--mut);font-weight:600}
+#db .db-tab:hover{color:var(--fg)}
+#db .db-tab.on{border-color:var(--fg);color:var(--fg)}
+#db .db-panel[hidden]{display:none}
+#db .db-analytics{flex:1;min-height:0;overflow:auto;padding:18px 24px}
+#db .db-products:not([hidden]){display:flex;flex:1;min-height:0;flex-direction:column;overflow:hidden}
 #db .dh{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-bottom:14px}#db .dh h2{margin:0}
 #db .dr{display:flex;flex-wrap:wrap;gap:6px;align-items:center}#db .dr input[type=date]{padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);font:inherit;font-size:13px}
 #db .tag{font-size:12px;padding:3px 9px;border-radius:99px;background:var(--soft);color:var(--mut);border:1px solid var(--line);font-weight:400}
@@ -209,9 +220,12 @@ button{font:inherit;cursor:pointer;color:inherit}
 .prr{display:flex;gap:8px;margin-bottom:8px}.prr input{flex:1;min-width:0;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);font:inherit}
 #pm{position:fixed;z-index:25;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:4px;min-width:160px;box-shadow:0 8px 28px rgba(0,0,0,.2)}#pm[hidden]{display:none}#pm button{display:block;width:100%;text-align:left;border:0;background:transparent;padding:8px 12px;border-radius:6px}#pm button:hover{background:var(--soft)}#pm button[data-m=del]{color:#c0392b}
 .s .pe{grid-column:1/-1;color:var(--pm)}
-.card.pw{max-width:980px;width:100%;height:min(82vh,720px);display:flex;flex-direction:column;padding:0;overflow:hidden}
+#db .db-products .pmh{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:18px 22px;border-bottom:1px solid var(--line);flex-shrink:0}
+#db .db-products .pmh h2{margin:0}
+#db .db-products .pmh p{margin:2px 0 0}
 .pmh{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:18px 22px;border-bottom:1px solid var(--line)}.pmh h2{margin:0}.pmh p{margin:2px 0 0}
-.pmb{flex:1;display:flex;min-height:0}.pml{width:320px;border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0;flex-shrink:0}
+#db .db-products .pmb{flex:1;display:flex;min-height:0}
+.pml{width:320px;border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0;flex-shrink:0}
 .pml .tb{padding:12px;display:flex;flex-direction:column;gap:8px;border-bottom:1px solid var(--line)}.pll{flex:1;overflow:auto;padding:6px}
 .pml input,.pme input,.pme textarea,.pme select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);font:inherit}
 .pri{display:flex;align-items:center;gap:10px;width:100%;padding:8px;border:1px solid transparent;border-radius:10px;background:transparent;text-align:left}.pri:hover{background:var(--soft)}.pri.on{border-color:var(--fg);background:var(--soft)}
@@ -220,7 +234,7 @@ button{font:inherit;cursor:pointer;color:inherit}
 .pme{flex:1;overflow:auto;padding:22px;min-width:0}.pme label{display:block;font-size:13px;font-weight:600;margin:0 0 6px}.pme .f{margin-bottom:16px}.pme .f2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.pme textarea{min-height:110px;resize:vertical}
 .pimgb{width:180px;height:180px;border:1.5px dashed var(--mut);border-radius:14px;background:var(--soft) center/cover no-repeat;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--mut);font-size:13px;padding:10px}.pimgb.has{border-style:solid;border-color:var(--line)}
 .pe0{text-align:center;padding:80px 20px;color:var(--mut)}.pe0 h3{color:var(--fg);margin:0 0 6px}
-@media(max-width:720px){.pmb{flex-direction:column}.pml{width:100%;max-height:38%;border-right:0;border-bottom:1px solid var(--line)}}
+@media(max-width:720px){#db .db-card{height:94vh}#db .db-head{padding:16px}#db .db-tabs{padding:0 16px}#db .db-analytics{padding:16px}.pmb{flex-direction:column}.pml{width:100%;max-height:38%;border-right:0;border-bottom:1px solid var(--line)}}
 .prod .im{background-size:cover;background-position:center}.prod .pr{display:flex;gap:8px;align-items:baseline}.prod .pr s{color:var(--pm);font-size:13px}
 .s .prod .pd{font-size:14px;color:var(--pm);margin:4px 0 0;max-width:none;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.add:disabled{opacity:.5;cursor:not-allowed}.add:disabled:hover{background:transparent;color:var(--pa)}
 #home{max-width:none;padding:0}.hm{max-width:960px;margin:0 auto;padding:40px 24px 48px}
@@ -824,7 +838,6 @@ qs('h1')  qsa('p')  print(x)  cls()  undo()  help()
     <input id="pname" aria-label="Project name"><select id="pgsel" aria-label="Current page"></select>
     <div class="sp"></div>
     <button class="btn ghost" id="prv">Preview</button><div class="seg"><button id="dk" class="on">Desktop</button><button id="mb">Mobile</button></div>
-    <button class="btn ghost" id="dsh">Dashboard</button>
     <button class="btn ghost" id="dl">Download site</button>
     <button class="btn" id="pub">Publish</button>
   </div>
@@ -841,8 +854,13 @@ qs('h1')  qsa('p')  print(x)  cls()  undo()  help()
 <div id="lk" hidden><label>Links to<select id="lks"></select></label></div>
 <div id="tb" hidden role="toolbar" aria-label="Text style"><select id="tf" aria-label="Font"></select><span class="sep"></span><button class="tbtn" id="tdn" aria-label="Smaller text">−</button><input id="tz" type="number" min="8" max="160" aria-label="Font size in pixels"><button class="tbtn" id="tup" aria-label="Larger text">+</button><span class="sep"></span><button class="tbtn" id="tbd" aria-label="Bold"><b>B</b></button><button class="tbtn" id="tit" aria-label="Italic"><i style="font-family:Georgia,serif">I</i></button><input id="tc" type="color" aria-label="Text color" title="Text color"><span class="sep"></span><label class="tcl" title="Background of this item"><span>Fill</span><input id="tbg" type="color" aria-label="Fill color"></label><button class="tbtn" id="tbx" title="Remove fill" aria-label="Remove fill">×</button><label class="tcl" title="Background of the whole section"><span>Section</span><input id="tsg" type="color" aria-label="Section background color"></label><button class="tbtn" id="tsx" title="Remove section color" aria-label="Remove section color">×</button><button class="tbtn" id="trs" title="Reset text style" aria-label="Reset text style">↺</button></div>
 <div id="dm"><div class="card"></div></div>
-<div id="pr" role="dialog" aria-modal="true"><div class="card" style="max-width:460px"></div></div>
-<div id="db" role="dialog" aria-modal="true" aria-label="Site dashboard"><div class="card"></div></div>
+<div id="pr" role="dialog" aria-modal="true" aria-label="Project options"><div class="card" style="max-width:460px"></div></div>
+<div id="db" role="dialog" aria-modal="true" aria-label="Project dashboard"><div class="card db-card">
+  <header class="db-head"><div><p class="db-eyebrow">PROJECT DASHBOARD</p><h2 id="dbTitle">Dashboard</h2><p id="dbSubtitle">Analytics and products for this project</p></div><button class="btn ghost" type="button" data-db-close aria-label="Close dashboard">Close</button></header>
+  <nav class="db-tabs" role="tablist" aria-label="Dashboard sections"><button class="db-tab on" type="button" role="tab" id="dbTabAnalytics" aria-controls="dbAnalytics" aria-selected="true" data-db-tab="analytics">Analytics</button><button class="db-tab" type="button" role="tab" id="dbTabProducts" aria-controls="dbProducts" aria-selected="false" data-db-tab="products">Products</button></nav>
+  <section class="db-panel db-analytics" id="dbAnalytics" role="tabpanel" aria-labelledby="dbTabAnalytics"></section>
+  <section class="db-panel db-products" id="dbProducts" role="tabpanel" aria-labelledby="dbTabProducts" hidden></section>
+</div></div>
 <div id="au" role="dialog" aria-modal="true" aria-label="Account"><div class="card auth-card"></div></div>
 <div id="pm" hidden><button data-m="ren">Rename</button><button data-m="dup">Duplicate</button><button data-m="del">Delete</button></div>
 <div id="toast"></div>
@@ -978,7 +996,7 @@ const cv=$('cv');
 function renderHome(){
  const plus='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>';
  $('grid').innerHTML=`<button class="new" id="add" aria-label="Create project">${plus}<span>Create project</span></button>`+
-  projects.map((p,i)=>`<div class="proj" data-i="${i}"><button class="pj-open"><div class="th"><i></i><i></i><i></i></div><div class="m"><b>${p.name.replace(/</g,'&lt;')}</b><span>${(p.pages||[p]).reduce((a,x)=>a+x.sections.length,0)} sections · ${(p.pages||[1]).length} pages</span></div></button><div class="pj-act">${hasProd(p)?'<button class="chip" data-pa="prod">Products</button>':''}<button class="chip" data-pa="more" aria-label="More options">⋯</button></div></div>`).join('');
+  projects.map((p,i)=>`<div class="proj" data-i="${i}"><button class="pj-open"><div class="th"><i></i><i></i><i></i></div><div class="m"><b>${p.name.replace(/</g,'&lt;')}</b><span>${(p.pages||[p]).reduce((a,x)=>a+x.sections.length,0)} sections · ${(p.pages||[1]).length} pages</span></div></button><div class="pj-act">${hasProd(p)?'<button class="chip" data-pa="dashboard">Dashboard</button>':''}<button class="chip" data-pa="more" aria-label="More options">⋯</button></div></div>`).join('');
  $('add').onclick=()=>{$('modal').classList.add('on');document.querySelectorAll('#tpls .tin').forEach(i=>i.style.transform=`scale(${i.parentElement.clientWidth/1000})`)};
  document.querySelectorAll('.pj-open').forEach(b=>b.onclick=()=>open(projects[b.parentElement.dataset.i]));
 }
@@ -1169,16 +1187,12 @@ addEventListener('keydown',e=>{if(e.key==='Escape')$('dm').classList.remove('on'
 function fillProds(){if(!cur||!cur.products)return;cv.querySelectorAll('.prods .cols').forEach(g=>g.innerHTML=cur.products.some(x=>x.st!=='draft')?cur.products.filter(x=>x.st!=='draft').map(prodItem).join(''):'<p class="pe">No products yet. Add some from the Projects screen, under Products.</p>')}
 function hasProd(p){return (p.pages||[p]).some(g=>g.sections.some(h=>h.includes('s prods')))}
 let pcur=null,mi=-1;
-function prRender(){$('pr').firstElementChild.innerHTML='<h2>Products</h2><p>Manage what you sell here. Every Products section on your site shows this list.</p>'+(pcur.products.length?pcur.products.map((x,i)=>`<div class="prr"><input data-pi="${i}" data-f="n" value="${ea(x.n)}" placeholder="Product name" aria-label="Product name"><input data-pi="${i}" data-f="price" value="${ea(x.price)}" placeholder="$0.00" aria-label="Price" style="max-width:90px"><button class="chip" data-pd="${i}" aria-label="Delete product">×</button></div>`).join(''):'<p>No products yet.</p>')+'<div class="ra" style="justify-content:space-between"><button class="btn ghost" data-pm="add">+ Add product</button><button class="btn" data-pm="done">Done</button></div>'}
-$('pr').addEventListener('input',e=>{const t=e.target;if(t.dataset.pi!=null)pcur.products[+t.dataset.pi][t.dataset.f]=t.value});
 $('pr').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='rnin')$('pr').querySelector('[data-pm=rsave]').click()});
-$('pr').onclick=e=>{if(e.target.id==='pr')return $('pr').classList.remove('on');const t=e.target.closest('[data-pm],[data-pd]');if(!t)return;const k=t.dataset.pm;
- if(t.dataset.pd!=null){pcur.products.splice(+t.dataset.pd,1);prRender()}
- else if(k==='done')$('pr').classList.remove('on');
- else if(k==='rsave'){pcur.name=$('rnin').value.trim()||pcur.name;$('pr').classList.remove('on');renderHome()}
- else if(k==='add'){pcur.products.push({n:'New product',price:'$0.00'});prRender()}};
+$('pr').onclick=e=>{if(e.target.id==='pr')return $('pr').classList.remove('on');const t=e.target.closest('[data-pm]');if(!t)return;
+ if(t.dataset.pm==='done')$('pr').classList.remove('on');
+ else if(t.dataset.pm==='rsave'){pcur.name=$('rnin').value.trim()||pcur.name;$('pr').classList.remove('on');renderHome()}};
 $('grid').addEventListener('click',e=>{const a=e.target.closest('[data-pa]');if(!a)return;const i=+a.closest('.proj').dataset.i,p=projects[i];
- if(a.dataset.pa==='prod'){pcur=p;p.products=p.products||[];prRender();$('pr').classList.add('on');return}
+ if(a.dataset.pa==='dashboard'){dbOpen(p);return}
  mi=i;const m=$('pm'),r=a.getBoundingClientRect(),d=m.querySelector('[data-m=del]');d.textContent='Delete';d.dataset.arm='';m.hidden=false;m.style.left=Math.max(8,r.right-165)+'px';m.style.top=(r.bottom+6)+'px'});
 $('pm').onclick=e=>{const b=e.target.closest('[data-m]');if(!b)return;const k=b.dataset.m,p=projects[mi];
  if(k==='del'){if(!b.dataset.arm){b.dataset.arm=1;b.textContent='Click to confirm';return}projects.splice(mi,1);$('pm').hidden=true;renderHome();return}
@@ -1201,18 +1215,18 @@ function pForm(){const x=pcur.products[psel],pe=$('pe');
 <div class="f f2"><div><label for="pf-s">SKU</label><input id="pf-s" data-f="sku" value="${ea(x.sku||'')}" placeholder="Optional"></div><div><label for="pf-k">Inventory</label><input id="pf-k" type="number" min="0" data-f="stock" value="${ea(String(x.stock==null?'':x.stock))}" placeholder="Blank = unlimited"></div></div>
 <div class="f"><label for="pf-t">Status</label><select id="pf-t" data-f="st"><option value="active"${x.st!=='draft'?' selected':''}>Active (shown on your site)</option><option value="draft"${x.st==='draft'?' selected':''}>Draft (hidden)</option></select></div>
 <div style="display:flex;justify-content:flex-end"><button class="btn ghost" data-pm="del">Delete product</button></div>`}
-function prRender(){const c=$('pr').firstElementChild;if(pcur!==plast){psel=0;pqs='';plast=pcur}c.className='card pw';c.style.maxWidth='980px';
- c.innerHTML='<div class="pmh"><div><h2>Products</h2><p>Manage what you sell. Every Products section on your site shows the active ones.</p></div><button class="btn" data-pm="done">Done</button></div><div class="pmb"><aside class="pml"><div class="tb"><input id="pq" placeholder="Search products" aria-label="Search products" value="'+ea(pqs)+'"><button class="btn" data-pm="add">+ Add product</button></div><div class="pll" id="pll"></div></aside><section class="pme" id="pe"></section></div>';
+function prRender(){const c=$('dbProducts');if(pcur!==plast){psel=0;pqs='';plast=pcur}
+ c.innerHTML='<div class="pmh"><div><h2>Products</h2><p>Manage what you sell. Every Products section on this site shows the active ones.</p></div></div><div class="pmb"><aside class="pml"><div class="tb"><input id="pq" placeholder="Search products" aria-label="Search products" value="'+ea(pqs)+'"><button class="btn" data-pm="add">+ Add product</button></div><div class="pll" id="pll"></div></aside><section class="pme" id="pe"></section></div>';
  if(psel>=pcur.products.length)psel=Math.max(0,pcur.products.length-1);pList();pForm()}
-$('pr').oninput=e=>{const t=e.target;if(t.id==='pq'){pqs=t.value;return pList()}if(!t.dataset.f)return;pcur.products[psel][t.dataset.f]=t.dataset.f==='stock'?(t.value===''?'':Math.max(0,+t.value)):t.value;pList()};
-$('pr').addEventListener('change',e=>{if(e.target.id==='pfi'){const x=pcur.products[psel];readImg(e.target.files[0],d=>{x.img=d;pList();pForm()})}});
-$('pr').addEventListener('dragover',e=>{if(e.target.closest('#pib'))e.preventDefault()});
-$('pr').addEventListener('drop',e=>{if(!e.target.closest('#pib'))return;e.preventDefault();const x=pcur.products[psel];readImg(e.dataTransfer.files[0],d=>{x.img=d;pList();pForm()})});
-$('pr').onclick=e=>{if(e.target.id==='pr')return $('pr').classList.remove('on');
+const dbProducts=$('dbProducts');
+dbProducts.oninput=e=>{const t=e.target;if(t.id==='pq'){pqs=t.value;return pList()}if(!t.dataset.f)return;pcur.products[psel][t.dataset.f]=t.dataset.f==='stock'?(t.value===''?'':Math.max(0,+t.value)):t.value;pList()};
+dbProducts.addEventListener('change',e=>{if(e.target.id==='pfi'){const x=pcur.products[psel];readImg(e.target.files[0],d=>{x.img=d;pList();pForm()})}});
+dbProducts.addEventListener('dragover',e=>{if(e.target.closest('#pib'))e.preventDefault()});
+dbProducts.addEventListener('drop',e=>{if(!e.target.closest('#pib'))return;e.preventDefault();const x=pcur.products[psel];readImg(e.dataTransfer.files[0],d=>{x.img=d;pList();pForm()})});
+dbProducts.onclick=e=>{
  const ps=e.target.closest('[data-ps]');if(ps){psel=+ps.dataset.ps;pList();pForm();return}
  const t=e.target.closest('[data-pm]');if(!t)return;const k=t.dataset.pm,x=pcur.products[psel];
- if(k==='done'){$('pr').classList.remove('on');renderHome()}
- else if(k==='rsave'){pcur.name=$('rnin').value.trim()||pcur.name;$('pr').classList.remove('on');renderHome()}
+ if(k==='done')dbSetTab('analytics');
  else if(k==='add'){pcur.products.push({id:uid(),n:'New product',price:'$0.00',st:'active'});psel=pcur.products.length-1;pqs='';prRender();$('pf-n').select()}
  else if(k==='img')$('pfi').click();
  else if(k==='rimg'){delete x.img;pList();pForm()}
@@ -1633,12 +1647,13 @@ if(c)send('click',{text:(c.textContent||'').trim().slice(0,40),href:c.getAttribu
 
 /* ---------- Dashboard ---------- */
 const DB={f:null,t:null,d:30};
+let dbProject=null;
 const dbMoney=c=>'$'+(c/100).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
 const dbDay=d=>d.toISOString().slice(0,10);
 function dbRange(days){const t=new Date();t.setUTCHours(24,0,0,0);DB.t=t;DB.f=new Date(+t-days*864e5);DB.d=days}
 function dbSample(f,t){let seed=(Math.floor(f/864e5)*7+Math.floor(t/864e5))>>>0;const r=()=>(seed=(seed*1664525+1013904223)>>>0)/4294967296;
  const daily=[];let V=0,PV=0;for(let d=new Date(f);d<t;d=new Date(+d+864e5)){const v=Math.round(40+r()*60),w=Math.round(v*(1.6+r()));V+=v;PV+=w;daily.push({d:dbDay(d),visitors:v,views:w})}
- const W=[.4,.25,.15,.12,.08],cart=Math.round(V*.09),co=Math.round(cart*.55),pu=Math.round(co*.6),names=(cur&&cur.products&&cur.products.length?cur.products.map(x=>x.n||'Product'):['Product A','Product B','Product C']).slice(0,5);
+ const W=[.4,.25,.15,.12,.08],cart=Math.round(V*.09),co=Math.round(cart*.55),pu=Math.round(co*.6),names=(dbProject&&dbProject.products&&dbProject.products.length?dbProject.products.map(x=>x.n||'Product'):['Product A','Product B','Product C']).slice(0,5);
  const split=(a,n)=>a.map((x,i)=>({name:x,n:Math.round(n*W[i])}));
  return{visitors:V,sessions:Math.round(V*1.15),pageviews:PV,orders:pu,revenue_cents:pu*(4200+Math.round(r()*3000)),funnel:{visitors:V,cart,checkout:co,purchases:pu},
   top_pages:split(['/','/shop.html','/about.html','/contact.html'],PV).map(x=>({path:x.name,views:x.n})),
@@ -1652,19 +1667,19 @@ async function dbData(){
  return{live:false,s:dbSample(DB.f,DB.t)}}
 const dbRows=(a,k,v,fmt)=>{const m=Math.max(1,...a.map(x=>+x[v]));return a.length?a.map(x=>`<div class="rw"><span title="${ea(String(x[k]))}">${ea(String(x[k]))}</span><i><u style="width:${Math.round(+x[v]/m*100)}%"></u></i><em>${fmt?fmt(x):x[v]}</em></div>`).join(''):'<p class="hint">No data yet.</p>'};
 async function dbRender(){
- const c=$('db').firstElementChild,rg=[7,30,90].map(n=>`<button class="chip${DB.d===n?' on':''}" data-db="${n}">${n} days</button>`).join('');
- c.innerHTML='<p class="hint">Loading…</p>';let o;
- try{o=await dbData()}catch(err){c.innerHTML='<h2>Dashboard</h2><p class="hint" role="alert">'+ea(err.message)+'</p><div class="ra"><button class="btn" data-db="x">Close</button></div>';return}
+ const c=$('dbAnalytics'),rg=[7,30,90].map(n=>`<button class="chip${DB.d===n?' on':''}" data-db-range="${n}">${n} days</button>`).join('');
+ c.innerHTML='<p class="hint" role="status">Loading analytics…</p>';let o;
+ try{o=await dbData()}catch(err){c.innerHTML='<p class="hint" role="alert">Could not load analytics: '+ea(err.message)+'</p>';return}
  const s=o.s,f=s.funnel,cr=f.visitors?(f.purchases/f.visitors*100).toFixed(1)+'%':'0%',aov=s.orders?dbMoney(s.revenue_cents/s.orders):'$0.00',mx=Math.max(1,...s.daily.map(x=>x.visitors));
  const fn=[['Visitors',f.visitors],['Added to cart',f.cart],['Started checkout',f.checkout],['Purchased',f.purchases]].map(x=>({n:x[0],v:x[1]}));
- c.innerHTML=`<div class="dh"><h2>Dashboard <span class="tag">${o.live?'Live data':'Sample data'}</span></h2><div class="dr">${rg}<input type="date" id="dbf" value="${dbDay(DB.f)}" aria-label="From"><input type="date" id="dbt" value="${dbDay(new Date(+DB.t-864e5))}" aria-label="To"><button class="btn" data-db="x">Close</button></div></div>
+ c.innerHTML=`<div class="dh"><span class="tag">${o.live?'Live data':'Sample data'}</span><div class="dr">${rg}<input type="date" id="dbf" value="${dbDay(DB.f)}" aria-label="From"><input type="date" id="dbt" value="${dbDay(new Date(+DB.t-864e5))}" aria-label="To"></div></div>
  <div class="kp"><div class="k"><span>Visitors</span><b>${s.visitors.toLocaleString()}</b></div><div class="k"><span>Sessions</span><b>${s.sessions.toLocaleString()}</b></div><div class="k"><span>Conversion rate</span><b>${cr}</b></div><div class="k"><span>Revenue</span><b>${dbMoney(s.revenue_cents)}</b></div><div class="k"><span>Avg order value</span><b>${aov}</b></div></div>
  <div class="pn" style="margin-bottom:12px"><h3>Visitors per day</h3><div class="bars" role="img" aria-label="Visitors per day">${s.daily.map(x=>`<u style="height:${Math.round(x.visitors/mx*100)}%" title="${x.d}: ${x.visitors}"></u>`).join('')}</div></div>
  <div class="gr"><div class="pn"><h3>Funnel</h3>${dbRows(fn,'n','v')}</div><div class="pn"><h3>Top pages</h3>${dbRows(s.top_pages,'path','views')}</div><div class="pn"><h3>Top products</h3>${dbRows(s.top_products,'name','revenue_cents',x=>dbMoney(x.revenue_cents))}</div><div class="pn"><h3>Traffic sources</h3>${dbRows(s.sources,'name','n')}</div><div class="pn"><h3>Devices</h3>${dbRows(s.devices,'name','n')}</div></div>
  ${o.live?'':'<p class="hint">This is made-up sample data. Fill in the BACKEND settings in the code to see real numbers.</p>'}`}
-$('dsh').onclick=()=>{if(!DB.f)dbRange(30);$('db').classList.add('on');dbRender()};
-$('db').addEventListener('click',e=>{if(e.target.id==='db')return $('db').classList.remove('on');const b=e.target.closest('[data-db]');if(!b)return;
- if(b.dataset.db==='x')return $('db').classList.remove('on');dbRange(+b.dataset.db);dbRender()});
+function dbSetTab(tab){const products=tab==='products';$('dbTabAnalytics').classList.toggle('on',!products);$('dbTabAnalytics').setAttribute('aria-selected',String(!products));$('dbTabProducts').classList.toggle('on',products);$('dbTabProducts').setAttribute('aria-selected',String(products));$('dbAnalytics').hidden=products;$('dbProducts').hidden=!products;if(products)prRender();else dbRender()}
+function dbOpen(p){dbProject=p;pcur=p;p.products=p.products||[];$('dbTitle').textContent=p.name;$('dbSubtitle').textContent='Analytics for your configured Supabase site · products for this project';if(!DB.f)dbRange(30);$('db').classList.add('on');dbSetTab('analytics')}
+$('db').addEventListener('click',e=>{if(e.target.id==='db'||e.target.closest('[data-db-close]'))return $('db').classList.remove('on');const tab=e.target.closest('[data-db-tab]');if(tab)return dbSetTab(tab.dataset.dbTab);const range=e.target.closest('[data-db-range]');if(range){dbRange(+range.dataset.dbRange);dbRender()}});
 $('db').addEventListener('change',e=>{if(e.target.id!=='dbf'&&e.target.id!=='dbt')return;const f=$('dbf').value,t=$('dbt').value;if(!f||!t||f>t)return;DB.f=new Date(f+'T00:00:00Z');DB.t=new Date(+new Date(t+'T00:00:00Z')+864e5);DB.d=0;dbRender()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')$('db').classList.remove('on')});
 

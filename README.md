@@ -1,7 +1,7 @@
 # Builder analytics: setup notes
 
 Files:
-- `public/index.html` : the builder (now has a Dashboard button and a tracking snippet in exports)
+- `public/index.html` : the builder (project dashboards include Analytics and Products tabs, plus a tracking snippet in exports)
 - `supabase/migrations/001_init.sql` : database tables, security rules, `site_stats` function
 - `supabase/functions/collect/index.ts` : the `/collect` endpoint that receives events
 - `supabase/config.toml` : Supabase CLI project and function settings
@@ -58,6 +58,7 @@ This publishes the **Shipify builder**. A separate website exported from the bui
 ## Known limits right now
 
 - The Dashboard shows **sample data** until `siteId` is set. Live dashboard data requires signing in as the Supabase Auth user who owns that site, because row-level security blocks anonymous reads. The builder now signs up and signs in with Supabase Auth; project data is not yet saved to the `projects` table.
+- The project-card Dashboard action appears only for templates with a Products section. Its Products tab edits that project's local product list; Analytics uses the configured Supabase site and is not separated by local project.
 - The exported cart and checkout are still simulated, so revenue stays at $0 until Stripe is added.
 - The rate limiter is per edge instance (best effort, not a global cap).
 
