@@ -331,6 +331,17 @@ button{font:inherit;cursor:pointer;color:inherit}
 #mn .ml{display:block;width:100%;text-align:left;padding:14px 0;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--fg);font:inherit;font-size:17px;cursor:pointer}#mn .ml:hover{color:var(--pa)}
 #tb{position:fixed;z-index:16;display:flex;flex-wrap:wrap;align-items:center;gap:6px;max-width:calc(100vw - 16px);background:var(--bg);color:var(--fg);border:1px solid var(--fg);border-radius:12px;padding:6px;box-shadow:0 8px 28px rgba(0,0,0,.25);font-size:13px}
 #tb[hidden]{display:none}
+#gpop{position:absolute;top:calc(100% + 8px);left:0;z-index:2;display:grid;grid-template-columns:auto auto;align-items:center;gap:9px 10px;width:min(260px,calc(100vw - 24px));padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--bg);box-shadow:0 10px 32px rgba(0,0,0,.2);font-size:12px}
+#gpop[hidden]{display:none}
+#tb.gright #gpop{left:auto;right:0}
+#tb.dn #gpop{top:auto;bottom:calc(100% + 8px)}
+#gpop label{color:var(--mut);font-weight:600}
+#gpop select{min-width:0}
+#gpop input[type=color]{width:34px;height:30px;padding:2px;border:1px solid var(--line);border-radius:7px;background:var(--bg)}
+#gpop input[type=range]{width:100%;min-width:0}
+#gpop output{text-align:right;color:var(--mut)}
+#gpop .btn{grid-column:1/-1}
+#gclear{grid-column:1/-1}
 #tb::after{content:"";position:absolute;left:var(--ax,24px);bottom:-6px;width:10px;height:10px;margin-left:-5px;background:var(--bg);border:solid var(--fg);border-width:0 1px 1px 0;transform:rotate(45deg)}
 #tb.dn::after{bottom:auto;top:-6px;border-width:1px 0 0 1px}
 #tb select{max-width:130px;padding:5px 8px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--fg);font:inherit;font-size:13px}
@@ -638,7 +649,8 @@ add('text', {}, 2)   // the empty {} keeps defaults; 2 is the position
 <li>If your markup is a single element with the class <code>s</code> (for example <code>&lt;section class="s my-hero"&gt;</code>), it is added exactly as written.</li>
 <li>Otherwise Atelier wraps it in a section for you and makes headings, paragraphs, list items and quotes editable.</li>
 <li>Put your <code>&lt;style&gt;</code> inside the markup. Scope every rule to your own class so it cannot affect other sections.</li>
-<li>Add <code>contenteditable</code> to any element you want visitors of the editor to be able to click and retype.</li>
+<li>Visible text in an <code>html()</code> section is editable in place. Add <code>contenteditable</code> when you want to explicitly mark an editable region.</li>
+<li>Select text to open the formatting toolbar. Use <strong>Gradient</strong> to apply a two-color gradient to text, an element's fill, or the whole section, and adjust its angle.</li>
 <li>Use the theme colour variables so the section follows theme changes. <code>var(--pb)</code> is the page background and <code>var(--pm)</code> is the muted text colour. The other theme values follow the same naming as the theme list (<code>pf</code>, <code>ps</code>, <code>pa</code>, <code>pt</code>, <code>pl</code>, <code>pr</code>, <code>pfh</code>).</li>
 </ul>
 <h3><code>code()</code>: interactive pieces</h3>
@@ -879,7 +891,7 @@ qs('h1')  qsa('p')  print(x)  cls()  undo()  help()
 <div id="ck" role="dialog" aria-modal="true" aria-label="Cart and checkout"><div class="card"></div></div>
 <div id="mn" role="dialog" aria-modal="true" aria-label="Menu"><div class="card"></div></div>
 <div id="lk" hidden><label>Links to<select id="lks"></select></label></div>
-<div id="tb" hidden role="toolbar" aria-label="Text style"><select id="tf" aria-label="Font"></select><span class="sep"></span><button class="tbtn" id="tdn" aria-label="Smaller text">−</button><input id="tz" type="number" min="8" max="160" aria-label="Font size in pixels"><button class="tbtn" id="tup" aria-label="Larger text">+</button><span class="sep"></span><button class="tbtn" id="tbd" aria-label="Bold"><b>B</b></button><button class="tbtn" id="tit" aria-label="Italic"><i style="font-family:Georgia,serif">I</i></button><input id="tc" type="color" aria-label="Text color" title="Text color"><span class="sep"></span><label class="tcl" title="Background of this item"><span>Fill</span><input id="tbg" type="color" aria-label="Fill color"></label><button class="tbtn" id="tbx" title="Remove fill" aria-label="Remove fill">×</button><label class="tcl" title="Background of the whole section"><span>Section</span><input id="tsg" type="color" aria-label="Section background color"></label><button class="tbtn" id="tsx" title="Remove section color" aria-label="Remove section color">×</button><button class="tbtn" id="trs" title="Reset text style" aria-label="Reset text style">↺</button></div>
+<div id="tb" hidden role="toolbar" aria-label="Text style"><select id="tf" aria-label="Font"></select><span class="sep"></span><button class="tbtn" id="tdn" aria-label="Smaller text">−</button><input id="tz" type="number" min="8" max="160" aria-label="Font size in pixels"><button class="tbtn" id="tup" aria-label="Larger text">+</button><span class="sep"></span><button class="tbtn" id="tbd" aria-label="Bold"><b>B</b></button><button class="tbtn" id="tit" aria-label="Italic"><i style="font-family:Georgia,serif">I</i></button><input id="tc" type="color" aria-label="Text color" title="Text color"><span class="sep"></span><label class="tcl" title="Background of this item"><span>Fill</span><input id="tbg" type="color" aria-label="Fill color"></label><button class="tbtn" id="tbx" title="Remove fill" aria-label="Remove fill">×</button><label class="tcl" title="Background of the whole section"><span>Section</span><input id="tsg" type="color" aria-label="Section background color"></label><button class="tbtn" id="tsx" title="Remove section color" aria-label="Remove section color">×</button><button class="tbtn" id="tgbtn" type="button" aria-label="Gradient colors" aria-expanded="false">Gradient</button><div id="gpop" hidden role="group" aria-label="Gradient settings"><label for="gwhere">Apply to</label><select id="gwhere"><option value="fill">Fill</option><option value="text">Text</option><option value="section">Section</option></select><label for="gfrom">From</label><input id="gfrom" type="color" value="#8b5cf6" aria-label="Gradient start color"><label for="gto">To</label><input id="gto" type="color" value="#ec4899" aria-label="Gradient end color"><label for="gangle">Angle</label><input id="gangle" type="range" min="0" max="360" value="100" aria-label="Gradient angle"><output id="gangleValue" for="gangle">100°</output><button class="btn" id="gapply" type="button">Apply gradient</button><button class="btn ghost" id="gclear" type="button">Remove gradient</button></div><button class="tbtn" id="trs" title="Reset text style" aria-label="Reset text style">↺</button></div>
 <div id="dm"><div class="card"></div></div>
 <div id="pr" role="dialog" aria-modal="true" aria-label="Project options"><div class="card" style="max-width:460px"></div></div>
 <div id="db" role="dialog" aria-modal="true" aria-label="Project dashboard"><div class="card db-card">
@@ -1088,7 +1100,15 @@ function draw(){
  $('dm').classList.remove('on');$('tb').hidden=true;
  if(cur.pages)cur.pages[cur.pi].sections=cur.sections;
  cv.innerHTML=cur.sections.length?cur.sections.map((h,i)=>`<div class="blk${h.includes('s hdr')?' hd':''}" data-i="${i}">${h}<div class="tools">${h.includes('class="s code"')?'<button data-a="e">Edit code</button>':''}<button data-a="s">Design</button><button data-a="u">Move up</button><button data-a="d">Move down</button><button data-a="c">Add code below</button><button data-a="x">Delete</button></div></div>`).join(''):'<div class="empty"><b>This page is empty</b><br>Add a section from the left to get started.</div>';
- cv.querySelectorAll('.blk>.s a[href],.blk>.s .pb:not(.sb),.blk>.s .b,.blk>.s .btn,.blk>.s [role="button"],.blk>.s [role="link"],.blk>.s button:not(.add):not(.cartlink):not(.menubtn):not(.sb)').forEach(b=>{b.dataset.builderButton='';if(!b.hasAttribute('contenteditable')&&(b.matches('a,button,[role="button"],[role="link"]')||b.classList.contains('b')||b.classList.contains('pb')))b.contentEditable='true'});
+ cv.querySelectorAll('.blk>.s *').forEach(el=>{
+  if(el.matches('style,script,noscript,svg,path,iframe,input,textarea,select,option,canvas,video,audio')||el.closest('.tools,svg,math,[contenteditable]'))return;
+  const hasText=[...el.childNodes].some(n=>n.nodeType===Node.TEXT_NODE&&n.textContent.trim());
+  if(hasText&&!el.hasAttribute('contenteditable'))el.contentEditable='true';
+ });
+ cv.querySelectorAll('.blk>.s a,.blk>.s .pb:not(.sb),.blk>.s .b,.blk>.s .btn,.blk>.s [role="button"],.blk>.s [role="link"],.blk>.s button:not(.add):not(.cartlink):not(.menubtn):not(.sb)').forEach(b=>{
+  b.dataset.builderButton='';
+  if(!b.hasAttribute('contenteditable')&&(b.matches('a,button,[role="button"],[role="link"]')||b.classList.contains('b')||b.classList.contains('pb')))b.contentEditable='true';
+ });
 }
 cv.onclick=e=>{
  const a=e.target.dataset&&e.target.dataset.a;if(!a)return;
@@ -1289,6 +1309,13 @@ const tb=$('tb');let tel=null;
 const ff1=x=>(x||'').split(',')[0].replace(/['"]/g,'').trim().toLowerCase();
 const toHex=c=>{const m=(c||'').match(/\d+(\.\d+)?/g);return m?'#'+m.slice(0,3).map(x=>(+x|0).toString(16).padStart(2,'0')).join(''):'#000000'};
 const fname=x=>(x||'').split(',')[0].replace(/['"]/g,'').trim();
+const gradientParts=value=>{const colors=value.match(/(?:rgba?\([^)]+\)|#[\da-f]{3,8})/gi)||[],angle=value.match(/linear-gradient\(\s*(-?\d+(?:\.\d+)?)deg/i),hex=c=>c[0]!=='#'?toHex(c):c.length===4?'#'+c.slice(1).split('').map(x=>x+x).join(''):c.length===5?'#'+c.slice(1,4).split('').map(x=>x+x).join(''):c.length===9?c.slice(0,7):c;return colors.length>=2?{from:hex(colors[0]),to:hex(colors[colors.length-1]),angle:angle?Math.max(0,Math.min(360,+angle[1])):100}:null};
+const gradientTarget=mode=>mode==='section'?tel&&tel.closest('.blk>.s'):tel;
+function gradientSync(){
+ const target=gradientTarget($('gwhere').value);if(!target)return;
+ const parts=gradientParts(target.style.backgroundImage||getComputedStyle(target).backgroundImage);
+ if(parts){$('gfrom').value=parts.from;$('gto').value=parts.to;$('gangle').value=parts.angle;$('gangleValue').value=parts.angle+'°'}
+}
 $('tf').innerHTML=FONTS.map((f,i)=>`<option value="${i}"${i?` style="font-family:${f[1]}"`:''}>${i?fname(f[1]):'Theme font'}</option>`).join('');
 function tbSync(){
  const cs=getComputedStyle(tel),own=ff1(tel.style.fontFamily);let k=0;
@@ -1299,15 +1326,17 @@ function tbSync(){
  $('tz').value=tel.dataset.fs||Math.round(parseFloat(cs.fontSize));
  $('tbd').classList.toggle('on',+cs.fontWeight>=600);
  $('tit').classList.toggle('on',cs.fontStyle==='italic');
- $('tc').value=toHex(cs.color);
+ const textGradient=(cs.backgroundClip==='text'||cs.webkitBackgroundClip==='text')&&gradientParts(tel.style.backgroundImage||cs.backgroundImage);
+ $('tc').value=textGradient?textGradient.from:toHex(cs.color);
  const vb=el=>{for(let n=el;n&&n!==document.body;n=n.parentElement){const c=getComputedStyle(n).backgroundColor;if(c&&!/rgba?\(.*,\s*0\)$/.test(c)&&c!=='transparent')return toHex(c)}return '#ffffff'},sc=tel.closest('.blk>.s');
- $('tbg').value=vb(tel);$('tsg').value=sc?vb(sc):vb(tel)}
+ $('tbg').value=vb(tel);$('tsg').value=sc?vb(sc):vb(tel);gradientSync()}
 function tbPlace(){
  if(!tel)return;const r=tel.getBoundingClientRect();tb.hidden=false;
  tb.style.visibility=(r.bottom<0||r.top>innerHeight)?'hidden':'';
  const w=tb.offsetWidth,h=tb.offsetHeight,left=Math.max(8,Math.min(r.left,innerWidth-w-8));
  let top=r.top-h-12,dn=false;if(top<8){top=r.bottom+12;dn=true}
  tb.classList.toggle('dn',dn);tb.style.left=left+'px';tb.style.top=top+'px';
+ if(!$('gpop').hidden){const gh=$('gpop').offsetHeight,br=tb.getBoundingClientRect(),above=br.top-8,below=innerHeight-br.bottom-8;tb.classList.toggle('dn',below<gh+8&&above>below)}
  tb.style.setProperty('--ax',Math.max(16,Math.min(w-16,r.left+Math.min(r.width,160)/2-left))+'px');
  if(dn&&!$('lk').hidden)$('lk').style.top=(top+h+6)+'px'}
 function tbTidy(){if(!tel.getAttribute('style'))tel.removeAttribute('style')}
@@ -1320,15 +1349,30 @@ tb.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||!tel)r
  if(b.id==='tup'||b.id==='tdn')tbSize((+$('tz').value||16)+(b.id==='tup'?2:-2));
  else if(b.id==='tbd'){tel.style.fontWeight=+getComputedStyle(tel).fontWeight>=600?'400':'700';tbSync()}
  else if(b.id==='tit'){tel.style.fontStyle=getComputedStyle(tel).fontStyle==='italic'?'normal':'italic';tbSync()}
- else if(b.id==='trs'){['fontFamily','fontSize','fontWeight','fontStyle','color','background'].forEach(k=>tel.style[k]='');delete tel.dataset.fs;tbTidy();tbSync();toast('Text style reset')}
+ else if(b.id==='tgbtn'){const open=$('gpop').hidden;$('gpop').hidden=!open;b.setAttribute('aria-expanded',String(open));tb.classList.toggle('gright',tb.getBoundingClientRect().right>innerWidth-280);if(open)gradientSync()}
+ else if(b.id==='gapply'||b.id==='gclear'){
+  const mode=$('gwhere').value,target=gradientTarget(mode);if(!target)return;
+  if(b.id==='gclear'){
+   target.style.backgroundImage='';target.style.backgroundColor='';if(mode==='text'){target.style.backgroundClip='';target.style.webkitBackgroundClip='';target.style.color='';target.style.webkitTextFillColor=''}
+  }else{
+   const image=`linear-gradient(${$('gangle').value}deg, ${$('gfrom').value}, ${$('gto').value})`;
+   target.style.backgroundImage=image;
+   if(mode==='text'){target.style.backgroundColor='';target.style.backgroundClip='text';target.style.webkitBackgroundClip='text';target.style.color='transparent';target.style.webkitTextFillColor='transparent'}
+   else{target.style.backgroundColor='transparent';if(mode==='fill'){target.style.backgroundClip='border-box';target.style.webkitBackgroundClip='border-box';target.style.color='';target.style.webkitTextFillColor=''}}
+  }
+  tbTidy();tbSync();toast(b.id==='gclear'?'Gradient removed':'Gradient applied');
+ }
+ else if(b.id==='trs'){['fontFamily','fontSize','fontWeight','fontStyle','color','background','backgroundClip','webkitBackgroundClip','webkitTextFillColor'].forEach(k=>tel.style[k]='');delete tel.dataset.fs;tbTidy();tbSync();toast('Text style reset')}
  tbPlace()});
 $('tf').onchange=e=>{if(!tel)return;const i=+e.target.value;tel.style.fontFamily=i?FONTS[i][1]:'';tbTidy();tbSync();tbPlace();tel.focus()};
 $('tz').onchange=()=>{if(tel&&+$('tz').value)tbSize(+$('tz').value)};
-$('tc').oninput=e=>{if(tel)tel.style.color=e.target.value};
-$('tbg').oninput=e=>{if(tel)tel.style.background=e.target.value};
-$('tsg').oninput=e=>{const s=tel&&tel.closest('.blk>.s');if(s)s.style.background=e.target.value};
-$('tbx').onclick=()=>{if(!tel)return;tel.style.background='';tbTidy();tbSync()};
-$('tsx').onclick=()=>{const s=tel&&tel.closest('.blk>.s');if(!s)return;s.style.background='';if(!s.getAttribute('style'))s.removeAttribute('style');tbSync()};
+$('tc').oninput=e=>{if(tel){tel.style.color=e.target.value;tel.style.backgroundImage='';tel.style.backgroundClip='';tel.style.webkitBackgroundClip='';tel.style.webkitTextFillColor=''}};
+$('tbg').oninput=e=>{if(tel){tel.style.backgroundImage='';tel.style.backgroundClip='';tel.style.webkitBackgroundClip='';tel.style.webkitTextFillColor='';tel.style.backgroundColor=e.target.value}};
+$('tsg').oninput=e=>{const s=tel&&tel.closest('.blk>.s');if(s){s.style.backgroundImage='';s.style.backgroundColor=e.target.value}};
+$('tbx').onclick=()=>{if(!tel)return;tel.style.backgroundImage='';tel.style.backgroundColor='';tel.style.backgroundClip='';tel.style.webkitBackgroundClip='';tel.style.webkitTextFillColor='';tbTidy();tbSync()};
+$('tsx').onclick=()=>{const s=tel&&tel.closest('.blk>.s');if(!s)return;s.style.backgroundImage='';s.style.backgroundColor='';if(!s.getAttribute('style'))s.removeAttribute('style');tbSync()};
+$('gwhere').onchange=gradientSync;
+$('gangle').oninput=e=>$('gangleValue').value=e.target.value+'°';
 cv.parentElement.addEventListener('scroll',()=>{if(tel&&!tb.hidden)tbPlace()});
 addEventListener('resize',()=>{if(tel&&!tb.hidden)tbPlace()});
 
