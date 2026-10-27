@@ -10,6 +10,7 @@
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#000;--fg:#fff;--mut:#9a9a9a;--line:#2a2a2a;--soft:#111;--ph:#222}}
 *{box-sizing:border-box}
 html,body{margin:0;height:100%}
+html{scrollbar-gutter:stable}
 body{background:var(--bg);color:var(--fg);font:15px/1.5 "Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
 button{font:inherit;cursor:pointer;color:inherit}
 :focus-visible{outline:2px solid var(--fg);outline-offset:2px}
@@ -93,7 +94,7 @@ button{font:inherit;cursor:pointer;color:inherit}
 .th .add{display:block;text-align:center}
 .tin{position:absolute;top:0;left:0;width:1000px;transform-origin:0 0;container-type:inline-size}
 .ud{width:100%;margin-bottom:14px;padding:8px;border:1px solid var(--line);border-radius:8px;background:transparent;font-size:13px}.ud[hidden]{display:none}
-.stage{flex:1;background:var(--soft);overflow:auto;padding:24px}
+.stage{flex:1;background:var(--soft);overflow:auto;padding:24px;scrollbar-gutter:stable}
 #cv{margin:0 auto;background:var(--pb);color:var(--pf);width:100%;max-width:1000px;min-height:480px;border:1px solid var(--line);border-radius:10px;overflow:hidden;container-type:inline-size;transition:max-width .2s}
 #cv.m{max-width:390px}
 .empty{padding:90px 24px;text-align:center;color:var(--pm)}
