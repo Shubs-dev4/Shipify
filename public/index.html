@@ -74,6 +74,7 @@ button{font:inherit;cursor:pointer;color:inherit}
 .bar input{border:0;background:transparent;font:600 15px inherit;color:var(--fg);min-width:0;width:200px;padding:6px 8px;border-radius:6px}
 .bar input:hover{background:var(--soft)}
 .sp{flex:1}
+.save-status{font-size:12px;color:var(--mut);white-space:nowrap}.save-status[data-state=error]{color:#b42318}
 .seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
 .seg button{border:0;background:transparent;padding:6px 12px;font-size:13px}
 .seg button.on{background:var(--fg);color:var(--bg)}
@@ -455,6 +456,7 @@ select option::checkmark{display:none}
   <h1>Projects</h1>
   <p class="sub">Build a website in three steps. No coding needed.</p>
   <ol class="steps"><li><b>1. Pick a template</b>Choose a ready-made layout.</li><li><b>2. Edit your page</b>Click any text to change it. Add or remove sections.</li><li><b>3. Publish</b>Share your finished site.</li></ol>
+  <p id="projectNotice" class="sub" role="status" aria-live="polite"></p>
   <div class="grid" id="grid"></div>
   </div>
 </main>
@@ -913,6 +915,7 @@ qs('h1')  qsa('p')  print(x)  cls()  undo()  help()
     <button class="btn ghost" id="back">← Projects</button>
     <input id="pname" aria-label="Project name"><select id="pgsel" aria-label="Current page"></select>
     <div class="sp"></div>
+    <span id="saveStatus" class="save-status" role="status" aria-live="polite"></span>
     <button class="btn ghost" id="prv">Preview</button><div class="seg"><button id="dk" class="on">Desktop</button><button id="mb">Mobile</button></div>
     <button class="btn ghost" id="dl">Download site</button>
     <button class="btn" id="pub">Publish</button>
@@ -1072,16 +1075,77 @@ const T=[
 const TOS=[['1. Acceptance of terms','By using this website you agree to these terms. If you do not agree, please do not use the site.'],['2. Use of the site','You agree to use the site lawfully and not to misuse, copy or disrupt it or its content.'],['3. Orders and payments','Prices and availability may change. We may refuse or cancel an order if something looks wrong.'],['4. Intellectual property','All text, images and logos on this site belong to us or our licensors and may not be reused without permission.'],['5. Limitation of liability','The site is provided as is. To the extent allowed by law, we are not liable for indirect or incidental losses.'],['6. Changes to these terms','We may update these terms from time to time. Continued use of the site means you accept the changes.'],['7. Contact us','Questions about these terms? Reach out using the contact details on this site.']];
 const PRV=[['1. Information we collect','We collect what you give us, such as your name, email and order details, plus basic usage data.'],['2. How we use it','We use your information to run the site, process orders, answer questions and improve our service.'],['3. Sharing','We do not sell your personal information. We share it only with services that help us operate, or when the law requires.'],['4. Cookies','This site may use cookies to remember your preferences and understand how the site is used.'],['5. Your choices','You can ask to see, correct or delete your information at any time by contacting us.'],['6. Contact us','Questions about privacy? Reach out using the contact details on this site.']];
 const PG=[{id:'tos',n:'Terms of Service',s:[['legal',{t:'Terms of Service',i:TOS}]]},{id:'prv',n:'Privacy Policy',s:[['legal',{t:'Privacy Policy',i:PRV}]]},{id:'abt',n:'About',s:[['text',{t:'About us',p:'Tell your story here.'}],'team']},{id:'cnt',n:'Contact',s:['contact']},{id:'new',n:'New page',s:[['text',{t:'New page',p:'Click any text to edit it, or add sections from the Sections tab.'}]]}];
-function applyTheme(i){cur.theme=i;const t=TH[i];for(const k in t)if(k!=='n')cv.style.setProperty('--'+k,t[k]);applyStyle();if($('pn'))panel()}
-let projects=[],cur=null,$=id=>document.getElementById(id);
+function applyTheme(i){cur.theme=i;const t=TH[i];for(const k in t)if(k!=='n')cv.style.setProperty('--'+k,t[k]);applyStyle();if($('pn'))panel();scheduleProjectSave()}
+let projects=[],cur=null,$=id=>document.getElementById(id),user=null,authClient=null,currentUserId='';
+let projectLoadState='loading',saveTimer=0,saveQueue=Promise.resolve(),projectLoadId=0;
+const setSaveStatus=(text,state='')=>{const el=$('saveStatus');el.textContent=text;el.dataset.state=state};
 const cv=$('cv');
 
 function renderHome(){
  const plus='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>';
  $('grid').innerHTML=`<button class="new" id="add" aria-label="Create project">${plus}<span>Create project</span></button>`+
-  projects.map((p,i)=>`<div class="proj" data-i="${i}"><button class="pj-open"><div class="th"><i></i><i></i><i></i></div><div class="m"><b>${p.name.replace(/</g,'&lt;')}</b><span>${(p.pages||[p]).reduce((a,x)=>a+x.sections.length,0)} sections · ${(p.pages||[1]).length} pages</span></div></button><div class="pj-act"><button class="chip" data-pa="dashboard">Dashboard</button><button class="chip" data-pa="more" aria-label="More options">⋯</button></div></div>`).join('');
- $('add').onclick=()=>{$('modal').classList.add('on');document.querySelectorAll('#tpls .tin').forEach(i=>i.style.transform=`scale(${i.parentElement.clientWidth/1000})`)};
+  projects.map((p,i)=>`<div class="proj" data-i="${i}"><button class="pj-open"><div class="th"><i></i><i></i><i></i></div><div class="m"><b>${ea(p.name)}</b><span>${(p.pages||[p]).reduce((a,x)=>a+(x.sections||[]).length,0)} sections · ${(p.pages||[1]).length} pages</span></div></button><div class="pj-act"><button class="chip" data-pa="dashboard">Dashboard</button><button class="chip" data-pa="more" aria-label="More options">⋯</button></div></div>`).join('');
+ const notice=$('projectNotice');
+ notice.innerHTML=projectLoadState==='loading'?'Loading your saved projects…':projectLoadState==='error'?'Could not load your projects. Check your connection. <button class="chip" type="button" data-project-retry>Retry</button>':user&&!projects.length?'Your projects will be saved to your account automatically.':'';
+ $('add').disabled=projectLoadState!=='ready';
+ $('add').onclick=()=>{if(!user){auOpen('in');authMessage('Sign in to create and save projects to your account.');return}$('modal').classList.add('on');document.querySelectorAll('#tpls .tin').forEach(i=>i.style.transform=`scale(${i.parentElement.clientWidth/1000})`)};
  document.querySelectorAll('.pj-open').forEach(b=>b.onclick=()=>open(projects[b.parentElement.dataset.i]));
+}
+$('projectNotice').onclick=async e=>{if(!e.target.closest('[data-project-retry]'))return;projectLoadState='loading';renderHome();try{const{data,error}=await authClient.auth.getSession();if(error)throw error;await applyAuthSession(data.session)}catch(error){console.error('Could not reload saved projects:',error);projectLoadState='error';renderHome()}};
+function projectError(err,action){
+ console.error('Could not '+action+' project:',err);
+ setSaveStatus(action.charAt(0).toUpperCase()+action.slice(1)+' failed','error');
+ toast('Could not '+action+' project. Check your connection and try again.');
+}
+async function loadProjects(ownerId,loadId){
+ projectLoadState='loading';renderHome();
+ try{
+  const{data,error}=await authClient.from('projects').select('id,name,data,updated_at').eq('owner',ownerId).order('updated_at',{ascending:false});
+  if(error)throw error;
+  if(loadId!==projectLoadId||ownerId!==currentUserId)return;
+  projects=(data||[]).filter(row=>row.data&&typeof row.data==='object').map(row=>({...row.data,id:row.id,name:row.name}));
+  projectLoadState='ready';renderHome();
+ }catch(error){
+  if(loadId!==projectLoadId)return;
+  console.error('Could not load saved projects from Supabase:',error);
+  projects=[];projectLoadState='error';renderHome();
+ }
+}
+function scheduleProjectSave(){
+ if(!user||!currentUserId||!cur?.id||!authClient)return;
+ setSaveStatus('Unsaved changes');
+ clearTimeout(saveTimer);
+ saveTimer=setTimeout(()=>persistCurrentProject(),650);
+}
+async function saveProjectRecord(project,ownerId=currentUserId){
+ if(!user||!ownerId||!project?.id||!authClient)return false;
+ saveQueue=saveQueue.catch(()=>{}).then(async()=>{
+  if(!user||ownerId!==currentUserId||!projects.includes(project))return false;
+  const data=JSON.parse(JSON.stringify(project));
+  setSaveStatus('Saving…');
+  const{error}=await authClient.from('projects').upsert({id:project.id,owner:ownerId,name:project.name,data,updated_at:new Date().toISOString()},{onConflict:'id'});
+  if(error)throw error;
+  if(cur===project||!cur)setSaveStatus('Saved');
+  renderHome();
+  return true;
+ }).catch(error=>{projectError(error,'save');return false});
+ return saveQueue;
+}
+async function persistCurrentProject(){
+ clearTimeout(saveTimer);
+ if(!user||!currentUserId||!cur?.id||!authClient)return false;
+ sync();
+ const project=cur,ownerId=currentUserId;
+ try{return await saveProjectRecord(project,ownerId)}catch(error){projectError(error,'save');return false}
+}
+async function createSavedProject(project){
+ if(!user||!currentUserId||!authClient){auOpen('in');authMessage('Sign in to create and save projects to your account.');return false}
+ setSaveStatus('Saving…');
+ try{
+  const{data,error}=await authClient.from('projects').insert({owner:currentUserId,name:project.name,data:project}).select('id').single();
+  if(error)throw error;
+  project.id=data.id;projects.unshift(project);projectLoadState='ready';setSaveStatus('Saved');renderHome();return true;
+ }catch(error){projectError(error,'create');return false}
 }
 const FONTS=[['Theme default'],['Modern',`'Instrument Sans',system-ui,sans-serif`,`'Instrument Sans',system-ui,sans-serif`],['Classic',`Georgia,serif`,`Georgia,serif`],['Elegant',`'Playfair Display',Georgia,serif`,`'Instrument Sans',system-ui,sans-serif`],['Friendly',`Poppins,system-ui,sans-serif`,`Poppins,system-ui,sans-serif`],['Techy',`'Space Grotesk',system-ui,sans-serif`,`'Space Grotesk',system-ui,sans-serif`],['Editorial',`'DM Serif Display',Georgia,serif`,`'Instrument Sans',system-ui,sans-serif`]];
 const RAD=[['Theme default'],['Sharp','0px'],['Rounded','12px'],['Very round','24px']],ANI=['None','Fade in','Slide up','Zoom in'],HOV=['Off','On'];
@@ -1089,10 +1153,10 @@ const vars=t=>Object.keys(t).filter(k=>k!=='n').map(k=>`--${k}:${t[k].replace(/"
 const tth=x=>({...TH[x.th],...(x.st&&x.st.f?{pfh:FONTS[x.st.f][1]}:{}),...(x.st&&x.st.r?{pr:RAD[x.st.r][1]}:{})});
 const thumb=(html,t,h)=>`<div class="th" style="${vars(t)};height:${h}px"><div class="tin">${html.replace(/ contenteditable(="[^"]*")?/g,'').replace(/<button/g,'<span').replace(/<\/button>/g,'</span>')}</div></div>`;
 $('tpls').innerHTML=T.map(t=>{const h=TH[t.th];return `<button class="tpl" data-id="${t.id}">${t.s.length?thumb(t.s.slice(0,3).map(mk).join(''),tth(t),120).replace('class="th"','class="th tp"'):`<div class="pv blank">Empty page</div>`}<div class="m"><b>${t.n}</b><span>${t.d}</span></div></button>`}).join('');
-document.querySelectorAll('.tpl').forEach(b=>b.onclick=()=>{
+document.querySelectorAll('.tpl').forEach(b=>b.onclick=async()=>{
  const t=T.find(x=>x.id===b.dataset.id);
  const p={name:'Untitled project',tpl:t.n,sections:t.s.map(mk),theme:t.th,st:{f:0,r:0,a:0,h:0,...(t.st||{})}};
- projects.push(p);$('modal').classList.remove('on');open(p);
+ if(await createSavedProject(p)){$('modal').classList.remove('on');open(p)}
 });
 $('cancel').onclick=()=>$('modal').classList.remove('on');
 $('modal').onclick=e=>{if(e.target.id==='modal')$('modal').classList.remove('on')};
@@ -1135,7 +1199,7 @@ $('pn').onclick=e=>{
  const b=e.target.closest('[data-k],[data-t],[data-i],[data-s],#pa,#pp,#ud');if(!b)return;
  if(b.dataset.k){sync();cur.sections.push(S[b.dataset.k].h({}));draw();cv.parentElement.scrollTop=1e5;toast('Section added')}
  else if(b.dataset.i)applyTheme(+b.dataset.i);
- else if(b.dataset.s){const q=b.dataset.s.split(':');cur.st[q[0]]=+q[1];applyTheme(cur.theme||0);if(prev)setPrev()}
+ else if(b.dataset.s){const q=b.dataset.s.split(':');cur.st[q[0]]=+q[1];applyTheme(cur.theme||0);if(prev)setPrev();scheduleProjectSave()}
  else if(b.id==='pa'){prev=true;setPrev()}
  else if(b.id==='pp'){prev=true;setPrev();pageTrans(()=>{})}
  else if(b.dataset.t){const t=T.find(x=>x.id===b.dataset.t);sync();undo={s:cur.sections.slice(),th:cur.theme,st:cur.st};cur.sections=t.s.map(mk);cur.tpl=t.n;cur.st={f:0,r:0,a:0,h:0,...(t.st||{})};draw();applyTheme(t.th);toast('Template applied')}
@@ -1159,7 +1223,11 @@ function draw(){
   const hasText=[...el.childNodes].some(n=>n.nodeType===Node.TEXT_NODE&&n.textContent.trim());
   if(hasText&&!el.hasAttribute('contenteditable'))el.contentEditable='true';
  });
+ scheduleProjectSave();
 }
+cv.addEventListener('input',()=>{if(!prev){sync();scheduleProjectSave()}});
+cv.addEventListener('change',()=>{if(!prev){sync();scheduleProjectSave()}});
+$('pname').addEventListener('input',()=>{if(!cur)return;cur.name=$('pname').value.trim()||'Untitled project';scheduleProjectSave()});
 cv.onclick=e=>{
  const a=e.target.dataset&&e.target.dataset.a;if(!a)return;
  if(a==='drag')return;
@@ -1285,12 +1353,12 @@ const setImg=(el,d)=>{
  if(d){el.style.backgroundImage=`url(${d})`;el.style.backgroundSize='cover';el.style.backgroundPosition='center'}else if(el.hasAttribute('data-builder-image')){el.style.backgroundImage='none'}else{['background-image','background-size','background-position'].forEach(k=>el.style.removeProperty(k));if(!el.getAttribute('style'))el.removeAttribute('style')}
 };
 const pickImg=el=>{ipEl=el;ip.hidden=true;ipf.value='';ipf.click()};
-ipf.onchange=()=>{const el=ipEl;if(el)readImg(ipf.files[0],d=>{setImg(el,d);sync()},imgMax(el))};
+ipf.onchange=()=>{const el=ipEl;if(el)readImg(ipf.files[0],d=>{setImg(el,d);sync();scheduleProjectSave()},imgMax(el))};
 cv.addEventListener('click',e=>{if(prev)return;const t=e.target.closest(SLOT);if(!t||!cv.contains(t)||(!t.matches('img')&&e.target.closest('[contenteditable]')))return;if(t.matches('img'))e.preventDefault();const hasImage=t.matches('img')?!t.dataset.builderImageEmpty&&!!t.getAttribute('src'):!!t.style.backgroundImage||(t.hasAttribute('data-builder-image')&&getComputedStyle(t).backgroundImage!=='none');if(!hasImage)return pickImg(t);ipEl=t;const r=t.getBoundingClientRect();ip.hidden=false;ip.style.left=Math.max(8,Math.min(innerWidth-210,r.left+r.width/2-100))+'px';ip.style.top=Math.max(8,r.top+8)+'px'});
-$('ipc').onclick=()=>pickImg(ipEl);$('ipr').onclick=()=>{setImg(ipEl,'');ip.hidden=true;sync()};
+$('ipc').onclick=()=>pickImg(ipEl);$('ipr').onclick=()=>{setImg(ipEl,'');ip.hidden=true;sync();scheduleProjectSave()};
 document.addEventListener('mousedown',e=>{if(!ip.contains(e.target))ip.hidden=true});
 cv.addEventListener('dragover',e=>{if(!prev&&e.target.closest(SLOT)&&[...e.dataTransfer.types].includes('Files'))e.preventDefault()});
-cv.addEventListener('drop',e=>{const t=e.target.closest(SLOT);if(prev||!t||![...e.dataTransfer.types].includes('Files'))return;e.preventDefault();readImg(e.dataTransfer.files[0],d=>{setImg(t,d);sync()},imgMax(t))});
+cv.addEventListener('drop',e=>{const t=e.target.closest(SLOT);if(prev||!t||![...e.dataTransfer.types].includes('Files'))return;e.preventDefault();readImg(e.dataTransfer.files[0],d=>{setImg(t,d);sync();scheduleProjectSave()},imgMax(t))});
 
 $('mn').onclick=e=>{
  if(e.target.id==='mn')return $('mn').classList.remove('on');
@@ -1307,7 +1375,7 @@ function open(p){
  prev=false;cart=[];undo=null;cur=p;initPages(p);$('pname').value=p.name;draw();applyTheme(p.theme||0);setDev(false);updSel();
  $('home').style.display='none';$('editor').classList.add('on');builderViewMotion($('editor'),'view-enter');panel();cmdLoad();
 }
-$('back').onclick=()=>{if(prev){prev=false;setPrev()}sync();cur.name=$('pname').value.trim()||'Untitled project';const editor=$('editor'),home=$('home');editor.classList.remove('view-enter');editor.classList.add('view-exit');setTimeout(()=>{editor.classList.remove('on','view-exit');home.style.display='';renderHome();builderViewMotion(home,'view-enter')},160)};
+$('back').onclick=async()=>{if(prev){prev=false;setPrev()}if(cur){sync();cur.name=$('pname').value.trim()||'Untitled project';if(!await persistCurrentProject())return}const editor=$('editor'),home=$('home');editor.classList.remove('view-enter');editor.classList.add('view-exit');setTimeout(()=>{editor.classList.remove('on','view-exit');home.style.display='';renderHome();builderViewMotion(home,'view-enter')},160)};
 function setDev(m){$('mn').classList.remove('on');$('ck').classList.remove('on');cv.classList.toggle('m',m);$('editor').classList.toggle('mob',m);$('mb').classList.toggle('on',m);$('dk').classList.toggle('on',!m)}
 $('dk').onclick=()=>setDev(false);$('mb').onclick=()=>setDev(true);
 $('pub').onclick=()=>{const t=$('toast');t.textContent='Published! (demo only, no real link yet)';t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1800)};
@@ -1329,14 +1397,14 @@ function delPage(i){sync();const r=cur.pages.splice(i,1)[0];eachLink(el=>{if(el.
 $('pn').addEventListener('click',e=>{const b=e.target.closest('[data-pg],[data-np],[data-dp]');if(!b)return;
  if(b.dataset.pg)switchPage(+b.dataset.pg);else if(b.dataset.np)addPage(b.dataset.np);
  else if(b.dataset.arm)delPage(+b.dataset.dp);else{b.dataset.arm=1;b.textContent='Delete?';setTimeout(()=>{b.dataset.arm='';b.textContent='×'},2500)}});
-$('pn').addEventListener('change',e=>{const n=e.target.dataset.n;if(n!=null){cur.pages[+n].n=e.target.value.trim()||'Untitled';updSel()}});
+$('pn').addEventListener('change',e=>{const n=e.target.dataset.n;if(n!=null){cur.pages[+n].n=e.target.value.trim()||'Untitled';updSel();scheduleProjectSave()}});
 $('pgsel').onchange=e=>switchPage(+e.target.value);
 let lkEl=null;
 function lkPlace(t){const r=t.getBoundingClientRect(),b=$('lk');b.style.left=Math.max(8,Math.min(r.left,innerWidth-240))+'px';b.style.top=Math.min(r.bottom+6,innerHeight-50)+'px'}
 function lkShow(t){lkEl=t;$('lks').innerHTML='<option value="">No link</option>'+cur.pages.map(p=>`<option value="${p.id}"${p.id===t.dataset.link?' selected':''}>${ea(p.n)}</option>`).join('');$('lk').hidden=false;lkPlace(t)}
 cv.addEventListener('focusin',e=>{if(prev)return;const t=e.target.closest&&e.target.closest(LK);if(t)lkShow(t)});
 cv.addEventListener('focusout',()=>setTimeout(()=>{if(!$('lk').contains(document.activeElement)&&!$('tb').contains(document.activeElement)&&document.activeElement!==lkEl)$('lk').hidden=true},200));
-$('lks').onchange=e=>{const v=e.target.value;if(v)lkEl.dataset.link=v;else delete lkEl.dataset.link;toast(v?'Linked to page':'Link removed');lkEl.focus()};
+$('lks').onchange=e=>{const v=e.target.value;if(v)lkEl.dataset.link=v;else delete lkEl.dataset.link;sync();scheduleProjectSave();toast(v?'Linked to page':'Link removed');lkEl.focus()};
 cv.parentElement.addEventListener('scroll',()=>{if(!lkEl||$('lk').hidden)return;const r=lkEl.getBoundingClientRect(),s=cv.parentElement.getBoundingClientRect();if(r.bottom<s.top||r.top>s.bottom){$('lk').hidden=true;return}lkPlace(lkEl)});
 cv.addEventListener('click',e=>{if(!prev)return;const t=e.target.closest('[data-link]'),go=id=>{if(t&&t.tagName==='A')e.preventDefault();const i=cur.pages.findIndex(p=>p.id===id);if(i>=0)pageTrans(()=>switchPage(i))};
  if(t)go(t.dataset.link);else if(e.target.closest('.hdr>b'))go(cur.pages[0].id)});
@@ -1345,21 +1413,21 @@ let dEl=null;
 const DO=[['ls','Link style',[['','Plain text'],['ul','Underlined'],['btn','Outline button'],['fill','Filled button']],1],['lh','Link hover',[['','None'],['ul','Underline'],['bold','Bold'],['fade','Fade'],['lift','Lift']],1],['bh','Button hover',[['','Darker'],['light','Lighter']],2],['na','Navigation alignment',[['left','Left'],['center','Center'],['right','Right']],3],['ca','Content alignment',[['left','Left'],['center','Center'],['right','Right']]],['bg','Background',[['','Default'],['soft','Soft'],['accent','Accent']]],['sp','Spacing',[['compact','Compact'],['','Normal'],['roomy','Roomy']]]];
 function dmr(){const L=dEl.matches('.hdr,.ftr'),B=!!dEl.querySelector('.pb,[data-builder-control]'),N=dEl.matches('.hdr')||!!dEl.querySelector('nav');$('dm').firstElementChild.innerHTML='<h2>Section design</h2><p>Changes apply to this section only.'+(L?'':' Use alignment to position this section’s content.')+'</p>'+DO.filter(o=>o[3]===1?(L||B):o[3]===2?B:o[3]===3?N:true).map(o=>`<h3>${o[1]}</h3><div class="row2">${o[2].map(v=>`<button class="chip${(dEl.dataset[o[0]]||'')===v[0]?' on':''}" data-o="${o[0]}:${v[0]}">${v[1]}</button>`).join('')}</div>`).join('')+'<div class="ra"><button class="btn" data-o="done">Done</button></div>'}
 function design(b){dEl=b.querySelector('.s');dmr();$('dm').classList.add('on')}
-$('dm').onclick=e=>{const o=e.target.dataset.o;if(!o)return;if(o==='done')return $('dm').classList.remove('on');const q=o.split(':');if(q[1])dEl.dataset[q[0]]=q[1];else delete dEl.dataset[q[0]];sync();dmr()};
+$('dm').onclick=e=>{const o=e.target.dataset.o;if(!o)return;if(o==='done')return $('dm').classList.remove('on');const q=o.split(':');if(q[1])dEl.dataset[q[0]]=q[1];else delete dEl.dataset[q[0]];sync();scheduleProjectSave();dmr()};
 addEventListener('keydown',e=>{if(e.key==='Escape')$('dm').classList.remove('on')});
 function fillProds(){if(!cur||!cur.products)return;cv.querySelectorAll('.prods .cols').forEach(g=>g.innerHTML=cur.products.some(x=>x.st!=='draft')?cur.products.filter(x=>x.st!=='draft').map(prodItem).join(''):'<p class="pe">No products yet. Add some from the Projects screen, under Products.</p>')}
 let pcur=null,mi=-1;
 $('pr').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='rnin')$('pr').querySelector('[data-pm=rsave]').click()});
-$('pr').onclick=e=>{if(e.target.id==='pr')return $('pr').classList.remove('on');const t=e.target.closest('[data-pm]');if(!t)return;
+ $('pr').onclick=async e=>{if(e.target.id==='pr')return $('pr').classList.remove('on');const t=e.target.closest('[data-pm]');if(!t)return;
  if(t.dataset.pm==='done')$('pr').classList.remove('on');
- else if(t.dataset.pm==='rsave'){pcur.name=$('rnin').value.trim()||pcur.name;$('pr').classList.remove('on');renderHome()}};
+ else if(t.dataset.pm==='rsave'){const old=pcur.name;pcur.name=$('rnin').value.trim()||pcur.name;if(await saveProjectRecord(pcur)){ $('pr').classList.remove('on');renderHome()}else pcur.name=old}};
 $('grid').addEventListener('click',e=>{const a=e.target.closest('[data-pa]');if(!a)return;const i=+a.closest('.proj').dataset.i,p=projects[i];
  if(a.dataset.pa==='dashboard'){dbOpen(p);return}
  mi=i;const m=$('pm'),r=a.getBoundingClientRect(),d=m.querySelector('[data-m=del]');d.textContent='Delete';d.dataset.arm='';m.hidden=false;m.style.left=Math.max(8,r.right-165)+'px';m.style.top=(r.bottom+6)+'px'});
-$('pm').onclick=e=>{const b=e.target.closest('[data-m]');if(!b)return;const k=b.dataset.m,p=projects[mi];
- if(k==='del'){if(!b.dataset.arm){b.dataset.arm=1;b.textContent='Click to confirm';return}projects.splice(mi,1);$('pm').hidden=true;renderHome();return}
+$('pm').onclick=async e=>{const b=e.target.closest('[data-m]');if(!b)return;const k=b.dataset.m,p=projects[mi];
+ if(k==='del'){if(!b.dataset.arm){b.dataset.arm=1;b.textContent='Click to confirm';return}b.disabled=true;try{const{error}=await authClient.from('projects').delete().eq('id',p.id).eq('owner',currentUserId);if(error)throw error;projects.splice(mi,1);$('pm').hidden=true;renderHome()}catch(error){projectError(error,'delete')}finally{b.disabled=false}return}
  $('pm').hidden=true;
- if(k==='dup'){const c=JSON.parse(JSON.stringify(p));c.name=p.name+' copy';projects.splice(mi+1,0,c);renderHome()}
+ if(k==='dup'){const c=JSON.parse(JSON.stringify(p));delete c.id;c.name=p.name+' copy';await createSavedProject(c)}
  else{pcur=p;$('pr').firstElementChild.className='card';$('pr').firstElementChild.style.maxWidth='460px';$('pr').firstElementChild.innerHTML='<h2>Rename project</h2><input id="rnin" value="'+ea(p.name)+'" style="width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);font:inherit"><div class="ra"><button class="btn ghost" data-pm="done">Cancel</button><button class="btn" data-pm="rsave">Save</button></div>';$('pr').classList.add('on');$('rnin').focus()}};
 document.addEventListener('click',e=>{if(!e.target.closest('#pm,[data-pa=more]'))$('pm').hidden=true});
 let psel=0,pqs='',plast=null;
@@ -1381,35 +1449,52 @@ function prRender(){const c=$('dbProducts');if(pcur!==plast){psel=0;pqs='';plast
  c.innerHTML='<div class="pmh"><div><h2>Products</h2><p>Manage what you sell. Every Products section on this site shows the active ones.</p></div></div><div class="pmb"><aside class="pml"><div class="tb"><input id="pq" placeholder="Search products" aria-label="Search products" value="'+ea(pqs)+'"><button class="btn" data-pm="add">+ Add product</button></div><div class="pll" id="pll"></div></aside><section class="pme" id="pe"></section></div>';
  if(psel>=pcur.products.length)psel=Math.max(0,pcur.products.length-1);pList();pForm()}
 const dbProducts=$('dbProducts');
-dbProducts.oninput=e=>{const t=e.target;if(t.id==='pq'){pqs=t.value;return pList()}if(!t.dataset.f)return;pcur.products[psel][t.dataset.f]=t.dataset.f==='stock'?(t.value===''?'':Math.max(0,+t.value)):t.value;pList()};
-dbProducts.addEventListener('change',e=>{if(e.target.id==='pfi'){const x=pcur.products[psel];readImg(e.target.files[0],d=>{x.img=d;pList();pForm()})}});
+dbProducts.oninput=e=>{const t=e.target;if(t.id==='pq'){pqs=t.value;return pList()}if(!t.dataset.f)return;pcur.products[psel][t.dataset.f]=t.dataset.f==='stock'?(t.value===''?'':Math.max(0,+t.value)):t.value;pList();scheduleProjectSave()};
+dbProducts.addEventListener('change',e=>{if(e.target.id==='pfi'){const x=pcur.products[psel];readImg(e.target.files[0],d=>{x.img=d;pList();pForm();scheduleProjectSave()})}});
 dbProducts.addEventListener('dragover',e=>{if(e.target.closest('#pib'))e.preventDefault()});
-dbProducts.addEventListener('drop',e=>{if(!e.target.closest('#pib'))return;e.preventDefault();const x=pcur.products[psel];readImg(e.dataTransfer.files[0],d=>{x.img=d;pList();pForm()})});
+dbProducts.addEventListener('drop',e=>{if(!e.target.closest('#pib'))return;e.preventDefault();const x=pcur.products[psel];readImg(e.dataTransfer.files[0],d=>{x.img=d;pList();pForm();scheduleProjectSave()})});
 dbProducts.onclick=e=>{
  const ps=e.target.closest('[data-ps]');if(ps){psel=+ps.dataset.ps;pList();pForm();return}
  const t=e.target.closest('[data-pm]');if(!t)return;const k=t.dataset.pm,x=pcur.products[psel];
  if(k==='done')dbSetTab('analytics');
- else if(k==='add'){pcur.products.push({id:uid(),n:'New product',price:'$0.00',st:'active'});psel=pcur.products.length-1;pqs='';prRender();$('pf-n').select()}
+ else if(k==='add'){pcur.products.push({id:uid(),n:'New product',price:'$0.00',st:'active'});psel=pcur.products.length-1;pqs='';prRender();$('pf-n').select();scheduleProjectSave()}
  else if(k==='img')$('pfi').click();
- else if(k==='rimg'){delete x.img;pList();pForm()}
- else if(k==='del'){if(!t.dataset.arm){t.dataset.arm=1;t.textContent='Click to confirm';return}pcur.products.splice(psel,1);psel=Math.max(0,psel-1);prRender()}};
-let user=null,authClient=null;
+ else if(k==='rimg'){delete x.img;pList();pForm();scheduleProjectSave()}
+ else if(k==='del'){if(!t.dataset.arm){t.dataset.arm=1;t.textContent='Click to confirm';return}pcur.products.splice(psel,1);psel=Math.max(0,psel-1);prRender();scheduleProjectSave()}};
 function authUser(u){const email=u.email||'';return{name:u.user_metadata?.full_name||u.user_metadata?.name||email.split('@')[0]||'Account',email}}
 function hdrRender(){$('auth').innerHTML='<button class="dlink" data-nav="docs">Docs</button>'+(user?`<div class="account-control"><button class="account-trigger" type="button" data-account-menu aria-label="Open account menu for ${ea(user.name)}" aria-haspopup="true" aria-controls="accountMenu" aria-expanded="false"><span class="av" aria-hidden="true">${ea(user.name.charAt(0).toUpperCase())}</span><span class="un">${ea(user.name)}</span><svg class="account-chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="account-menu" id="accountMenu" hidden><div class="account-summary"><strong>${ea(user.name)}</strong><span>${ea(user.email)}</span></div><div class="account-divider"></div><button type="button" data-au="out"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8 3H4.5A1.5 1.5 0 0 0 3 4.5v11A1.5 1.5 0 0 0 4.5 17H8M12 6l4 4-4 4m4-4H7"/></svg><span>Log out</span></button></div></div>`:'<button class="btn ghost" data-au="in">Log in</button><button class="btn" data-au="up">Sign up</button>')}
 function auOpen(m){const up=m==='up',card=$('au').firstElementChild;card.innerHTML=`<button class="auth-close" type="button" data-au="x" aria-label="Close dialog">×</button><div class="auth-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="9" cy="9" r="1.5"/><path d="M21 16l-5-5-8 8"/></svg></div><p class="auth-eyebrow">${up?'Get started':'Your workspace'}</p><h2 id="authTitle">${up?'Create your account':'Welcome back'}</h2><p class="auth-intro">${up?'Create an account to start building and manage your projects.':'Sign in to continue to your projects.'}</p><div class="auth-fields">${up?'<div class="auth-field"><label for="a1">Full name</label><input id="a1" name="name" placeholder="Your name" autocomplete="name" required></div>':''}<div class="auth-field"><label for="a2">Email address</label><input id="a2" name="email" type="email" placeholder="you@example.com" autocomplete="email" required></div><div class="auth-field"><label for="a3">Password</label><input id="a3" name="password" type="password" placeholder="${up?'At least 6 characters':'Enter your password'}" autocomplete="${up?'new-password':'current-password'}" minlength="${up?6:1}" required></div></div><p class="auth-message" id="ae" role="status" aria-live="polite"></p><button class="btn auth-submit" type="button" data-au="go">${up?'Create account':'Sign in'}</button><p class="auth-switch">${up?'Already have an account? <a href="#" data-au="in">Sign in</a>':'New to Shipify? <a href="#" data-au="up">Create an account</a>'}</p><p class="auth-secure"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="4" y="8" width="12" height="9" rx="2"/><path d="M7 8V5a3 3 0 0 1 6 0v3"/></svg>Secure sign-in powered by Supabase</p>`;$('au').classList.add('on');$(up?'a1':'a2').focus()}
 function auVerify(email){const card=$('au').firstElementChild;card.innerHTML=`<button class="auth-close" type="button" data-au="x" aria-label="Close dialog">×</button><div class="verify-content"><div class="verify-icon" aria-hidden="true"><svg viewBox="0 0 40 40"><rect x="5" y="9" width="30" height="22" rx="4"/><path d="m7 12 13 10 13-10"/><path d="m27 28 3 3 6-7"/></svg></div><p class="auth-eyebrow">One last step</p><h2 id="authTitle">Check your inbox</h2><p class="verify-intro">We sent a confirmation link to the email address below. Open it to verify your account and finish signing up.</p><div class="verify-address">${ea(email)}</div><div class="verify-steps"><strong>What to do next</strong><ul><li>Open the email from Supabase and select <b>Confirm your email</b>.</li><li>Return here after confirmation; your account will be ready to sign in.</li><li>If it’s missing, check your spam or junk folder.</li></ul></div><p class="auth-message" id="ae" role="status" aria-live="polite"></p><div class="verify-actions"><button class="btn auth-submit" type="button" data-au="resend">Resend confirmation email</button><button class="btn ghost" type="button" data-au="edit">Use a different email</button></div><p class="auth-secure"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="4" y="8" width="12" height="9" rx="2"/><path d="M7 8V5a3 3 0 0 1 6 0v3"/></svg>Your password is never included in the confirmation email</p></div>`;card.dataset.verifyEmail=email}
 function authMessage(message,type='error'){const el=$('ae');if(!el)return;el.textContent=message;el.className='auth-message'+(type?' '+type:'')}
-function authInit(){if(!window.supabase?.createClient){console.error('Supabase Auth client failed to load from its CDN.');return}if(!BACKEND.anonKey){console.error('Supabase Auth is not configured: add the project publishable/anon key to BACKEND.anonKey.');return}authClient=window.supabase.createClient(BACKEND.supabaseUrl,BACKEND.anonKey);authClient.auth.onAuthStateChange((event,session)=>{user=session?.user?authUser(session.user):null;BACKEND.token=session?.access_token||'';hdrRender();if(session&&$('au').classList.contains('on'))$('au').classList.remove('on')});authClient.auth.getSession().then(({data,error})=>{if(error)throw error;user=data.session?.user?authUser(data.session.user):null;BACKEND.token=data.session?.access_token||'';hdrRender()}).catch(error=>{console.error('Could not restore Supabase Auth session:',error);toast('Could not restore your sign-in session')})}
+async function applyAuthSession(session){
+ const nextId=session?.user?.id||'';
+ const accountChanged=currentUserId!==nextId;
+ if(currentUserId&&currentUserId!==nextId&&cur){
+  clearTimeout(saveTimer);cur=null;$('editor').classList.remove('on','view-enter','view-exit');$('home').style.display='';
+ }
+ currentUserId=nextId;user=session?.user?authUser(session.user):null;BACKEND.token=session?.access_token||'';hdrRender();
+ if($('au').classList.contains('on')&&session)$('au').classList.remove('on');
+ if(!currentUserId){projectLoadId++;projects=[];projectLoadState='ready';setSaveStatus('');renderHome();return}
+ if(!accountChanged&&projectLoadState==='ready')return;
+ await loadProjects(currentUserId,++projectLoadId);
+}
+function authInit(){
+ if(!window.supabase?.createClient){console.error('Supabase Auth client failed to load from its CDN.');projectLoadState='error';renderHome();return}
+ if(!BACKEND.anonKey){console.error('Supabase Auth is not configured: add the project publishable/anon key to BACKEND.anonKey.');projectLoadState='error';renderHome();return}
+ authClient=window.supabase.createClient(BACKEND.supabaseUrl,BACKEND.anonKey);
+ authClient.auth.onAuthStateChange((event,session)=>{setTimeout(()=>applyAuthSession(session),0)});
+ authClient.auth.getSession().then(({data,error})=>{if(error)throw error;return applyAuthSession(data.session)}).catch(error=>{console.error('Could not restore Supabase Auth session:',error);projectLoadState='error';renderHome();toast('Could not restore your sign-in session')});
+}
 document.addEventListener('click',async e=>{if(e.target.id==='au')return $('au').classList.remove('on');const menuTrigger=e.target.closest('[data-account-menu]');if(menuTrigger){const open=menuTrigger.getAttribute('aria-expanded')!=='true';menuTrigger.setAttribute('aria-expanded',String(open));$('accountMenu').hidden=!open;return}const accountMenu=$('accountMenu');if(accountMenu&&!accountMenu.hidden&&!e.target.closest('.account-control')){accountMenu.hidden=true;$('auth').querySelector('[data-account-menu]')?.setAttribute('aria-expanded','false')}const t=e.target.closest('[data-au]');if(!t)return;e.preventDefault();const k=t.dataset.au;
  if(k==='in'||k==='up')auOpen(k);
  else if(k==='x')$('au').classList.remove('on');
- else if(k==='out'){if(!authClient)return toast('Supabase Auth is not configured');t.disabled=true;const{error}=await authClient.auth.signOut();t.disabled=false;if(error){console.error('Supabase sign-out failed:',error);return toast('Could not log out. Please try again.')}user=null;BACKEND.token='';hdrRender();toast('Logged out')}
+ else if(k==='out'){if(!authClient)return toast('Supabase Auth is not configured');t.disabled=true;if(cur&&!await persistCurrentProject()){t.disabled=false;return}const{error}=await authClient.auth.signOut();t.disabled=false;if(error){console.error('Supabase sign-out failed:',error);return toast('Could not log out. Please try again.')}toast('Logged out')}
  else if(k==='edit'){const email=$('au').firstElementChild.dataset.verifyEmail||'';auOpen('up');$('a2').value=email}
  else if(k==='resend'){if(!authClient)return authMessage('Email confirmation is unavailable. Refresh the page and try again.');const email=$('au').firstElementChild.dataset.verifyEmail,button=t;button.disabled=true;button.textContent='Sending…';authMessage('');try{const{error}=await authClient.auth.resend({type:'signup',email,options:{emailRedirectTo:location.origin+location.pathname}});if(error)throw error;authMessage('A new confirmation email is on its way. Check your inbox and spam folder.','success')}catch(error){console.error('Could not resend confirmation email:',error);authMessage(error.message||'Could not resend the email. Please try again.')}finally{button.disabled=false;button.textContent='Resend confirmation email'}}
  else if(k==='go'){const up=!!$('a1'),n=up?$('a1').value.trim():'',m=$('a2').value.trim(),p=$('a3').value,submit=$('au').querySelector('[data-au=go]');
   authMessage('');if(up&&!n)return authMessage('Enter your name.');if(!/\S+@\S+\.\S+/.test(m))return authMessage('Enter a valid email address.');if(p.length<(up?6:1))return authMessage(up?'Use a password with at least 6 characters.':'Enter your password.');if(!authClient)return authMessage('Sign-in is unavailable because Supabase Auth could not initialize. Refresh the page and try again.');
   submit.disabled=true;submit.textContent=up?'Creating account…':'Signing in…';
-  try{const result=up?await authClient.auth.signUp({email:m,password:p,options:{data:{full_name:n},emailRedirectTo:location.origin+location.pathname}}):await authClient.auth.signInWithPassword({email:m,password:p});if(result.error)throw result.error;if(up&&!result.data.session){auVerify(m);return}user=authUser(result.data.user||result.data.session.user);BACKEND.token=result.data.session?.access_token||'';$('au').classList.remove('on');hdrRender();toast(up?'Account created':'Welcome back')}
+  try{const result=up?await authClient.auth.signUp({email:m,password:p,options:{data:{full_name:n},emailRedirectTo:location.origin+location.pathname}}):await authClient.auth.signInWithPassword({email:m,password:p});if(result.error)throw result.error;if(up&&!result.data.session){auVerify(m);return}await applyAuthSession(result.data.session);$('au').classList.remove('on');toast(up?'Account created':'Welcome back')}
   catch(error){console.error('Supabase Auth request failed:',error);const message=error.message||'Please try again.';authMessage(message)}finally{submit.disabled=false;submit.textContent=up?'Create account':'Sign in'}}
 });
 document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;const menu=$('accountMenu');if(menu&&!menu.hidden){menu.hidden=true;const trigger=$('auth').querySelector('[data-account-menu]');trigger.setAttribute('aria-expanded','false');trigger.focus()}});
@@ -1476,6 +1561,9 @@ tb.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||!tel)r
  }
  else if(b.id==='trs'){['fontFamily','fontSize','fontWeight','fontStyle','textAlign','color','background','backgroundClip','webkitBackgroundClip','webkitTextFillColor'].forEach(k=>tel.style[k]='');delete tel.dataset.fs;tbTidy();tbSync();toast('Text style reset')}
  tbPlace()});
+tb.addEventListener('input',()=>{if(tel){sync();scheduleProjectSave()}});
+tb.addEventListener('change',()=>{if(tel){sync();scheduleProjectSave()}});
+tb.addEventListener('click',()=>{if(tel)setTimeout(()=>{if(tel){sync();scheduleProjectSave()}},0)},true);
 $('tf').onchange=e=>{if(!tel)return;const i=+e.target.value;tel.style.fontFamily=i?FONTS[i][1]:'';tbTidy();tbSync();tbPlace();tel.focus()};
 $('tz').onchange=()=>{if(tel&&+$('tz').value)tbSize(+$('tz').value)};
 $('tc').oninput=e=>{if(tel){tel.style.color=e.target.value;tel.style.backgroundImage='';tel.style.backgroundClip='';tel.style.webkitBackgroundClip='';tel.style.webkitTextFillColor=''}};

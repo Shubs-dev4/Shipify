@@ -51,20 +51,20 @@ This publishes the **Shipify builder**. A separate website exported from the bui
      token:'', siteId:'THE_ID', siteKey:'THE_SITE_KEY'};
    ```
    The URL and publishable/anon key are intended for browser use. `siteId` and `siteKey` are returned by the insert query; the site key is included in the exported tracking script, so restrict the site's domain in the database once you know its hostname. Never use the service-role key here.
-   The builder's sign-up and sign-in use Supabase Auth with this same publishable/anon key. In Supabase, set **Authentication → URL Configuration → Site URL** to `https://shubs-dev4.github.io/Shipify/` and add that URL under **Redirect URLs** so email-confirmation links can return to the builder. Email confirmations can be enabled in the Supabase Auth provider settings; when enabled, signup asks the user to confirm by email before signing in. The builder does not save projects to the `projects` table yet.
+   The builder's sign-up and sign-in use Supabase Auth with this same publishable/anon key. In Supabase, set **Authentication → URL Configuration → Site URL** to `https://shubs-dev4.github.io/Shipify/` and add that URL under **Redirect URLs** so email-confirmation links can return to the builder. Email confirmations can be enabled in the Supabase Auth provider settings; when enabled, signup asks the user to confirm by email before signing in. Signed-in users' projects are loaded from and autosaved to the `projects` table. The existing `projects` table and `own_projects` row-level security policy from step 2 must be applied; project saving does not use browser storage.
 6. **Export and host.** Click Download site, upload the folder to any static host (Netlify, Cloudflare Pages, GitHub Pages). The export now contains `track.js`.
 7. **Test.** Visit the hosted site, click around, then check Table Editor > `events` in Supabase. Rows should appear.
 
 ## Known limits right now
 
-- The Dashboard shows **sample data** until `siteId` is set. Live dashboard data requires signing in as the Supabase Auth user who owns that site, because row-level security blocks anonymous reads. The builder now signs up and signs in with Supabase Auth; project data is not yet saved to the `projects` table.
-- Every project card has a Dashboard with Analytics and Products tabs, regardless of template. Templates without a Products section start with an empty product list, and products can be added from that tab. Products are local to each project; Analytics uses the configured Supabase site and is not separated by local project.
+- The Dashboard shows **sample data** until `siteId` is set. Live dashboard data requires signing in as the Supabase Auth user who owns that site, because row-level security blocks anonymous reads. Projects are stored in Supabase and scoped to the signed-in user by row-level security; project content is not stored in localStorage.
+- Every project card has a Dashboard with Analytics and Products tabs, regardless of template. Templates without a Products section start with an empty product list, and products can be added from that tab. Product data is saved as part of its project; Analytics uses the configured Supabase site and is not separated by local project.
 - The exported cart and checkout are still simulated, so revenue stays at $0 until Stripe is added.
 - The rate limiter is per edge instance (best effort, not a global cap).
 
 ## Build order from here
 
-1. **Accounts and saved projects** (Supabase Auth, replaces the demo login, saves to `projects`)
+1. **Accounts and saved projects** (Supabase Auth and per-user Supabase project storage): done
 2. **Publish button** (upload the export to Cloudflare Pages or Netlify via API, auto-create the `sites` row)
 3. Tracking + dashboard: **done** (this package)
 4. **Stripe Checkout + webhook** writing to `orders` / `order_items` (revenue, AOV, top products come from here)
