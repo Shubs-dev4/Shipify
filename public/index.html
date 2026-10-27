@@ -1131,9 +1131,7 @@ function panel(){
 }
 addEventListener('resize',()=>{if($('editor').classList.contains('on'))panel()});
 $('rail').onclick=e=>{const b=e.target.closest('button');if(!b)return;tab=b.dataset.tab;document.querySelectorAll('#rail button').forEach(x=>x.classList.toggle('on',x===b));panel()};
-let suppressSectionClick=false;
 $('pn').onclick=e=>{
- if(suppressSectionClick){suppressSectionClick=false;return}
  const b=e.target.closest('[data-k],[data-t],[data-i],[data-s],#pa,#pp,#ud');if(!b)return;
  if(b.dataset.k){sync();cur.sections.push(S[b.dataset.k].h({}));draw();cv.parentElement.scrollTop=1e5;toast('Section added')}
  else if(b.dataset.i)applyTheme(+b.dataset.i);
@@ -1182,7 +1180,11 @@ function clearSectionDrop(){
  $('editor').classList.remove('dragging-section');
  document.body.classList.remove('dragging-section');
 }
-let sectionDrag=null;
+let sectionDrag=null,suppressSectionClick=null,suppressSectionClickTimer=0;
+document.addEventListener('click',e=>{
+ if(!suppressSectionClick||!suppressSectionClick.contains(e.target))return;
+ e.preventDefault();e.stopImmediatePropagation();suppressSectionClick=null;clearTimeout(suppressSectionClickTimer);
+},true);
 function sectionDragTarget(e){
  const source=e.target.closest('#pn .it[data-k],#cv .tools [data-a="drag"]');
  if(!source||prev)return;
@@ -1203,7 +1205,7 @@ function sectionDragMove(e){
 function sectionDragEnd(e){
  const drag=sectionDrag;if(!drag||drag.pointerId!==e.pointerId)return;
  if(drag.active){
-  if(drag.key){suppressSectionClick=true;setTimeout(()=>{suppressSectionClick=false},0)}
+  if(drag.key){suppressSectionClick=drag.source;clearTimeout(suppressSectionClickTimer);suppressSectionClickTimer=setTimeout(()=>{suppressSectionClick=null},500)}
   const r=cv.getBoundingClientRect(),inside=e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom;
   if(inside){
    const index=sectionDropIndex(e.clientY);sync();
