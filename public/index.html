@@ -106,6 +106,7 @@ button{font:inherit;cursor:pointer;color:inherit}
 [contenteditable]{outline:none}
 :where(#cv:not(.prev)) [contenteditable]:hover{background:rgba(127,127,127,.15);cursor:text}
 [contenteditable]:focus{box-shadow:0 0 0 2px #888;background:rgba(127,127,127,.15)}
+#cv img[data-builder-image-empty]{background:var(--ps);opacity:.5}
 /* page sections */
 .s{padding:56px 48px}
 .s h1{font-family:var(--pfh);font-size:56px;line-height:1.05;letter-spacing:-.03em;margin:0 0 16px;max-width:14ch}
@@ -198,20 +199,30 @@ button{font:inherit;cursor:pointer;color:inherit}
 .hdr[data-ls=btn] nav>span,.ftr[data-ls=btn] span,.hdr[data-ls=fill] nav>span,.ftr[data-ls=fill] span{padding:8px 16px;border-radius:var(--pr)}
 .hdr[data-ls=btn] nav>span,.ftr[data-ls=btn] span{border:1px solid var(--pf);color:var(--pf)}
 .hdr[data-ls=fill] nav>span,.ftr[data-ls=fill] span{background:var(--pa);color:var(--pt)}
+#cv .s[data-ls=ul] [data-builder-control]{text-decoration:underline;text-underline-offset:4px}
+#cv .s[data-ls=btn] [data-builder-control],#cv .s[data-ls=fill] [data-builder-control]{padding:8px 16px;border-radius:var(--pr)}
+#cv .s[data-ls=btn] [data-builder-control]{border:1px solid var(--pa);background:transparent;color:var(--pa)}
+#cv .s[data-ls=fill] [data-builder-control]{background:var(--pa);color:var(--pt)}
 .ftr[data-ls=btn] span,.ftr[data-ls=fill] span{display:inline-block;margin:0 8px 8px 0}
 .hdr[data-lh=ul] nav>span:hover,.ftr[data-lh=ul] span:hover{text-decoration:underline;text-underline-offset:4px}
 .hdr[data-lh=bold] nav>span:hover,.ftr[data-lh=bold] span:hover{font-weight:700}
 .hdr[data-lh=fade] nav>span:hover,.ftr[data-lh=fade] span:hover{opacity:.55}
 .hdr[data-lh=lift] nav>span:hover,.ftr[data-lh=lift] span:hover{transform:translateY(-2px)}
-.s[data-bg=soft]{background:var(--ps)}.s[data-bg=accent]{background:var(--pa);color:var(--pt)}.s[data-bg=accent] :is(h1,h2,h3,p,span,b){color:var(--pt)}.s[data-bg=accent] .pb{background:var(--pt);color:var(--pa)}
-.s[data-sp=compact]{padding-top:20px;padding-bottom:20px}.s[data-sp=roomy]{padding-top:96px;padding-bottom:96px}
+#cv .s[data-lh=ul] [data-builder-control]:hover{text-decoration:underline;text-underline-offset:4px}
+#cv .s[data-lh=bold] [data-builder-control]:hover{font-weight:700}
+#cv .s[data-lh=fade] [data-builder-control]:hover{opacity:.55}
+#cv .s[data-lh=lift] [data-builder-control]:hover{transform:translateY(-2px)}
+#cv .s[data-bg=soft]{background:var(--ps)}#cv .s[data-bg=accent]{background:var(--pa);color:var(--pt)}#cv .s[data-bg=accent] :is(h1,h2,h3,p,span,b){color:var(--pt)}#cv .s[data-bg=accent] .pb{background:var(--pt);color:var(--pa)}
+#cv .s[data-sp=compact]{padding-top:20px;padding-bottom:20px}#cv .s[data-sp=roomy]{padding-top:96px;padding-bottom:96px}
 #cv.stk{overflow:clip}.stk .blk.hd{position:sticky;top:0;z-index:5}.stk .blk.hd>.s:where(:not([data-bg])){background:var(--pb)}.stk .blk.hd>.s{box-shadow:0 1px 0 var(--pl)}
 #dm{position:fixed;inset:0;display:none;align-items:center;justify-content:flex-end;padding:20px;z-index:20;pointer-events:none}#dm.on{display:flex}#dm .card{max-width:320px;pointer-events:auto;box-shadow:0 12px 40px rgba(0,0,0,.3)}#dm h3{font-size:13px;margin:16px 0 8px;color:var(--mut);font-weight:600}
 .prev,.prev *{cursor:default!important}.prev [data-link],.prev .pb,.prev .add,.prev .cartlink,.prev .cartlink *,.prev .menubtn,.prev .menubtn *,.prev .hdr>b{cursor:pointer!important}.prev [contenteditable]{-webkit-user-modify:read-only}
-.s .pb,.hdr[data-ls=fill] nav>span,.ftr[data-ls=fill] span,.hdr[data-ls=btn] nav>span,.ftr[data-ls=btn] span{transition:filter .15s,background-color .15s,color .15s,transform .2s}
+#cv .s .pb,.hdr[data-ls=fill] nav>span,.ftr[data-ls=fill] span,.hdr[data-ls=btn] nav>span,.ftr[data-ls=btn] span,#cv .s[data-ls=fill] [data-builder-control],#cv .s[data-ls=btn] [data-builder-control]{transition:filter .15s,background-color .15s,color .15s,transform .2s}
 .s .pb:hover,.hdr[data-ls=fill] nav>span:hover,.ftr[data-ls=fill] span:hover{filter:brightness(.82)}
+#cv .s[data-ls=fill] [data-builder-control]:hover{filter:brightness(.82)}
 .hdr[data-ls=btn] nav>span:hover,.ftr[data-ls=btn] span:hover{background:color-mix(in srgb,var(--pf) 12%,transparent)}
 .s[data-bh=light] .pb:hover,.hdr[data-ls=fill][data-bh=light] nav>span:hover,.ftr[data-ls=fill][data-bh=light] span:hover{filter:none;background:color-mix(in srgb,var(--pa) 16%,var(--pb));color:var(--pf)}
+#cv .s[data-bh=light][data-ls=fill] [data-builder-control]:hover{filter:none;background:color-mix(in srgb,var(--pa) 16%,var(--pb));color:var(--pf)}
 .s[data-bh=light].cta .pb:hover,.s[data-bg=accent][data-bh=light] .pb:hover{background:color-mix(in srgb,var(--pt) 80%,transparent);color:var(--pa)}
 .hdr[data-ls=btn][data-bh=light] nav>span:hover,.ftr[data-ls=btn][data-bh=light] span:hover{background:color-mix(in srgb,var(--pa) 16%,transparent)}
 .grid{grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}.proj{position:relative}.pj-open{display:block;width:100%;border:0;background:none;padding:0;text-align:left;color:inherit}
@@ -647,14 +658,15 @@ add('text', {}, 2)   // the empty {} keeps defaults; 2 is the position
 <p>Use this for anything that should behave like the rest of the page: it uses the page theme, can be edited in place, and sits in the page layout.</p>
 <ul>
 <li>If your markup is a single element with the class <code>s</code> (for example <code>&lt;section class="s my-hero"&gt;</code>), it is added exactly as written.</li>
-<li>Otherwise Atelier wraps it in a section for you and makes headings, paragraphs, list items and quotes editable.</li>
+<li>Visible text is editable in place. Click it to open the font, size, weight, text-color, fill, section-color and gradient controls. Explicit <code>contenteditable</code> regions are preserved, and nested editable regions are avoided.</li>
+<li>Anchors, buttons, role-based controls, styled button-like elements and keyboard-focusable controls can be linked to project pages. Click one in the editor to choose a destination. Its original behavior and styling remain unless you change them.</li>
+<li>Image elements and the builder's image slots can be clicked to upload, replace or remove an image. Images dropped onto those targets are also accepted. For a custom CSS background-image, add <code>data-builder-image</code> to its element to enable the same controls.</li>
+<li>Use the section's <strong>Design</strong> menu to adjust supported link/button styles, hover effects, section background and spacing.</li>
 <li>Put your <code>&lt;style&gt;</code> inside the markup. Scope every rule to your own class so it cannot affect other sections.</li>
-<li>Visible text in an <code>html()</code> section is editable in place. Add <code>contenteditable</code> when you want to explicitly mark an editable region.</li>
-<li>Select text to open the formatting toolbar. Use <strong>Gradient</strong> to apply a two-color gradient to text, an element's fill, or the whole section, and adjust its angle.</li>
 <li>Use the theme colour variables so the section follows theme changes. <code>var(--pb)</code> is the page background and <code>var(--pm)</code> is the muted text colour. The other theme values follow the same naming as the theme list (<code>pf</code>, <code>ps</code>, <code>pa</code>, <code>pt</code>, <code>pl</code>, <code>pr</code>, <code>pfh</code>).</li>
 </ul>
 <h3><code>code()</code>: interactive pieces</h3>
-<p><code>code(markup, height)</code> places your markup inside a sandboxed frame. Scripts run here, and nowhere else. The frame is isolated from the rest of the page, so it needs its own full HTML document, its own CSS and its own fonts. The height is in pixels and is kept between 40 and 1200 (default 300).</p>
+<p><code>code(markup, height)</code> places your markup inside a sandboxed frame. Scripts run here, and nowhere else. The frame is intentionally isolated: its text, images and controls cannot use the page editor's text, link, gradient or image tools. Use the section's <strong>Edit code</strong> button to customize the frame itself. It needs its own full HTML document, CSS and fonts. The height is in pixels and is kept between 40 and 1200 (default 300).</p>
 <p>The AURA script uses this for its 3D project carousel: <code>code(`...`, 780)</code>.</p>
 <h2>6. Running a full-site script</h2>
 <ol>
@@ -730,7 +742,7 @@ add('text', {}, 2)   // the empty {} keeps defaults; 2 is the position
 <p>Each section carries its own <code>&lt;style&gt;</code> block (the shared <code>B</code> plus a section-specific one). That keeps every section self-contained, so you can later <code>move()</code> or <code>remove()</code> any of them without breaking the others. Every rule is scoped under <code>.au</code> and a section class such as <code>.au-hero</code>, which stops the styles leaking.</p>
 <h3>Notes on how it is written</h3>
 <ul>
-<li><strong>Editable text.</strong> Headlines, paragraphs and buttons have <code>contenteditable</code>, so you can click them and type after the script has run.</li>
+<li><strong>Editable HTML sections.</strong> Visible text, including the stats and ticker labels, can be formatted with the editor toolbar; the CTA controls can be linked and styled from the section's Design menu. The carousel is a separate <code>code()</code> frame, so customize its contents with <strong>Edit code</strong>.</li>
 <li><strong>Responsive layouts.</strong> Sizes use <code>clamp()</code> and container units (<code>cqw</code>), and <code>@container</code> rules reflow the layout for narrow widths.</li>
 <li><strong>Scroll animations.</strong> Reveal-on-scroll effects sit inside <code>@supports (animation-timeline:view())</code>, so browsers that lack the feature simply show the content without the animation.</li>
 <li><strong>Reduced motion.</strong> The carousel checks <code>prefers-reduced-motion</code> and stops auto-advancing and tilt effects for people who ask for less motion.</li>
@@ -884,7 +896,7 @@ qs('h1')  qsa('p')  print(x)  cls()  undo()  help()
   <div id="cmdo" hidden><div class="ch"><button id="cmdc">Clear output</button><button id="cmdx">Hide</button></div><div id="cmdl"></div></div>
   <div class="work">
     <aside class="side"><nav class="rail" id="rail"><button data-tab="sec" class="on"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="7" rx="1.5"/><rect x="3" y="14" width="18" height="7" rx="1.5"/></svg><span>Sections</span></button><button data-tab="pg"><svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/></svg><span>Pages</span></button><button data-tab="tpl"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg><span>Templates</span></button><button data-tab="col"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="8.5" cy="10" r="1"/><circle cx="12" cy="7.5" r="1"/><circle cx="15.5" cy="10" r="1"/></svg><span>Colors</span></button><button data-tab="sty"><svg viewBox="0 0 24 24"><text x="1" y="17" font-size="15" font-weight="700" fill="currentColor" stroke="none">Aa</text></svg><span>Style</span></button></nav><div class="pn" id="pn"></div></aside>
-    <div class="stage"><div class="tip" id="tip"><span><b>How to edit:</b> click any text to change it, or click a grey image box to add a picture. Hover or tap a section to move or delete it. Use the left side to add sections and change colors. Use the Pages tab to add more pages, like Terms of Service. Need something special? Add a Custom code section.</span><button class="btn ghost" id="tipx">Got it</button></div><div id="cv"></div></div>
+    <div class="stage"><div class="tip" id="tip"><span><b>How to edit:</b> click text to change its style, buttons to assign page links, or images to replace them. Use a section’s Design menu for section-wide options. Use the left side to add sections and change colors. Need custom interactions? Add a Custom code section.</span><button class="btn ghost" id="tipx">Got it</button></div><div id="cv"></div></div>
   </div>
 </section>
 <div id="cm" role="dialog" aria-modal="true" aria-label="Edit custom code"><div class="card"><h2>Custom code</h2><p>Write HTML, CSS and JavaScript. Your code runs in its own box, so it can’t break the rest of your page.</p><textarea id="cc" spellcheck="false" aria-label="Code"></textarea><p class="hint">Box height in pixels <input id="ch" type="number" min="40" max="1200" style="width:80px"></p><div style="margin-top:16px;display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost" id="cx">Cancel</button><button class="btn" id="cs">Save code</button></div></div></div>
@@ -1100,14 +1112,16 @@ function draw(){
  $('dm').classList.remove('on');$('tb').hidden=true;
  if(cur.pages)cur.pages[cur.pi].sections=cur.sections;
  cv.innerHTML=cur.sections.length?cur.sections.map((h,i)=>`<div class="blk${h.includes('s hdr')?' hd':''}" data-i="${i}">${h}<div class="tools">${h.includes('class="s code"')?'<button data-a="e">Edit code</button>':''}<button data-a="s">Design</button><button data-a="u">Move up</button><button data-a="d">Move down</button><button data-a="c">Add code below</button><button data-a="x">Delete</button></div></div>`).join(''):'<div class="empty"><b>This page is empty</b><br>Add a section from the left to get started.</div>';
+ const controls='.blk>.s a,.blk>.s .pb:not(.sb),.blk>.s .b,.blk>.s .btn,.blk>.s [role="button"],.blk>.s [role="link"],.blk>.s [onclick],.blk>.s [tabindex]:not([tabindex="-1"]),.blk>.s button:not(.add):not(.cartlink):not(.menubtn):not(.sb)';
+ cv.querySelectorAll(controls).forEach(b=>{
+  b.dataset.builderButton='';b.dataset.builderControl='';
+  if(!b.hasAttribute('contenteditable')&&b.matches('a,button,[role="button"],[role="link"],[onclick],[tabindex],.b,.btn,.pb'))b.contentEditable='true';
+ });
+ cv.querySelectorAll('.blk>.s img').forEach(img=>{img.dataset.builderImage=''});
  cv.querySelectorAll('.blk>.s *').forEach(el=>{
-  if(el.matches('style,script,noscript,svg,path,iframe,input,textarea,select,option,canvas,video,audio')||el.closest('.tools,svg,math,[contenteditable]'))return;
+  if(el.matches('style,script,noscript,svg,path,iframe,input,textarea,select,option,canvas,video,audio')||(el.matches('label')&&el.querySelector('input,textarea,select,button'))||!el.getClientRects().length||getComputedStyle(el).visibility==='hidden'||el.closest('.tools,svg,math,[contenteditable],[data-builder-control],.add,.cartlink,.menubtn,.sb,.fld'))return;
   const hasText=[...el.childNodes].some(n=>n.nodeType===Node.TEXT_NODE&&n.textContent.trim());
   if(hasText&&!el.hasAttribute('contenteditable'))el.contentEditable='true';
- });
- cv.querySelectorAll('.blk>.s a,.blk>.s .pb:not(.sb),.blk>.s .b,.blk>.s .btn,.blk>.s [role="button"],.blk>.s [role="link"],.blk>.s button:not(.add):not(.cartlink):not(.menubtn):not(.sb)').forEach(b=>{
-  b.dataset.builderButton='';
-  if(!b.hasAttribute('contenteditable')&&(b.matches('a,button,[role="button"],[role="link"]')||b.classList.contains('b')||b.classList.contains('pb')))b.contentEditable='true';
  });
 }
 cv.onclick=e=>{
@@ -1127,7 +1141,7 @@ $('prv').onclick=()=>{prev=!prev;setPrev()};
 const _d=draw;draw=function(){_d();cv.querySelectorAll('.hdr').forEach(h=>{if(!h.querySelector('.menubtn'))h.insertAdjacentHTML('afterbegin',MB)});fillProds();updCart();if(prev)setPrev()};
 cv.addEventListener('click',e=>{
  const customButton=e.target.closest('[data-builder-button]');
- if(customButton&&!prev){customButton.focus();if(customButton.matches('a,button'))e.preventDefault();lkShow(customButton)}
+ if(customButton&&!prev){if(e.target.closest('img[data-builder-image]'))return;customButton.focus();if(customButton.matches('a,button'))e.preventDefault();lkShow(customButton)}
  const b=e.target.closest('.add');
  if(b){const c=b.closest('.prod'),n=c.querySelector('b').textContent.trim(),pt=c.querySelector('span').textContent.trim(),p=parseFloat(pt.replace(/[^0-9.]/g,''))||0;
   if(/[^\d.\s]/.test(pt.charAt(0)))sym=pt.charAt(0);
@@ -1169,14 +1183,17 @@ function mnOpen(hd){
  fitOv(m);void m.offsetWidth;m.classList.add('on')}
 cv.addEventListener('click',e=>{const b=e.target.closest('.menubtn');if(b)mnOpen(b.closest('.hdr'))});
 /* image boxes: click to add, click again to replace or remove, or drop a file on them */
-const SLOT='.him,.wi .im,.posts.feat .im,.cols:not(.f):not(.n) .im';
+const SLOT='.him,.wi .im,.posts.feat .im,.cols:not(.f):not(.n) .im,img[data-builder-image],[data-builder-image]:not(img)';
 document.head.appendChild(Object.assign(document.createElement('style'),{textContent:`#cv :is(${SLOT}){cursor:pointer}#cv :is(${SLOT}):hover{outline:2px dashed var(--pa);outline-offset:-3px}.prev #cv :is(${SLOT}){outline:none!important}#ip{position:fixed;z-index:16;display:flex;gap:6px;background:var(--bg);border:1px solid var(--fg);border-radius:8px;padding:6px;box-shadow:0 4px 16px rgba(0,0,0,.2)}#ip[hidden]{display:none}#ip button{font:inherit;font-size:13px;padding:5px 10px;border-radius:6px;border:1px solid var(--line);background:var(--bg);color:var(--fg);cursor:pointer}`}));
 document.body.insertAdjacentHTML('beforeend','<div id="ip" hidden><button id="ipc">Replace image</button><button id="ipr">Remove</button><input type="file" id="ipf" accept="image/*" hidden></div>');
 let ipEl=null;const ip=$('ip'),ipf=$('ipf'),imgMax=el=>el.matches('.him')?1400:900;
-const setImg=(el,d)=>{if(d){el.style.backgroundImage=`url(${d})`;el.style.backgroundSize='cover';el.style.backgroundPosition='center'}else{['background-image','background-size','background-position'].forEach(k=>el.style.removeProperty(k));if(!el.getAttribute('style'))el.removeAttribute('style')}};
+const setImg=(el,d)=>{
+ if(el.matches('img')){if(d){el.src=d;delete el.dataset.builderImageEmpty}else{el.src='data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';el.dataset.builderImageEmpty=''}return}
+ if(d){el.style.backgroundImage=`url(${d})`;el.style.backgroundSize='cover';el.style.backgroundPosition='center'}else if(el.hasAttribute('data-builder-image')){el.style.backgroundImage='none'}else{['background-image','background-size','background-position'].forEach(k=>el.style.removeProperty(k));if(!el.getAttribute('style'))el.removeAttribute('style')}
+};
 const pickImg=el=>{ipEl=el;ip.hidden=true;ipf.value='';ipf.click()};
 ipf.onchange=()=>{const el=ipEl;if(el)readImg(ipf.files[0],d=>{setImg(el,d);sync()},imgMax(el))};
-cv.addEventListener('click',e=>{if(prev)return;const t=e.target.closest(SLOT);if(!t||!cv.contains(t)||e.target.closest('[contenteditable]'))return;if(!t.style.backgroundImage)return pickImg(t);ipEl=t;const r=t.getBoundingClientRect();ip.hidden=false;ip.style.left=Math.max(8,Math.min(innerWidth-210,r.left+r.width/2-100))+'px';ip.style.top=Math.max(8,r.top+8)+'px'});
+cv.addEventListener('click',e=>{if(prev)return;const t=e.target.closest(SLOT);if(!t||!cv.contains(t)||(!t.matches('img')&&e.target.closest('[contenteditable]')))return;if(t.matches('img'))e.preventDefault();const hasImage=t.matches('img')?!t.dataset.builderImageEmpty&&!!t.getAttribute('src'):!!t.style.backgroundImage||(t.hasAttribute('data-builder-image')&&getComputedStyle(t).backgroundImage!=='none');if(!hasImage)return pickImg(t);ipEl=t;const r=t.getBoundingClientRect();ip.hidden=false;ip.style.left=Math.max(8,Math.min(innerWidth-210,r.left+r.width/2-100))+'px';ip.style.top=Math.max(8,r.top+8)+'px'});
 $('ipc').onclick=()=>pickImg(ipEl);$('ipr').onclick=()=>{setImg(ipEl,'');ip.hidden=true;sync()};
 document.addEventListener('mousedown',e=>{if(!ip.contains(e.target))ip.hidden=true});
 cv.addEventListener('dragover',e=>{if(!prev&&e.target.closest(SLOT)&&[...e.dataTransfer.types].includes('Files'))e.preventDefault()});
@@ -1233,7 +1250,7 @@ cv.addEventListener('click',e=>{if(!prev)return;const t=e.target.closest('[data-
 addEventListener('keydown',e=>{if(e.key==='Escape'&&prev){prev=false;setPrev()}});
 let dEl=null;
 const DO=[['ls','Link style',[['','Plain text'],['ul','Underlined'],['btn','Outline button'],['fill','Filled button']],1],['lh','Link hover',[['','None'],['ul','Underline'],['bold','Bold'],['fade','Fade'],['lift','Lift']],1],['bh','Button hover',[['','Darker'],['light','Lighter']],2],['bg','Background',[['','Default'],['soft','Soft'],['accent','Accent']]],['sp','Spacing',[['compact','Compact'],['','Normal'],['roomy','Roomy']]]];
-function dmr(){const L=dEl.matches('.hdr,.ftr'),B=!!dEl.querySelector('.pb')||/btn|fill/.test(dEl.dataset.ls||'');$('dm').firstElementChild.innerHTML='<h2>Section design</h2><p>Changes apply to this section only.'+(L?'':' Link options show up on headers and footers.')+'</p>'+DO.filter(o=>!o[3]||(o[3]==1?L:B)).map(o=>`<h3>${o[1]}</h3><div class="row2">${o[2].map(v=>`<button class="chip${(dEl.dataset[o[0]]||'')===v[0]?' on':''}" data-o="${o[0]}:${v[0]}">${v[1]}</button>`).join('')}</div>`).join('')+'<div class="ra"><button class="btn" data-o="done">Done</button></div>'}
+function dmr(){const L=dEl.matches('.hdr,.ftr'),B=!!dEl.querySelector('.pb,[data-builder-control]');$('dm').firstElementChild.innerHTML='<h2>Section design</h2><p>Changes apply to this section only.'+(L?'':' Link options show up when this section has links or buttons.')+'</p>'+DO.filter(o=>!o[3]||(o[3]===1?(L||B):B)).map(o=>`<h3>${o[1]}</h3><div class="row2">${o[2].map(v=>`<button class="chip${(dEl.dataset[o[0]]||'')===v[0]?' on':''}" data-o="${o[0]}:${v[0]}">${v[1]}</button>`).join('')}</div>`).join('')+'<div class="ra"><button class="btn" data-o="done">Done</button></div>'}
 function design(b){dEl=b.querySelector('.s');dmr();$('dm').classList.add('on')}
 $('dm').onclick=e=>{const o=e.target.dataset.o;if(!o)return;if(o==='done')return $('dm').classList.remove('on');const q=o.split(':');if(q[1])dEl.dataset[q[0]]=q[1];else delete dEl.dataset[q[0]];sync();dmr()};
 addEventListener('keydown',e=>{if(e.key==='Escape')$('dm').classList.remove('on')});
@@ -1422,8 +1439,9 @@ function cmdHelp(){return ['Command bar: type JavaScript and press Enter. Shift+
  "add('hero',{t:'Title',p:'Text',b:'Button'})   add a section; add('text',{},2) puts it at position 2",
  '   section types: '+Object.keys(S).join(', '),
  "html('<h1>Hello</h1><a href=\"#\">Learn more</a>')   add editable HTML (links and button-like controls can be linked to project pages)",
- '   Buttons in HTML sections are editable and can be linked to a page by clicking them in the editor.',
- "code('<button>Hi</button>', 300)   add a custom code box (the place for custom JavaScript behavior)",
+ '   Visible HTML text gets the text toolbar; links and button-like controls can link to project pages.',
+ '   Image elements can be replaced or removed; section Design styles link/button controls and the section.',
+ "code('<button>Hi</button>', 300)   add an isolated custom-code box (edit its code to change its contents)",
  'sections()   remove(i)   move(i,j)           list, delete and reorder sections',
  "pages()   go('About')   theme()   theme(3)   list or switch pages and themes",
  "qs('h1')   qsa('p')   cv                     the live page, e.g. qs('h1').textContent='Hi'",
@@ -1551,19 +1569,29 @@ textarea.fld{min-height:130px;resize:vertical}
 .hdr[data-ls=btn] ${N},.ftr[data-ls=btn] ${F},.hdr[data-ls=fill] ${N},.ftr[data-ls=fill] ${F}{padding:8px 16px;border-radius:var(--pr)}
 .hdr[data-ls=btn] ${N},.ftr[data-ls=btn] ${F}{border:1px solid var(--pf);color:var(--pf)}
 .hdr[data-ls=fill] ${N},.ftr[data-ls=fill] ${F}{background:var(--pa);color:var(--pt)}
+#cv .s[data-ls=ul] [data-builder-control]{text-decoration:underline;text-underline-offset:4px}
+#cv .s[data-ls=btn] [data-builder-control],#cv .s[data-ls=fill] [data-builder-control]{padding:8px 16px;border-radius:var(--pr)}
+#cv .s[data-ls=btn] [data-builder-control]{border:1px solid var(--pa);background:transparent;color:var(--pa)}
+#cv .s[data-ls=fill] [data-builder-control]{background:var(--pa);color:var(--pt)}
 .ftr[data-ls=btn] ${F},.ftr[data-ls=fill] ${F}{display:inline-block;margin:0 8px 8px 0}
 .hdr[data-lh=ul] ${N}:hover,.ftr[data-lh=ul] ${F}:hover{text-decoration:underline;text-underline-offset:4px}
 .hdr[data-lh=bold] ${N}:hover,.ftr[data-lh=bold] ${F}:hover{font-weight:700}
 .hdr[data-lh=fade] ${N}:hover,.ftr[data-lh=fade] ${F}:hover{opacity:.55}
 .hdr[data-lh=lift] ${N}:hover,.ftr[data-lh=lift] ${F}:hover{transform:translateY(-2px)}
-.s[data-bg=soft]{background:var(--ps)}.s[data-bg=accent]{background:var(--pa);color:var(--pt)}.s[data-bg=accent] :is(h1,h2,h3,p,span,b){color:var(--pt)}.s[data-bg=accent] .pb{background:var(--pt);color:var(--pa)}
-.s[data-sp=compact]{padding-top:20px;padding-bottom:20px}.s[data-sp=roomy]{padding-top:96px;padding-bottom:96px}
+#cv .s[data-lh=ul] [data-builder-control]:hover{text-decoration:underline;text-underline-offset:4px}
+#cv .s[data-lh=bold] [data-builder-control]:hover{font-weight:700}
+#cv .s[data-lh=fade] [data-builder-control]:hover{opacity:.55}
+#cv .s[data-lh=lift] [data-builder-control]:hover{transform:translateY(-2px)}
+#cv .s[data-bg=soft]{background:var(--ps)}#cv .s[data-bg=accent]{background:var(--pa);color:var(--pt)}#cv .s[data-bg=accent] :is(h1,h2,h3,p,span,b){color:var(--pt)}#cv .s[data-bg=accent] .pb{background:var(--pt);color:var(--pa)}
+#cv .s[data-sp=compact]{padding-top:20px;padding-bottom:20px}#cv .s[data-sp=roomy]{padding-top:96px;padding-bottom:96px}
 ${XCSS}
 .stk .blk.hd{position:sticky;top:0;z-index:5}.stk .blk.hd>.s:where(:not([data-bg])){background:var(--pb)}.stk .blk.hd>.s{box-shadow:0 1px 0 var(--pl)}
-.s .pb,.hdr[data-ls=fill] ${N},.ftr[data-ls=fill] ${F},.hdr[data-ls=btn] ${N},.ftr[data-ls=btn] ${F}{transition:filter .15s,background-color .15s,color .15s,transform .2s}
+#cv .s .pb,.hdr[data-ls=fill] ${N},.ftr[data-ls=fill] ${F},.hdr[data-ls=btn] ${N},.ftr[data-ls=btn] ${F},#cv .s[data-ls=fill] [data-builder-control],#cv .s[data-ls=btn] [data-builder-control]{transition:filter .15s,background-color .15s,color .15s,transform .2s}
 .s .pb:hover,.hdr[data-ls=fill] ${N}:hover,.ftr[data-ls=fill] ${F}:hover{filter:brightness(.82)}
+#cv .s[data-ls=fill] [data-builder-control]:hover{filter:brightness(.82)}
 .hdr[data-ls=btn] ${N}:hover,.ftr[data-ls=btn] ${F}:hover{background:color-mix(in srgb,var(--pf) 12%,transparent)}
 .s[data-bh=light] .pb:hover,.hdr[data-ls=fill][data-bh=light] ${N}:hover,.ftr[data-ls=fill][data-bh=light] ${F}:hover{filter:none;background:color-mix(in srgb,var(--pa) 16%,var(--pb));color:var(--pf)}
+#cv .s[data-bh=light][data-ls=fill] [data-builder-control]:hover{filter:none;background:color-mix(in srgb,var(--pa) 16%,var(--pb));color:var(--pf)}
 .s[data-bh=light].cta .pb:hover,.s[data-bg=accent][data-bh=light] .pb:hover{background:color-mix(in srgb,var(--pt) 80%,transparent);color:var(--pa)}
 .hdr[data-ls=btn][data-bh=light] ${N}:hover,.ftr[data-ls=btn][data-bh=light] ${F}:hover{background:color-mix(in srgb,var(--pa) 16%,transparent)}
 .an1 .blk>.s{opacity:0;transition:opacity .8s ease}
@@ -1671,7 +1699,7 @@ function buildSite(){
   return y});
  const clean=s=>{
   s.querySelectorAll('[contenteditable]').forEach(e=>e.removeAttribute('contenteditable'));
-  s.querySelectorAll('[data-builder-button]').forEach(e=>e.removeAttribute('data-builder-button'));
+  s.querySelectorAll('[data-builder-button],[data-builder-image],[data-builder-image-empty]').forEach(e=>{e.removeAttribute('data-builder-button');e.removeAttribute('data-builder-image');e.removeAttribute('data-builder-image-empty')});
   s.removeAttribute('contenteditable');s.classList.remove('in');s.removeAttribute('data-code');s.removeAttribute('data-h');
   s.querySelectorAll('.prods .cols').forEach(g=>g.innerHTML=prods.map(prodItem).join(''));
   s.querySelectorAll('[data-link]').forEach(e=>{
