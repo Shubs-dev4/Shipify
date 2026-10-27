@@ -101,6 +101,8 @@ button{font:inherit;cursor:pointer;color:inherit}
 .blk{position:relative}
 .blk:hover{outline:2px dashed #888;outline-offset:-2px}
 .tools{position:absolute;top:8px;right:8px;display:none;gap:4px;z-index:2}
+.blk.hd>.s.hdr{padding-top:26px}
+.blk.hd>.tools{top:0}
 .blk:hover .tools{display:flex}
 .tools button{height:28px;padding:0 10px;border:1px solid #fff;border-radius:6px;background:#000;color:#fff;font-size:12px}
 [contenteditable]{outline:none}
@@ -194,7 +196,18 @@ button{font:inherit;cursor:pointer;color:inherit}
 #editor.pv #cv{max-width:none;border:0;border-radius:0;box-shadow:none;min-height:calc(100vh - 56px)}
 #editor.pv.mob .stage{background:#2b2b2b;padding:20px 0}
 #editor.pv.mob #cv.m{max-width:390px;border-radius:28px;min-height:calc(100vh - 96px);box-shadow:0 10px 40px rgba(0,0,0,.5)}
-.hdr nav>span,.ftr span{transition:.15s}
+#cv .s[data-ca=left]{text-align:left}
+#cv .s[data-ca=center]{text-align:center}
+#cv .s[data-ca=right]{text-align:right}
+#cv .s[data-ca=center] :is(h1,h2,h3,h4,h5,h6,p,.q){margin-left:auto;margin-right:auto}
+#cv .s[data-ca=right] :is(h1,h2,h3,h4,h5,h6,p,.q){margin-left:auto;margin-right:0}
+#cv .hdr[data-na=left] nav{flex:1;justify-content:flex-start}
+#cv .hdr[data-na=center] nav{flex:1;justify-content:center}
+#cv .hdr[data-na=right] nav{flex:1;justify-content:flex-end}
+#cv .s[data-na=left] nav{justify-content:flex-start}
+#cv .s[data-na=center] nav{justify-content:center}
+#cv .s[data-na=right] nav{justify-content:flex-end}
+#cv .hdr nav>span,.ftr span{transition:.15s}
 .hdr[data-ls=ul] nav>span,.ftr[data-ls=ul] span{text-decoration:underline;text-underline-offset:4px}
 .hdr[data-ls=btn] nav>span,.ftr[data-ls=btn] span,.hdr[data-ls=fill] nav>span,.ftr[data-ls=fill] span{padding:8px 16px;border-radius:var(--pr)}
 .hdr[data-ls=btn] nav>span,.ftr[data-ls=btn] span{border:1px solid var(--pf);color:var(--pf)}
@@ -357,6 +370,8 @@ button{font:inherit;cursor:pointer;color:inherit}
 #tb.dn::after{bottom:auto;top:-6px;border-width:1px 0 0 1px}
 #tb select{max-width:130px;padding:5px 8px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--fg);font:inherit;font-size:13px}
 #tb .tbtn{min-width:30px;height:30px;padding:0 8px;border:1px solid var(--line);border-radius:8px;background:transparent;font:inherit;font-weight:600}
+#tb .talign{width:30px;min-width:30px;padding:4px}
+#tb .talign svg{display:block;width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round}
 #tb .tbtn:hover{border-color:var(--fg)}#tb .tbtn.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
 #tb input[type=number]{width:54px;height:30px;padding:0 4px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);font:inherit;text-align:center}
 #tb input[type=color]{width:30px;height:30px;padding:2px;border:1px solid var(--line);border-radius:8px;background:transparent;cursor:pointer}
@@ -658,10 +673,10 @@ add('text', {}, 2)   // the empty {} keeps defaults; 2 is the position
 <p>Use this for anything that should behave like the rest of the page: it uses the page theme, can be edited in place, and sits in the page layout.</p>
 <ul>
 <li>If your markup is a single element with the class <code>s</code> (for example <code>&lt;section class="s my-hero"&gt;</code>), it is added exactly as written.</li>
-<li>Visible text is editable in place. Click it to open the font, size, weight, text-color, fill, section-color and gradient controls. Explicit <code>contenteditable</code> regions are preserved, and nested editable regions are avoided.</li>
+<li>Visible text is editable in place. Click it to open the font, size, weight, left/center/right alignment, text-color, fill, section-color and gradient controls. Explicit <code>contenteditable</code> regions are preserved, and nested editable regions are avoided.</li>
 <li>Anchors, buttons, role-based controls, styled button-like elements and keyboard-focusable controls can be linked to project pages. Click one in the editor to choose a destination. Its original behavior and styling remain unless you change them.</li>
 <li>Image elements and the builder's image slots can be clicked to upload, replace or remove an image. Images dropped onto those targets are also accepted. For a custom CSS background-image, add <code>data-builder-image</code> to its element to enable the same controls.</li>
-<li>Use the section's <strong>Design</strong> menu to adjust supported link/button styles, hover effects, section background and spacing.</li>
+<li>Use the section's <strong>Design</strong> menu to adjust content alignment, navigation alignment, supported link/button styles, hover effects, section background and spacing. Navigation alignment appears for sections with a <code>&lt;nav&gt;</code>.</li>
 <li>Put your <code>&lt;style&gt;</code> inside the markup. Scope every rule to your own class so it cannot affect other sections.</li>
 <li>Use the theme colour variables so the section follows theme changes. <code>var(--pb)</code> is the page background and <code>var(--pm)</code> is the muted text colour. The other theme values follow the same naming as the theme list (<code>pf</code>, <code>ps</code>, <code>pa</code>, <code>pt</code>, <code>pl</code>, <code>pr</code>, <code>pfh</code>).</li>
 </ul>
@@ -903,7 +918,7 @@ qs('h1')  qsa('p')  print(x)  cls()  undo()  help()
 <div id="ck" role="dialog" aria-modal="true" aria-label="Cart and checkout"><div class="card"></div></div>
 <div id="mn" role="dialog" aria-modal="true" aria-label="Menu"><div class="card"></div></div>
 <div id="lk" hidden><label>Links to<select id="lks"></select></label></div>
-<div id="tb" hidden role="toolbar" aria-label="Text style"><select id="tf" aria-label="Font"></select><span class="sep"></span><button class="tbtn" id="tdn" aria-label="Smaller text">−</button><input id="tz" type="number" min="8" max="160" aria-label="Font size in pixels"><button class="tbtn" id="tup" aria-label="Larger text">+</button><span class="sep"></span><button class="tbtn" id="tbd" aria-label="Bold"><b>B</b></button><button class="tbtn" id="tit" aria-label="Italic"><i style="font-family:Georgia,serif">I</i></button><input id="tc" type="color" aria-label="Text color" title="Text color"><span class="sep"></span><label class="tcl" title="Background of this item"><span>Fill</span><input id="tbg" type="color" aria-label="Fill color"></label><button class="tbtn" id="tbx" title="Remove fill" aria-label="Remove fill">×</button><label class="tcl" title="Background of the whole section"><span>Section</span><input id="tsg" type="color" aria-label="Section background color"></label><button class="tbtn" id="tsx" title="Remove section color" aria-label="Remove section color">×</button><button class="tbtn" id="tgbtn" type="button" aria-label="Gradient colors" aria-expanded="false">Gradient</button><div id="gpop" hidden role="group" aria-label="Gradient settings"><label for="gwhere">Apply to</label><select id="gwhere"><option value="fill">Fill</option><option value="text">Text</option><option value="section">Section</option></select><label for="gfrom">From</label><input id="gfrom" type="color" value="#8b5cf6" aria-label="Gradient start color"><label for="gto">To</label><input id="gto" type="color" value="#ec4899" aria-label="Gradient end color"><label for="gangle">Angle</label><input id="gangle" type="range" min="0" max="360" value="100" aria-label="Gradient angle"><output id="gangleValue" for="gangle">100°</output><button class="btn" id="gapply" type="button">Apply gradient</button><button class="btn ghost" id="gclear" type="button">Remove gradient</button></div><button class="tbtn" id="trs" title="Reset text style" aria-label="Reset text style">↺</button></div>
+<div id="tb" hidden role="toolbar" aria-label="Text style"><select id="tf" aria-label="Font"></select><span class="sep"></span><button class="tbtn" id="tdn" aria-label="Smaller text">−</button><input id="tz" type="number" min="8" max="160" aria-label="Font size in pixels"><button class="tbtn" id="tup" aria-label="Larger text">+</button><span class="sep"></span><button class="tbtn" id="tbd" aria-label="Bold"><b>B</b></button><button class="tbtn" id="tit" aria-label="Italic"><i style="font-family:Georgia,serif">I</i></button><span class="sep"></span><button class="tbtn talign" id="tal" aria-label="Align text left" title="Align text left"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 4h14M3 8h9M3 12h14M3 16h9"/></svg></button><button class="tbtn talign" id="tac" aria-label="Center text" title="Center text"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 4h14M5 8h10M3 12h14M5 16h10"/></svg></button><button class="tbtn talign" id="tar" aria-label="Align text right" title="Align text right"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 4h14M8 8h9M3 12h14M8 16h9"/></svg></button><input id="tc" type="color" aria-label="Text color" title="Text color"><span class="sep"></span><label class="tcl" title="Background of this item"><span>Fill</span><input id="tbg" type="color" aria-label="Fill color"></label><button class="tbtn" id="tbx" title="Remove fill" aria-label="Remove fill">×</button><label class="tcl" title="Background of the whole section"><span>Section</span><input id="tsg" type="color" aria-label="Section background color"></label><button class="tbtn" id="tsx" title="Remove section color" aria-label="Remove section color">×</button><button class="tbtn" id="tgbtn" type="button" aria-label="Gradient colors" aria-expanded="false">Gradient</button><div id="gpop" hidden role="group" aria-label="Gradient settings"><label for="gwhere">Apply to</label><select id="gwhere"><option value="fill">Fill</option><option value="text">Text</option><option value="section">Section</option></select><label for="gfrom">From</label><input id="gfrom" type="color" value="#8b5cf6" aria-label="Gradient start color"><label for="gto">To</label><input id="gto" type="color" value="#ec4899" aria-label="Gradient end color"><label for="gangle">Angle</label><input id="gangle" type="range" min="0" max="360" value="100" aria-label="Gradient angle"><output id="gangleValue" for="gangle">100°</output><button class="btn" id="gapply" type="button">Apply gradient</button><button class="btn ghost" id="gclear" type="button">Remove gradient</button></div><button class="tbtn" id="trs" title="Reset text style" aria-label="Reset text style">↺</button></div>
 <div id="dm"><div class="card"></div></div>
 <div id="pr" role="dialog" aria-modal="true" aria-label="Project options"><div class="card" style="max-width:460px"></div></div>
 <div id="db" role="dialog" aria-modal="true" aria-label="Project dashboard"><div class="card db-card">
@@ -1249,8 +1264,8 @@ cv.addEventListener('click',e=>{if(!prev)return;const t=e.target.closest('[data-
  if(t)go(t.dataset.link);else if(e.target.closest('.hdr>b'))go(cur.pages[0].id)});
 addEventListener('keydown',e=>{if(e.key==='Escape'&&prev){prev=false;setPrev()}});
 let dEl=null;
-const DO=[['ls','Link style',[['','Plain text'],['ul','Underlined'],['btn','Outline button'],['fill','Filled button']],1],['lh','Link hover',[['','None'],['ul','Underline'],['bold','Bold'],['fade','Fade'],['lift','Lift']],1],['bh','Button hover',[['','Darker'],['light','Lighter']],2],['bg','Background',[['','Default'],['soft','Soft'],['accent','Accent']]],['sp','Spacing',[['compact','Compact'],['','Normal'],['roomy','Roomy']]]];
-function dmr(){const L=dEl.matches('.hdr,.ftr'),B=!!dEl.querySelector('.pb,[data-builder-control]');$('dm').firstElementChild.innerHTML='<h2>Section design</h2><p>Changes apply to this section only.'+(L?'':' Link options show up when this section has links or buttons.')+'</p>'+DO.filter(o=>!o[3]||(o[3]===1?(L||B):B)).map(o=>`<h3>${o[1]}</h3><div class="row2">${o[2].map(v=>`<button class="chip${(dEl.dataset[o[0]]||'')===v[0]?' on':''}" data-o="${o[0]}:${v[0]}">${v[1]}</button>`).join('')}</div>`).join('')+'<div class="ra"><button class="btn" data-o="done">Done</button></div>'}
+const DO=[['ls','Link style',[['','Plain text'],['ul','Underlined'],['btn','Outline button'],['fill','Filled button']],1],['lh','Link hover',[['','None'],['ul','Underline'],['bold','Bold'],['fade','Fade'],['lift','Lift']],1],['bh','Button hover',[['','Darker'],['light','Lighter']],2],['na','Navigation alignment',[['left','Left'],['center','Center'],['right','Right']],3],['ca','Content alignment',[['left','Left'],['center','Center'],['right','Right']]],['bg','Background',[['','Default'],['soft','Soft'],['accent','Accent']]],['sp','Spacing',[['compact','Compact'],['','Normal'],['roomy','Roomy']]]];
+function dmr(){const L=dEl.matches('.hdr,.ftr'),B=!!dEl.querySelector('.pb,[data-builder-control]'),N=dEl.matches('.hdr')||!!dEl.querySelector('nav');$('dm').firstElementChild.innerHTML='<h2>Section design</h2><p>Changes apply to this section only.'+(L?'':' Use alignment to position this section’s content.')+'</p>'+DO.filter(o=>o[3]===1?(L||B):o[3]===2?B:o[3]===3?N:true).map(o=>`<h3>${o[1]}</h3><div class="row2">${o[2].map(v=>`<button class="chip${(dEl.dataset[o[0]]||'')===v[0]?' on':''}" data-o="${o[0]}:${v[0]}">${v[1]}</button>`).join('')}</div>`).join('')+'<div class="ra"><button class="btn" data-o="done">Done</button></div>'}
 function design(b){dEl=b.querySelector('.s');dmr();$('dm').classList.add('on')}
 $('dm').onclick=e=>{const o=e.target.dataset.o;if(!o)return;if(o==='done')return $('dm').classList.remove('on');const q=o.split(':');if(q[1])dEl.dataset[q[0]]=q[1];else delete dEl.dataset[q[0]];sync();dmr()};
 addEventListener('keydown',e=>{if(e.key==='Escape')$('dm').classList.remove('on')});
@@ -1343,6 +1358,7 @@ function tbSync(){
  $('tz').value=tel.dataset.fs||Math.round(parseFloat(cs.fontSize));
  $('tbd').classList.toggle('on',+cs.fontWeight>=600);
  $('tit').classList.toggle('on',cs.fontStyle==='italic');
+ ['left','center','right'].forEach((a,i)=>{const b=$(['tal','tac','tar'][i]);b.classList.toggle('on',cs.textAlign===a);b.setAttribute('aria-pressed',String(cs.textAlign===a))});
  const textGradient=(cs.backgroundClip==='text'||cs.webkitBackgroundClip==='text')&&gradientParts(tel.style.backgroundImage||cs.backgroundImage);
  $('tc').value=textGradient?textGradient.from:toHex(cs.color);
  const vb=el=>{for(let n=el;n&&n!==document.body;n=n.parentElement){const c=getComputedStyle(n).backgroundColor;if(c&&!/rgba?\(.*,\s*0\)$/.test(c)&&c!=='transparent')return toHex(c)}return '#ffffff'},sc=tel.closest('.blk>.s');
@@ -1366,6 +1382,7 @@ tb.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||!tel)r
  if(b.id==='tup'||b.id==='tdn')tbSize((+$('tz').value||16)+(b.id==='tup'?2:-2));
  else if(b.id==='tbd'){tel.style.fontWeight=+getComputedStyle(tel).fontWeight>=600?'400':'700';tbSync()}
  else if(b.id==='tit'){tel.style.fontStyle=getComputedStyle(tel).fontStyle==='italic'?'normal':'italic';tbSync()}
+ else if(b.id==='tal'||b.id==='tac'||b.id==='tar'){tel.style.textAlign={tal:'left',tac:'center',tar:'right'}[b.id];tbSync()}
  else if(b.id==='tgbtn'){const open=$('gpop').hidden;$('gpop').hidden=!open;b.setAttribute('aria-expanded',String(open));tb.classList.toggle('gright',tb.getBoundingClientRect().right>innerWidth-280);if(open)gradientSync()}
  else if(b.id==='gapply'||b.id==='gclear'){
   const mode=$('gwhere').value,target=gradientTarget(mode);if(!target)return;
@@ -1379,7 +1396,7 @@ tb.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||!tel)r
   }
   tbTidy();tbSync();toast(b.id==='gclear'?'Gradient removed':'Gradient applied');
  }
- else if(b.id==='trs'){['fontFamily','fontSize','fontWeight','fontStyle','color','background','backgroundClip','webkitBackgroundClip','webkitTextFillColor'].forEach(k=>tel.style[k]='');delete tel.dataset.fs;tbTidy();tbSync();toast('Text style reset')}
+ else if(b.id==='trs'){['fontFamily','fontSize','fontWeight','fontStyle','textAlign','color','background','backgroundClip','webkitBackgroundClip','webkitTextFillColor'].forEach(k=>tel.style[k]='');delete tel.dataset.fs;tbTidy();tbSync();toast('Text style reset')}
  tbPlace()});
 $('tf').onchange=e=>{if(!tel)return;const i=+e.target.value;tel.style.fontFamily=i?FONTS[i][1]:'';tbTidy();tbSync();tbPlace();tel.focus()};
 $('tz').onchange=()=>{if(tel&&+$('tz').value)tbSize(+$('tz').value)};
@@ -1439,8 +1456,8 @@ function cmdHelp(){return ['Command bar: type JavaScript and press Enter. Shift+
  "add('hero',{t:'Title',p:'Text',b:'Button'})   add a section; add('text',{},2) puts it at position 2",
  '   section types: '+Object.keys(S).join(', '),
  "html('<h1>Hello</h1><a href=\"#\">Learn more</a>')   add editable HTML (links and button-like controls can be linked to project pages)",
- '   Visible HTML text gets the text toolbar; links and button-like controls can link to project pages.',
- '   Image elements can be replaced or removed; section Design styles link/button controls and the section.',
+ '   Visible HTML text gets the text toolbar, including left/center/right alignment; links and button-like controls can link to project pages.',
+ '   Image elements can be replaced or removed; section Design sets content/nav alignment and styles link/button controls.',
  "code('<button>Hi</button>', 300)   add an isolated custom-code box (edit its code to change its contents)",
  'sections()   remove(i)   move(i,j)           list, delete and reorder sections',
  "pages()   go('About')   theme()   theme(3)   list or switch pages and themes",
@@ -1564,6 +1581,17 @@ textarea.fld{min-height:130px;resize:vertical}
 .s .pe{grid-column:1/-1;color:var(--pm)}
 .prod .im{background-size:cover;background-position:center}.prod .pr{display:flex;gap:8px;align-items:baseline}.prod .pr s{color:var(--pm);font-size:13px}
 .s .prod .pd{font-size:14px;color:var(--pm);margin:4px 0 0;max-width:none;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.add:disabled{opacity:.5;cursor:not-allowed}.add:disabled:hover{background:transparent;color:var(--pa)}
+#cv .s[data-ca=left]{text-align:left}
+#cv .s[data-ca=center]{text-align:center}
+#cv .s[data-ca=right]{text-align:right}
+#cv .s[data-ca=center] :is(h1,h2,h3,h4,h5,h6,p,.q){margin-left:auto;margin-right:auto}
+#cv .s[data-ca=right] :is(h1,h2,h3,h4,h5,h6,p,.q){margin-left:auto;margin-right:0}
+#cv .hdr[data-na=left] nav{flex:1;justify-content:flex-start}
+#cv .hdr[data-na=center] nav{flex:1;justify-content:center}
+#cv .hdr[data-na=right] nav{flex:1;justify-content:flex-end}
+#cv .s[data-na=left] nav{justify-content:flex-start}
+#cv .s[data-na=center] nav{justify-content:center}
+#cv .s[data-na=right] nav{justify-content:flex-end}
 .hdr ${N},.ftr ${F}{transition:.15s}
 .hdr[data-ls=ul] ${N},.ftr[data-ls=ul] ${F}{text-decoration:underline;text-underline-offset:4px}
 .hdr[data-ls=btn] ${N},.ftr[data-ls=btn] ${F},.hdr[data-ls=fill] ${N},.ftr[data-ls=fill] ${F}{padding:8px 16px;border-radius:var(--pr)}
