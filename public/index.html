@@ -100,11 +100,15 @@ button{font:inherit;cursor:pointer;color:inherit}
 .empty{padding:90px 24px;text-align:center;color:var(--pm)}
 .blk{position:relative}
 .blk:hover{outline:2px dashed #888;outline-offset:-2px}
+.drop-slot{height:0;position:relative;z-index:3}
+.drop-slot.active:after{content:"";position:absolute;left:12px;right:12px;top:-2px;border-top:4px solid var(--pa);border-radius:4px;box-shadow:0 0 0 3px color-mix(in srgb,var(--pa) 18%,transparent)}
+.it[draggable=true]{cursor:grab}.it[draggable=true]:active{cursor:grabbing}
 .tools{position:absolute;top:8px;right:8px;display:none;gap:4px;z-index:2}
 .blk.hd>.s.hdr{padding-top:26px}
 .blk.hd>.tools{top:0}
 .blk:hover .tools{display:flex}
 .tools button{height:28px;padding:0 10px;border:1px solid #fff;border-radius:6px;background:#000;color:#fff;font-size:12px}
+.tools button[data-a=drag]{cursor:grab;padding:0 7px}
 [contenteditable]{outline:none}
 :where(#cv:not(.prev)) [contenteditable]:hover{background:rgba(127,127,127,.15);cursor:text}
 [contenteditable]:focus{box-shadow:0 0 0 2px #888;background:rgba(127,127,127,.15)}
@@ -139,6 +143,8 @@ button{font:inherit;cursor:pointer;color:inherit}
 .tip .btn{white-space:nowrap;flex-shrink:0;padding:8px 22px}
 #cv{font-family:var(--pfb,inherit)}
 .pn h3{font-size:13px;margin:20px 0 8px;color:var(--mut);font-weight:600}.row2{display:flex;flex-wrap:wrap;gap:8px}
+.basics{margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid var(--line)}
+.basics .ph{margin-bottom:10px}
 .chip{padding:8px 14px;border:1px solid var(--line);border-radius:999px;background:transparent;font-size:13px}.chip:hover{border-color:var(--fg)}.chip.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
 .chip.fnt{display:flex;align-items:center;gap:12px;width:100%;border-radius:10px;text-align:left;padding:10px 14px}.chip.fnt b{font-size:22px;width:36px;font-weight:600}
 .prev.an1 .blk>.s{opacity:0;transition:opacity .8s ease}
@@ -620,10 +626,11 @@ sections()
 <p>Anything that is not one of these is treated as plain JavaScript, and <code>await</code> works. For example, <code>qs('h1').textContent = 'Hi'</code> changes the first headline.</p>
 <h2>4. Ready-made sections with <code>add()</code></h2>
 <p><code>add('hero')</code> creates a section with sample content. Pass an options object to change the text:</p>
+<p>In the editor, drag a basic item or section from the left panel onto the page to place it between existing sections. Drag a section by its <strong>Drag</strong> handle to reorder it. The <strong>Basics</strong> group includes a text block, button, text field, message box and divider.</p>
 <pre><code class="language-js">add('hero', {t: 'Title', p: 'Paragraph text', b: 'Button label'})
 add('text', {}, 2)   // the empty {} keeps defaults; 2 is the position
 </code></pre>
-<p>The available section types are <code>header</code>, <code>hero</code>, <code>herocenter</code>, <code>products</code>, <code>posts</code>, <code>menu</code>, <code>features</code>, <code>team</code>, <code>gallery</code>, <code>pricing</code>, <code>quote</code>, <code>text</code>, <code>cta</code>, <code>contact</code>, <code>signup</code>, <code>legal</code>, <code>code</code> and <code>footer</code>.</p>
+<p>The available section types are <code>header</code>, <code>hero</code>, <code>herocenter</code>, <code>products</code>, <code>posts</code>, <code>menu</code>, <code>features</code>, <code>team</code>, <code>gallery</code>, <code>pricing</code>, <code>quote</code>, <code>text</code>, <code>cta</code>, <code>contact</code>, <code>signup</code>, <code>legal</code>, <code>code</code>, <code>footer</code>, <code>basictext</code>, <code>basicbutton</code>, <code>textfield</code>, <code>messagebox</code> and <code>divider</code>.</p>
 <p>Options that are understood:</p>
 <div class="dg-t"><table>
 <thead>
@@ -911,7 +918,7 @@ qs('h1')  qsa('p')  print(x)  cls()  undo()  help()
   <div id="cmdo" hidden><div class="ch"><button id="cmdc">Clear output</button><button id="cmdx">Hide</button></div><div id="cmdl"></div></div>
   <div class="work">
     <aside class="side"><nav class="rail" id="rail"><button data-tab="sec" class="on"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="7" rx="1.5"/><rect x="3" y="14" width="18" height="7" rx="1.5"/></svg><span>Sections</span></button><button data-tab="pg"><svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/></svg><span>Pages</span></button><button data-tab="tpl"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg><span>Templates</span></button><button data-tab="col"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="8.5" cy="10" r="1"/><circle cx="12" cy="7.5" r="1"/><circle cx="15.5" cy="10" r="1"/></svg><span>Colors</span></button><button data-tab="sty"><svg viewBox="0 0 24 24"><text x="1" y="17" font-size="15" font-weight="700" fill="currentColor" stroke="none">Aa</text></svg><span>Style</span></button></nav><div class="pn" id="pn"></div></aside>
-    <div class="stage"><div class="tip" id="tip"><span><b>How to edit:</b> click text to change its style, buttons to assign page links, or images to replace them. Use a section’s Design menu for section-wide options. Use the left side to add sections and change colors. Need custom interactions? Add a Custom code section.</span><button class="btn ghost" id="tipx">Got it</button></div><div id="cv"></div></div>
+    <div class="stage"><div class="tip" id="tip"><span><b>How to edit:</b> click text to change its style, buttons to assign page links, or images to replace them. Drag a basic item or section from the left panel into the page; drag a section’s Drag handle to move it. Use a section’s Design menu for section-wide options. Need custom interactions? Add a Custom code section.</span><button class="btn ghost" id="tipx">Got it</button></div><div id="cv"></div></div>
   </div>
 </section>
 <div id="cm" role="dialog" aria-modal="true" aria-label="Edit custom code"><div class="card"><h2>Custom code</h2><p>Write HTML, CSS and JavaScript. Your code runs in its own box, so it can’t break the rest of your page.</p><textarea id="cc" spellcheck="false" aria-label="Code"></textarea><p class="hint">Box height in pixels <input id="ch" type="number" min="40" max="1200" style="width:80px"></p><div style="margin-top:16px;display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost" id="cx">Cancel</button><button class="btn" id="cs">Save code</button></div></div></div>
@@ -941,6 +948,8 @@ const cols=(c,a)=>`<section class="s"><div class="cols ${c}">${a.map(f=>`<div><d
 const SAMPLE=[['Classic tee','$32'],['Canvas tote','$24'],['Daily mug','$18'],['Wool beanie','$28'],['Notebook set','$15'],['Water bottle','$22']].map(x=>({n:x[0],price:x[1]}));
 const XCSS=String.raw`.kick{display:inline-block;font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--pa);margin-bottom:14px}
 .btns{display:flex;gap:12px;flex-wrap:wrap}.center .btns{justify-content:center}
+.basic-form label{display:block;max-width:420px;color:var(--pm);font-size:14px}.basic-form input.fld,.basic-form textarea.fld{display:block;width:100%;margin:6px 0 0;background:transparent;color:var(--pf);font:inherit}.basic-form textarea.fld{min-height:120px;resize:vertical}
+.basic-divider hr{border:0;border-top:1px solid var(--pl)}
 .s .pb.alt{background:transparent;color:var(--pf);box-shadow:inset 0 0 0 1.5px var(--pf)}
 .cta .pb.alt,.s[data-bg=accent] .pb.alt{background:transparent;color:var(--pt);box-shadow:inset 0 0 0 1.5px var(--pt)}
 .meta{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 24px}.center .meta{justify-content:center}
@@ -990,6 +999,11 @@ const S={
  pricing:{n:'Pricing / tickets',h:o=>`<section class="s"><h2 contenteditable>${o.t||'Simple pricing'}</h2><div class="plans">${(o.i||[['Basic','$9','For getting started'],['Standard','$29','Our most popular'],['Premium','$59','For teams and events']]).map((p,i)=>`<div class="plan${o.hot===i?' hot':''}"><b contenteditable>${p[0]}</b><div class="amt" contenteditable>${p[1]}</div><p contenteditable>${p[2]}</p></div>`).join('')}</div></section>`},
  quote:{n:'Testimonial',h:o=>`<section class="s center"><p class="q" contenteditable>${o.q||'“Working with them was the easiest decision we made all year.”'}</p>${E(o.a||'Casey M., happy customer')}</section>`},
  text:{n:'Text',h:o=>`<section class="s"><h2 contenteditable>${o.t||'About us'}</h2><p contenteditable>${o.p||'Tell your story here. Click any text on the page to edit it.'}</p></section>`},
+ basictext:{n:'Text block',h:o=>`<section class="s basic"><p contenteditable>${o.t||'Add your text here.'}</p></section>`},
+ basicbutton:{n:'Button',h:o=>`<section class="s basic"><button class="pb" type="button" contenteditable>${o.t||'Click me'}</button></section>`},
+ textfield:{n:'Text field',h:o=>`<section class="s basic basic-form"><label><span contenteditable>${o.t||'Your name'}</span><input class="fld" type="text" placeholder="${o.ph||'Enter your name'}" aria-label="${o.t||'Your name'}"></label></section>`},
+ messagebox:{n:'Message box',h:o=>`<section class="s basic basic-form"><label><span contenteditable>${o.t||'Your message'}</span><textarea class="fld" rows="4" placeholder="${o.ph||'Type your message'}" aria-label="${o.t||'Your message'}"></textarea></label></section>`},
+ divider:{n:'Divider',h:()=>'<section class="s basic basic-divider"><hr></section>'},
  cta:{n:'Call to action',h:o=>`<section class="s cta"><h2 contenteditable>${o.t||'Ready to start?'}</h2><p contenteditable>${o.p||'Join today and launch in minutes.'}</p><span class="pb" contenteditable>${o.b||'Sign up'}</span></section>`},
  contact:{n:'Contact form',h:o=>`<section class="s"><h2 contenteditable>Get in touch</h2><p contenteditable>We usually reply within one day.</p><div class="fld">Your name</div><div class="fld">Email address</div><div class="fld tall">Message</div><span class="pb" contenteditable>Send message</span></section>`},
  legal:{n:'Legal text',h:o=>`<section class="s legal"><h1 contenteditable>${o.t||'Terms of Service'}</h1><span class="d" contenteditable>Last updated: ${new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}</span>${(o.i||[['1. Section title','Write your text here.']]).map(x=>`<h2 contenteditable>${x[0]}</h2><p contenteditable>${x[1]}</p>`).join('')}</section>`},
@@ -1099,7 +1113,11 @@ function runAnim(){if(io)io.disconnect();const els=cv.querySelectorAll('.blk>.s'
 let tab='sec',undo=null;
 function panel(){
  const p=$('pn'),t=TH[cur.theme||0];let h='';
- if(tab==='sec')h='<h2>Sections</h2><p class="ph">Click a section to add it to the bottom of your page.</p><div class="g2">'+Object.keys(S).map(k=>`<button class="it" data-k="${k}">${thumb(k==='code'?'<div style="padding:70px;text-align:center;font:600 70px monospace">&lt;/&gt;</div>':S[k].h({}),t,66)}<span>${S[k].n}</span></button>`).join('')+'</div>';
+ if(tab==='sec'){
+  const item=k=>`<button class="it" draggable="true" data-k="${k}">${thumb(k==='code'?'<div style="padding:70px;text-align:center;font:600 70px monospace">&lt;/&gt;</div>':S[k].h({}),t,66)}<span>${S[k].n}</span></button>`;
+  const basics=['basictext','basicbutton','textfield','messagebox','divider'];
+  h='<section class="basics"><h2>Basics</h2><p class="ph">Simple text, buttons, fields and dividers.</p><div class="g2">'+basics.map(item).join('')+'</div></section><h2>Sections</h2><p class="ph">Drag a section into the page, or click to add it at the bottom.</p><div class="g2">'+Object.keys(S).filter(k=>!basics.includes(k)).map(item).join('')+'</div>';
+ }
  else if(tab==='tpl')h='<h2>Templates</h2><p class="ph">Replace your page with a ready-made layout.</p><button class="ud" id="ud"'+(undo?'':' hidden')+'>Undo last template</button><div class="g1">'+T.map(x=>`<button class="it" data-t="${x.id}">${thumb(x.s.length?x.s.slice(0,3).map(mk).join(''):'<div style="padding:130px;text-align:center;font:600 56px sans-serif;color:#999">&nbsp;</div>',tth(x),130)}<span>${x.n}</span></button>`).join('')+'</div>';
  else if(tab==='pg')h='<h2>Pages</h2><p class="ph">Each page has its own sections. To link a menu or footer item, click its text and pick a page. Starter legal text is a template, so have it reviewed.</p>'+cur.pages.map((x,i)=>`<div class="pgr${i===cur.pi?' on':''}"><input data-n="${i}" value="${ea(x.n)}" aria-label="Page name"><button class="chip" data-pg="${i}">${i===cur.pi?'Editing':'Edit'}</button>${i?`<button class="chip" data-dp="${i}" aria-label="Delete page">×</button>`:''}</div>`).join('')+'<h3>Add a page</h3><div class="row2">'+PG.map(x=>`<button class="chip" data-np="${x.id}">+ ${x.n}</button>`).join('')+'</div>';
  else if(tab==='sty'){const st=cur.st||{f:0,r:0,a:0,h:0},ch=(k,arr,fm)=>arr.map((x,i)=>`<button class="chip${(st[k]||0)===i?' on':''}" data-s="${k}:${i}">${fm?fm(x):x}</button>`).join('');
@@ -1111,6 +1129,7 @@ function panel(){
 addEventListener('resize',()=>{if($('editor').classList.contains('on'))panel()});
 $('rail').onclick=e=>{const b=e.target.closest('button');if(!b)return;tab=b.dataset.tab;document.querySelectorAll('#rail button').forEach(x=>x.classList.toggle('on',x===b));panel()};
 $('pn').onclick=e=>{
+ if(skipSectionClick){skipSectionClick=false;return}
  const b=e.target.closest('[data-k],[data-t],[data-i],[data-s],#pa,#pp,#ud');if(!b)return;
  if(b.dataset.k){sync();cur.sections.push(S[b.dataset.k].h({}));draw();cv.parentElement.scrollTop=1e5;toast('Section added')}
  else if(b.dataset.i)applyTheme(+b.dataset.i);
@@ -1126,7 +1145,7 @@ function sync(){cur.sections=[...cv.querySelectorAll('.blk>.s')].map(e=>e.outerH
 function draw(){
  $('dm').classList.remove('on');$('tb').hidden=true;
  if(cur.pages)cur.pages[cur.pi].sections=cur.sections;
- cv.innerHTML=cur.sections.length?cur.sections.map((h,i)=>`<div class="blk${h.includes('s hdr')?' hd':''}" data-i="${i}">${h}<div class="tools">${h.includes('class="s code"')?'<button data-a="e">Edit code</button>':''}<button data-a="s">Design</button><button data-a="u">Move up</button><button data-a="d">Move down</button><button data-a="c">Add code below</button><button data-a="x">Delete</button></div></div>`).join(''):'<div class="empty"><b>This page is empty</b><br>Add a section from the left to get started.</div>';
+ cv.innerHTML=cur.sections.length?cur.sections.map((h,i)=>`<div class="drop-slot" data-insert="${i}" aria-hidden="true"></div><div class="blk${h.includes('s hdr')?' hd':''}" data-i="${i}">${h}<div class="tools"><button data-a="drag" draggable="true" title="Drag to move this section" aria-label="Drag section">Drag</button>${h.includes('class="s code"')?'<button data-a="e">Edit code</button>':''}<button data-a="s">Design</button><button data-a="u">Move up</button><button data-a="d">Move down</button><button data-a="c">Add code below</button><button data-a="x">Delete</button></div></div>`).join('')+`<div class="drop-slot" data-insert="${cur.sections.length}" aria-hidden="true"></div>`:'<div class="empty"><b>This page is empty</b><br>Drag a basic item or section here, or click one in the left panel to add it.</div>';
  const controls='.blk>.s a,.blk>.s .pb:not(.sb),.blk>.s .b,.blk>.s .btn,.blk>.s [role="button"],.blk>.s [role="link"],.blk>.s [onclick],.blk>.s [tabindex]:not([tabindex="-1"]),.blk>.s button:not(.add):not(.cartlink):not(.menubtn):not(.sb)';
  cv.querySelectorAll(controls).forEach(b=>{
   b.dataset.builderButton='';b.dataset.builderControl='';
@@ -1141,12 +1160,63 @@ function draw(){
 }
 cv.onclick=e=>{
  const a=e.target.dataset&&e.target.dataset.a;if(!a)return;
+ if(a==='drag')return;
  sync();const i=+e.target.closest('.blk').dataset.i,s=cur.sections;
  if(a==='e')return editCode(e.target.closest('.blk'));if(a==='s')return design(e.target.closest('.blk'));if(a==='c')s.splice(i+1,0,codeBlock(CODE0,200));else if(a==='x')s.splice(i,1);
  else{const j=a==='u'?i-1:i+1;if(j<0||j>=s.length)return;[s[i],s[j]]=[s[j],s[i]]}
  draw();
 };
-cv.addEventListener('keydown',e=>{if(e.key==='Enter')e.preventDefault()});
+const SECTION_DRAG='application/x-shipify-section';
+let skipSectionClick=false;
+function sectionDropIndex(y){
+ const blocks=[...cv.querySelectorAll('.blk')];
+ const i=blocks.findIndex(b=>y<b.getBoundingClientRect().top+b.getBoundingClientRect().height/2);
+ return i<0?blocks.length:i;
+}
+function clearSectionDrop(){
+ cv.querySelectorAll('.drop-slot.active').forEach(x=>x.classList.remove('active'));
+ $('editor').classList.remove('dragging-section');
+}
+$('pn').addEventListener('dragstart',e=>{
+ const item=e.target.closest('.it[data-k]');if(!item)return;
+ e.dataTransfer.setData(SECTION_DRAG,'new:'+item.dataset.k);e.dataTransfer.effectAllowed='copy';skipSectionClick=true;
+});
+$('pn').addEventListener('dragend',()=>{setTimeout(()=>{skipSectionClick=false},500)});
+cv.addEventListener('dragstart',e=>{
+ const handle=e.target.closest('.tools [data-a="drag"]');if(!handle)return;
+ const block=handle.closest('.blk');
+ e.dataTransfer.setData(SECTION_DRAG,'move:'+block.dataset.i);e.dataTransfer.effectAllowed='move';
+});
+cv.addEventListener('dragover',e=>{
+ const payload=[...e.dataTransfer.types].includes(SECTION_DRAG);if(!payload)return;
+ e.preventDefault();
+ const i=sectionDropIndex(e.clientY);
+ cv.querySelectorAll('.drop-slot.active').forEach(x=>x.classList.remove('active'));
+ cv.querySelector(`.drop-slot[data-insert="${i}"]`)?.classList.add('active');
+ $('editor').classList.add('dragging-section');
+ e.dataTransfer.dropEffect=e.dataTransfer.effectAllowed==='move'?'move':'copy';
+});
+cv.addEventListener('dragleave',e=>{if(!cv.contains(e.relatedTarget))clearSectionDrop()});
+cv.addEventListener('drop',e=>{
+ const payload=e.dataTransfer.getData(SECTION_DRAG);if(!payload)return;
+ e.preventDefault();
+ const index=sectionDropIndex(e.clientY);
+ if(payload.startsWith('new:')){
+  const key=payload.slice(4);
+  if(!S[key]){clearSectionDrop();return}
+  sync();cur.sections.splice(index,0,S[key].h({}));draw();toast(S[key].n+' added');
+ }else if(payload.startsWith('move:')){
+  const from=Number(payload.slice(5));
+  sync();
+  if(Number.isInteger(from)&&from>=0&&from<cur.sections.length){
+   const [section]=cur.sections.splice(from,1),to=index-(from<index?1:0);
+   cur.sections.splice(Math.max(0,Math.min(to,cur.sections.length)),0,section);draw();
+  }
+ }
+ clearSectionDrop();
+});
+cv.addEventListener('dragend',clearSectionDrop);
+cv.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.target.closest('input,textarea,select,button'))e.preventDefault()});
 let cart=[],sym='$',prev=false;
 const money=n=>sym+n.toFixed(2);
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1800)}
@@ -1212,7 +1282,7 @@ cv.addEventListener('click',e=>{if(prev)return;const t=e.target.closest(SLOT);if
 $('ipc').onclick=()=>pickImg(ipEl);$('ipr').onclick=()=>{setImg(ipEl,'');ip.hidden=true;sync()};
 document.addEventListener('mousedown',e=>{if(!ip.contains(e.target))ip.hidden=true});
 cv.addEventListener('dragover',e=>{if(!prev&&e.target.closest(SLOT)&&[...e.dataTransfer.types].includes('Files'))e.preventDefault()});
-cv.addEventListener('drop',e=>{const t=e.target.closest(SLOT);if(prev||!t)return;e.preventDefault();readImg(e.dataTransfer.files[0],d=>{setImg(t,d);sync()},imgMax(t))});
+cv.addEventListener('drop',e=>{const t=e.target.closest(SLOT);if(prev||!t||![...e.dataTransfer.types].includes('Files'))return;e.preventDefault();readImg(e.dataTransfer.files[0],d=>{setImg(t,d);sync()},imgMax(t))});
 
 $('mn').onclick=e=>{
  if(e.target.id==='mn')return $('mn').classList.remove('on');
