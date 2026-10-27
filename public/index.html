@@ -1088,7 +1088,7 @@ function draw(){
  $('dm').classList.remove('on');$('tb').hidden=true;
  if(cur.pages)cur.pages[cur.pi].sections=cur.sections;
  cv.innerHTML=cur.sections.length?cur.sections.map((h,i)=>`<div class="blk${h.includes('s hdr')?' hd':''}" data-i="${i}">${h}<div class="tools">${h.includes('class="s code"')?'<button data-a="e">Edit code</button>':''}<button data-a="s">Design</button><button data-a="u">Move up</button><button data-a="d">Move down</button><button data-a="c">Add code below</button><button data-a="x">Delete</button></div></div>`).join(''):'<div class="empty"><b>This page is empty</b><br>Add a section from the left to get started.</div>';
- cv.querySelectorAll('.blk>.s .pb:not(.sb),.blk>.s .b,.blk>.s .btn,.blk>.s [role="button"],.blk>.s button:not(.add):not(.cartlink):not(.menubtn):not(.sb)').forEach(b=>{b.dataset.builderButton='';if(!b.hasAttribute('contenteditable'))b.contentEditable='true'});
+ cv.querySelectorAll('.blk>.s a[href],.blk>.s .pb:not(.sb),.blk>.s .b,.blk>.s .btn,.blk>.s [role="button"],.blk>.s [role="link"],.blk>.s button:not(.add):not(.cartlink):not(.menubtn):not(.sb)').forEach(b=>{b.dataset.builderButton='';if(!b.hasAttribute('contenteditable')&&(b.matches('a,button,[role="button"],[role="link"]')||b.classList.contains('b')||b.classList.contains('pb')))b.contentEditable='true'});
 }
 cv.onclick=e=>{
  const a=e.target.dataset&&e.target.dataset.a;if(!a)return;
@@ -1107,7 +1107,7 @@ $('prv').onclick=()=>{prev=!prev;setPrev()};
 const _d=draw;draw=function(){_d();cv.querySelectorAll('.hdr').forEach(h=>{if(!h.querySelector('.menubtn'))h.insertAdjacentHTML('afterbegin',MB)});fillProds();updCart();if(prev)setPrev()};
 cv.addEventListener('click',e=>{
  const customButton=e.target.closest('[data-builder-button]');
- if(customButton&&!prev&&customButton.tagName==='BUTTON'){customButton.focus();e.preventDefault()}
+ if(customButton&&!prev){customButton.focus();if(customButton.matches('a,button'))e.preventDefault();lkShow(customButton)}
  const b=e.target.closest('.add');
  if(b){const c=b.closest('.prod'),n=c.querySelector('b').textContent.trim(),pt=c.querySelector('span').textContent.trim(),p=parseFloat(pt.replace(/[^0-9.]/g,''))||0;
   if(/[^\d.\s]/.test(pt.charAt(0)))sym=pt.charAt(0);
@@ -1202,11 +1202,13 @@ $('pn').addEventListener('click',e=>{const b=e.target.closest('[data-pg],[data-n
 $('pn').addEventListener('change',e=>{const n=e.target.dataset.n;if(n!=null){cur.pages[+n].n=e.target.value.trim()||'Untitled';updSel()}});
 $('pgsel').onchange=e=>switchPage(+e.target.value);
 let lkEl=null;
-cv.addEventListener('focusin',e=>{if(prev)return;const t=e.target.closest&&e.target.closest(LK);if(!t)return;lkEl=t;$('lks').innerHTML='<option value="">No link</option>'+cur.pages.map(p=>`<option value="${p.id}"${p.id===t.dataset.link?' selected':''}>${ea(p.n)}</option>`).join('');const r=t.getBoundingClientRect(),b=$('lk');b.hidden=false;b.style.left=Math.max(8,Math.min(r.left,innerWidth-240))+'px';b.style.top=Math.min(r.bottom+6,innerHeight-50)+'px'});
+function lkPlace(t){const r=t.getBoundingClientRect(),b=$('lk');b.style.left=Math.max(8,Math.min(r.left,innerWidth-240))+'px';b.style.top=Math.min(r.bottom+6,innerHeight-50)+'px'}
+function lkShow(t){lkEl=t;$('lks').innerHTML='<option value="">No link</option>'+cur.pages.map(p=>`<option value="${p.id}"${p.id===t.dataset.link?' selected':''}>${ea(p.n)}</option>`).join('');$('lk').hidden=false;lkPlace(t)}
+cv.addEventListener('focusin',e=>{if(prev)return;const t=e.target.closest&&e.target.closest(LK);if(t)lkShow(t)});
 cv.addEventListener('focusout',()=>setTimeout(()=>{if(!$('lk').contains(document.activeElement)&&!$('tb').contains(document.activeElement)&&document.activeElement!==lkEl)$('lk').hidden=true},200));
 $('lks').onchange=e=>{const v=e.target.value;if(v)lkEl.dataset.link=v;else delete lkEl.dataset.link;toast(v?'Linked to page':'Link removed');lkEl.focus()};
-cv.parentElement.addEventListener('scroll',()=>$('lk').hidden=true);
-cv.addEventListener('click',e=>{if(!prev)return;const t=e.target.closest('[data-link]'),go=id=>{const i=cur.pages.findIndex(p=>p.id===id);if(i>=0)pageTrans(()=>switchPage(i))};
+cv.parentElement.addEventListener('scroll',()=>{if(!lkEl||$('lk').hidden)return;const r=lkEl.getBoundingClientRect(),s=cv.parentElement.getBoundingClientRect();if(r.bottom<s.top||r.top>s.bottom){$('lk').hidden=true;return}lkPlace(lkEl)});
+cv.addEventListener('click',e=>{if(!prev)return;const t=e.target.closest('[data-link]'),go=id=>{if(t&&t.tagName==='A')e.preventDefault();const i=cur.pages.findIndex(p=>p.id===id);if(i>=0)pageTrans(()=>switchPage(i))};
  if(t)go(t.dataset.link);else if(e.target.closest('.hdr>b'))go(cur.pages[0].id)});
 addEventListener('keydown',e=>{if(e.key==='Escape'&&prev){prev=false;setPrev()}});
 let dEl=null;
@@ -1375,9 +1377,9 @@ function cmdHelp(){return ['Command bar: type JavaScript and press Enter. Shift+
  'clear()  clear(true)        clear the page (true keeps the header and footer)',
  "add('hero',{t:'Title',p:'Text',b:'Button'})   add a section; add('text',{},2) puts it at position 2",
  '   section types: '+Object.keys(S).join(', '),
- "html('<h1>Hello</h1><p>Your own HTML</p>')   add your own HTML as a section (headings and text stay editable)",
+ "html('<h1>Hello</h1><a href=\"#\">Learn more</a>')   add editable HTML (links and button-like controls can be linked to project pages)",
  '   Buttons in HTML sections are editable and can be linked to a page by clicking them in the editor.',
- "code('<button>Hi</button>', 300)   add a custom code box (that is where scripts run)",
+ "code('<button>Hi</button>', 300)   add a custom code box (the place for custom JavaScript behavior)",
  'sections()   remove(i)   move(i,j)           list, delete and reorder sections',
  "pages()   go('About')   theme()   theme(3)   list or switch pages and themes",
  "qs('h1')   qsa('p')   cv                     the live page, e.g. qs('h1').textContent='Hi'",
@@ -1630,6 +1632,7 @@ function buildSite(){
   s.querySelectorAll('.prods .cols').forEach(g=>g.innerHTML=prods.map(prodItem).join(''));
   s.querySelectorAll('[data-link]').forEach(e=>{
    const f=fn[e.dataset.link];if(!f){e.removeAttribute('data-link');return}
+   if(e.tagName==='A'){e.href=f;e.removeAttribute('data-link');return}
    const a=document.createElement('a');[...e.attributes].forEach(x=>{if(x.name!=='data-link')a.setAttribute(x.name,x.value)});
    a.href=f;a.innerHTML=e.innerHTML;e.replaceWith(a)});
   if(s.classList.contains('hdr')){if(!s.querySelector('.menubtn'))s.insertAdjacentHTML('afterbegin',MB);const b=s.querySelector(':scope>b');if(b)b.innerHTML='<a href="index.html">'+b.innerHTML+'</a>'}
