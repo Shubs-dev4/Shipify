@@ -229,7 +229,34 @@ button{font:inherit;cursor:pointer;color:inherit}
 .top .logo{width:28px;height:28px;border-radius:8px;background:var(--fg);color:var(--bg);display:grid;place-items:center;font-size:15px}
 #auth{display:flex;align-items:center;gap:8px}.account-control{position:relative}.account-trigger{display:flex;align-items:center;gap:8px;padding:5px 9px;border:1px solid transparent;border-radius:999px;background:transparent;color:inherit;cursor:pointer;transition:background .15s,border-color .15s}.account-trigger:hover,.account-trigger[aria-expanded=true]{background:rgba(127,127,127,.16);border-color:var(--iline)}.account-trigger:focus-visible{outline:2px solid currentColor;outline-offset:2px}.av{width:30px;height:30px;border-radius:50%;background:var(--ifg);color:var(--ibg);display:grid;place-items:center;font-weight:600;font-size:13px}.un{font-weight:600;font-size:14px}.account-chevron{width:14px;height:14px;transition:transform .15s}.account-trigger[aria-expanded=true] .account-chevron{transform:rotate(180deg)}.account-menu{position:absolute;top:calc(100% + 9px);right:0;z-index:10;width:260px;padding:7px;border:1px solid var(--iline);border-radius:14px;background:var(--ibg);color:var(--ifg);box-shadow:0 14px 40px rgba(0,0,0,.22)}.account-menu[hidden]{display:none}.account-summary{padding:11px 12px 13px}.account-summary strong,.account-summary span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.account-summary strong{font-size:14px}.account-summary span{margin-top:2px;color:var(--imut);font-size:12px}.account-divider{height:1px;margin:0 5px 5px;background:var(--iline)}.account-menu button{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border:0;border-radius:8px;background:transparent;color:inherit;text-align:left;font:inherit;font-size:14px;cursor:pointer}.account-menu button:hover,.account-menu button:focus-visible{outline:0;background:rgba(127,127,127,.18)}.account-menu button svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 @media(max-width:560px){.un,.top .brand small{display:none}}
-#au{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:20px;z-index:20}#au.on{display:flex}#au a{color:var(--fg);font-weight:600}
+#au{position:fixed;inset:0;background:rgba(12,14,18,.62);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px;z-index:20;opacity:0;transition:opacity .2s}#au.on{display:flex;opacity:1}#au a{color:var(--fg);font-weight:600}
+#au .auth-card{position:relative;width:min(100%,440px);max-height:min(92vh,760px);overflow:auto;padding:36px;border-radius:22px;border-color:rgba(127,127,127,.22);box-shadow:0 24px 80px rgba(0,0,0,.28);animation:auth-enter .22s ease-out}
+#au .auth-close{position:absolute;top:17px;right:17px;width:36px;height:36px;display:grid;place-items:center;border:1px solid var(--line);border-radius:50%;background:var(--bg);color:var(--mut);font-size:21px;line-height:1}
+#au .auth-close:hover{color:var(--fg);background:var(--soft)}
+#au .auth-mark{width:44px;height:44px;display:grid;place-items:center;margin-bottom:24px;border-radius:14px;background:var(--fg);color:var(--bg)}
+#au .auth-mark svg{width:23px;height:23px}
+#au .auth-eyebrow{margin:0 0 7px!important;color:var(--mut);font-size:12px;font-weight:700;letter-spacing:.11em;text-transform:uppercase}
+#au .auth-card h2{margin:0 0 8px;font-size:28px;letter-spacing:-.04em}
+#au .auth-intro{margin:0 0 26px!important;color:var(--mut);font-size:14px}
+#au .auth-fields{display:grid;gap:15px}
+#au .auth-field{display:grid;gap:7px}
+#au .auth-field label{font-size:13px;font-weight:600}
+#au .auth-field input{width:100%;height:46px;padding:0 13px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--fg);font:inherit;font-size:14px;transition:border-color .15s,box-shadow .15s}
+#au .auth-field input::placeholder{color:var(--mut);opacity:.75}
+#au .auth-field input:focus{outline:0;border-color:var(--fg);box-shadow:0 0 0 3px rgba(127,127,127,.14)}
+#au .auth-message{min-height:0;margin:13px 0 0!important;font-size:13px;line-height:1.45}
+#au .auth-message:empty{display:none}
+#au .auth-message.error{color:#c0392b}
+#au .auth-message.success{color:#18804a}
+#au .auth-submit{width:100%;min-height:46px;margin-top:18px;border-radius:10px}
+#au .auth-submit:disabled{opacity:.65;cursor:wait}
+#au .auth-switch{margin:20px 0 0!important;text-align:center;color:var(--mut);font-size:13px}
+#au .auth-switch a{text-underline-offset:3px}
+#au .auth-secure{display:flex;align-items:center;justify-content:center;gap:6px;margin:17px 0 0!important;color:var(--mut);font-size:11px}
+#au .auth-secure svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+@keyframes auth-enter{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:none}}
+@media(max-width:480px){#au{padding:12px}#au .auth-card{padding:28px 22px;border-radius:18px}#au .auth-card h2{font-size:25px}#au .auth-mark{margin-bottom:20px}}
+@media(prefers-reduced-motion:reduce){#au .auth-card{animation:none}}
 :root{--ibg:#000;--ifg:#fff;--imut:#a8a8a8;--iline:#3a3a3a}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--ibg:#fff;--ifg:#000;--imut:#555;--iline:#ccc}}
 .top .logo{background:transparent;border:1.5px dashed var(--mut);color:var(--mut)}
@@ -321,6 +348,7 @@ select option::checkmark{display:none}
 </head>
 <body>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <main id="home">
   <header class="top"><div class="brand"><span class="logo wide" role="img" aria-label="Logo placeholder"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="1.5"/><path d="M21 16l-5-5-8 8"/></svg>Your logo</span></div><div id="auth"></div></header>
   <div class="hm">
@@ -802,7 +830,7 @@ qs('h1')  qsa('p')  print(x)  cls()  undo()  help()
 <div id="dm"><div class="card"></div></div>
 <div id="pr" role="dialog" aria-modal="true"><div class="card" style="max-width:460px"></div></div>
 <div id="db" role="dialog" aria-modal="true" aria-label="Site dashboard"><div class="card"></div></div>
-<div id="au" role="dialog" aria-modal="true" aria-label="Account"><div class="card" style="max-width:420px"></div></div>
+<div id="au" role="dialog" aria-modal="true" aria-label="Account"><div class="card auth-card"></div></div>
 <div id="pm" hidden><button data-m="ren">Rename</button><button data-m="dup">Duplicate</button><button data-m="del">Delete</button></div>
 <div id="toast"></div>
 
@@ -1176,16 +1204,22 @@ $('pr').onclick=e=>{if(e.target.id==='pr')return $('pr').classList.remove('on');
  else if(k==='img')$('pfi').click();
  else if(k==='rimg'){delete x.img;pList();pForm()}
  else if(k==='del'){if(!t.dataset.arm){t.dataset.arm=1;t.textContent='Click to confirm';return}pcur.products.splice(psel,1);psel=Math.max(0,psel-1);prRender()}};
-let user=null;
+let user=null,authClient=null;
+function authUser(u){const email=u.email||'';return{name:u.user_metadata?.full_name||u.user_metadata?.name||email.split('@')[0]||'Account',email}}
 function hdrRender(){$('auth').innerHTML='<button class="dlink" data-nav="docs">Docs</button>'+(user?`<div class="account-control"><button class="account-trigger" type="button" data-account-menu aria-label="Open account menu for ${ea(user.name)}" aria-haspopup="true" aria-controls="accountMenu" aria-expanded="false"><span class="av" aria-hidden="true">${ea(user.name.charAt(0).toUpperCase())}</span><span class="un">${ea(user.name)}</span><svg class="account-chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="account-menu" id="accountMenu" hidden><div class="account-summary"><strong>${ea(user.name)}</strong><span>${ea(user.email)}</span></div><div class="account-divider"></div><button type="button" data-au="out"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8 3H4.5A1.5 1.5 0 0 0 3 4.5v11A1.5 1.5 0 0 0 4.5 17H8M12 6l4 4-4 4m4-4H7"/></svg><span>Log out</span></button></div></div>`:'<button class="btn ghost" data-au="in">Log in</button><button class="btn" data-au="up">Sign up</button>')}
-function auOpen(m){const up=m==='up';$('au').firstElementChild.innerHTML=`<h2>${up?'Create your account':'Welcome back'}</h2><p>${up?'Start building your site in minutes.':'Log in to keep building.'}</p><div class="ckf">${up?'<input id="a1" placeholder="Full name" autocomplete="name">':''}<input id="a2" type="email" placeholder="Email address" autocomplete="email"><input id="a3" type="password" placeholder="Password" autocomplete="${up?'new-password':'current-password'}"></div><p class="hint" id="ae" role="alert"></p><div class="ra"><button class="btn ghost" data-au="x">Cancel</button><button class="btn" data-au="go">${up?'Create account':'Log in'}</button></div><p class="hint" style="text-align:center">${up?'Already have an account? <a href="#" data-au="in">Log in</a>':'New here? <a href="#" data-au="up">Sign up</a>'}</p><p class="hint" style="text-align:center">Demo only: no real account is created.</p>`;$('au').classList.add('on');$(up?'a1':'a2').focus()}
-document.addEventListener('click',e=>{if(e.target.id==='au')return $('au').classList.remove('on');const menuTrigger=e.target.closest('[data-account-menu]');if(menuTrigger){const open=menuTrigger.getAttribute('aria-expanded')!=='true';menuTrigger.setAttribute('aria-expanded',String(open));$('accountMenu').hidden=!open;return}const accountMenu=$('accountMenu');if(accountMenu&&!accountMenu.hidden&&!e.target.closest('.account-control')){accountMenu.hidden=true;$('auth').querySelector('[data-account-menu]').setAttribute('aria-expanded','false')}const t=e.target.closest('[data-au]');if(!t)return;e.preventDefault();const k=t.dataset.au;
+function auOpen(m){const up=m==='up',card=$('au').firstElementChild;card.innerHTML=`<button class="auth-close" type="button" data-au="x" aria-label="Close dialog">×</button><div class="auth-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="9" cy="9" r="1.5"/><path d="M21 16l-5-5-8 8"/></svg></div><p class="auth-eyebrow">${up?'Get started':'Your workspace'}</p><h2 id="authTitle">${up?'Create your account':'Welcome back'}</h2><p class="auth-intro">${up?'Create an account to start building and manage your projects.':'Sign in to continue to your projects.'}</p><div class="auth-fields">${up?'<div class="auth-field"><label for="a1">Full name</label><input id="a1" name="name" placeholder="Your name" autocomplete="name" required></div>':''}<div class="auth-field"><label for="a2">Email address</label><input id="a2" name="email" type="email" placeholder="you@example.com" autocomplete="email" required></div><div class="auth-field"><label for="a3">Password</label><input id="a3" name="password" type="password" placeholder="${up?'At least 6 characters':'Enter your password'}" autocomplete="${up?'new-password':'current-password'}" minlength="${up?6:1}" required></div></div><p class="auth-message" id="ae" role="status" aria-live="polite"></p><button class="btn auth-submit" type="button" data-au="go">${up?'Create account':'Sign in'}</button><p class="auth-switch">${up?'Already have an account? <a href="#" data-au="in">Sign in</a>':'New to Shipify? <a href="#" data-au="up">Create an account</a>'}</p><p class="auth-secure"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="4" y="8" width="12" height="9" rx="2"/><path d="M7 8V5a3 3 0 0 1 6 0v3"/></svg>Secure sign-in powered by Supabase</p>`;$('au').classList.add('on');$(up?'a1':'a2').focus()}
+function authMessage(message,type='error'){const el=$('ae');if(!el)return;el.textContent=message;el.className='auth-message'+(type?' '+type:'')}
+function authInit(){if(!window.supabase?.createClient){console.error('Supabase Auth client failed to load from its CDN.');return}if(!BACKEND.anonKey){console.error('Supabase Auth is not configured: add the project publishable/anon key to BACKEND.anonKey.');return}authClient=window.supabase.createClient(BACKEND.supabaseUrl,BACKEND.anonKey);authClient.auth.onAuthStateChange((event,session)=>{user=session?.user?authUser(session.user):null;BACKEND.token=session?.access_token||'';hdrRender()});authClient.auth.getSession().then(({data,error})=>{if(error)throw error;user=data.session?.user?authUser(data.session.user):null;BACKEND.token=data.session?.access_token||'';hdrRender()}).catch(error=>{console.error('Could not restore Supabase Auth session:',error);toast('Could not restore your sign-in session')})}
+document.addEventListener('click',async e=>{if(e.target.id==='au')return $('au').classList.remove('on');const menuTrigger=e.target.closest('[data-account-menu]');if(menuTrigger){const open=menuTrigger.getAttribute('aria-expanded')!=='true';menuTrigger.setAttribute('aria-expanded',String(open));$('accountMenu').hidden=!open;return}const accountMenu=$('accountMenu');if(accountMenu&&!accountMenu.hidden&&!e.target.closest('.account-control')){accountMenu.hidden=true;$('auth').querySelector('[data-account-menu]')?.setAttribute('aria-expanded','false')}const t=e.target.closest('[data-au]');if(!t)return;e.preventDefault();const k=t.dataset.au;
  if(k==='in'||k==='up')auOpen(k);
  else if(k==='x')$('au').classList.remove('on');
- else if(k==='out'){user=null;hdrRender();toast('Logged out')}
- else if(k==='go'){const up=!!$('a1'),n=up?$('a1').value.trim():'',m=$('a2').value.trim(),p=$('a3').value,er=s=>{$('ae').textContent=s};
-  if(up&&!n)return er('Enter your name.');if(!/\S+@\S+\.\S+/.test(m))return er('Enter a valid email address.');if(p.length<(up?6:1))return er(up?'Use a password with at least 6 characters.':'Enter your password.');
-  user={name:n||m.split('@')[0],email:m};$('au').classList.remove('on');hdrRender();toast(up?'Account created':'Welcome back')}});
+ else if(k==='out'){if(!authClient)return toast('Supabase Auth is not configured');t.disabled=true;const{error}=await authClient.auth.signOut();t.disabled=false;if(error){console.error('Supabase sign-out failed:',error);return toast('Could not log out. Please try again.')}user=null;BACKEND.token='';hdrRender();toast('Logged out')}
+ else if(k==='go'){const up=!!$('a1'),n=up?$('a1').value.trim():'',m=$('a2').value.trim(),p=$('a3').value,submit=$('au').querySelector('[data-au=go]');
+  authMessage('');if(up&&!n)return authMessage('Enter your name.');if(!/\S+@\S+\.\S+/.test(m))return authMessage('Enter a valid email address.');if(p.length<(up?6:1))return authMessage(up?'Use a password with at least 6 characters.':'Enter your password.');if(!authClient)return authMessage('Sign-in is unavailable because Supabase Auth could not initialize. Refresh the page and try again.');
+  submit.disabled=true;submit.textContent=up?'Creating account…':'Signing in…';
+  try{const result=up?await authClient.auth.signUp({email:m,password:p,options:{data:{full_name:n},emailRedirectTo:location.origin+location.pathname}}):await authClient.auth.signInWithPassword({email:m,password:p});if(result.error)throw result.error;if(up&&!result.data.session){$('a3').value='';authMessage('Check your email for a confirmation link to finish creating your account.','success');submit.textContent='Account created';return}user=authUser(result.data.user||result.data.session.user);BACKEND.token=result.data.session?.access_token||'';$('au').classList.remove('on');hdrRender();toast(up?'Account created':'Welcome back')}
+  catch(error){console.error('Supabase Auth request failed:',error);const message=error.message||'Please try again.';authMessage(message)}finally{submit.disabled=false;submit.textContent=up?'Create account':'Sign in'}}
+});
 document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;const menu=$('accountMenu');if(menu&&!menu.hidden){menu.hidden=true;const trigger=$('auth').querySelector('[data-account-menu]');trigger.setAttribute('aria-expanded','false');trigger.focus()}});
 $('au').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.tagName==='INPUT')$('au').querySelector('[data-au=go]').click()});
 /* ---------- Per-text font toolbar ---------- */
@@ -1562,7 +1596,7 @@ $('dl').onclick=()=>{
  catch(err){console.error(err);toast('Could not build the download')}};
 
 /* ---------- Backend config ---------- */
-const BACKEND={supabaseUrl:'https://zvxadjnrlirvwktdsjmx.supabase.co',anonKey:'',token:'',siteId:'e59b5372-5632-48d8-b9ca-1f1503d76a62',siteKey:'f4783c22ddef7d0a9a277455'};
+const BACKEND={supabaseUrl:'https://zvxadjnrlirvwktdsjmx.supabase.co',anonKey:'sb_publishable_AcH7mU6CV8vLKd30JK787g_hpsstXUh',token:'',siteId:'e59b5372-5632-48d8-b9ca-1f1503d76a62',siteKey:'f4783c22ddef7d0a9a277455'};
 const TRACK={get url(){return BACKEND.supabaseUrl+'/functions/v1/collect'},get key(){return BACKEND.supabaseUrl&&BACKEND.siteKey}};
 const trackJs=(U,K)=>`(function(){
 if(navigator.webdriver||/bot|crawl|spider/i.test(navigator.userAgent))return;
@@ -1625,6 +1659,7 @@ function colorsPanel(){
  return '<h2>Colors</h2><p class="ph">Change the look of your whole page. To recolor one item, click it and use the Fill and Section colors in the toolbar that appears.</p><h3>Light</h3><div class="g2">'+grp(false)+'</div><h3>Dark</h3><div class="g2">'+grp(true)+'</div>'}
 
 hdrRender();
+authInit();
 renderHome();
 </script>
 </body>
