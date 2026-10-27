@@ -327,6 +327,8 @@ body.dragging-section{user-select:none;cursor:grabbing}
 .account-menu:not([hidden]){transform-origin:top right;animation:builder-menu-in .16s ease-out both}
 .proj{transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
 .proj:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.08)}
+.proj[data-enter]{animation:project-enter .42s cubic-bezier(.2,.75,.25,1) both}
+@keyframes project-enter{from{opacity:0;transform:translateX(-28px) translateY(4px) scale(.98)}to{opacity:1;transform:none}}
 .btn,.chip,.tpl,.rail button{transition:transform .16s ease,background-color .16s ease,color .16s ease,border-color .16s ease,box-shadow .16s ease}
 .btn:hover,.chip:hover,.tpl:hover{transform:translateY(-1px)}
 .btn:active,.chip:active,.tpl:active{transform:translateY(0) scale(.985)}
@@ -344,6 +346,7 @@ body.dragging-section{user-select:none;cursor:grabbing}
  #modal>.card,#cm>.card,#db>.db-card,#pr>.card{transition:none!important;transform:none!important}
  #db .db-panel:not([hidden]),.account-menu:not([hidden]),#editor.view-enter,#editor.view-exit,#home.view-enter,#editor #pn>*{animation:none!important}
  .proj,.btn,.chip,.tpl,.rail button{transition:none!important}
+ .proj[data-enter]{animation:none!important}
 }
 :root{--ibg:#000;--ifg:#fff;--imut:#a8a8a8;--iline:#3a3a3a}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--ibg:#fff;--ifg:#000;--imut:#555;--iline:#ccc}}
@@ -1081,12 +1084,12 @@ let projectLoadState='loading',saveTimer=0,saveQueue=Promise.resolve(),projectLo
 const setSaveStatus=(text,state='')=>{const el=$('saveStatus');el.textContent=text;el.dataset.state=state};
 const cv=$('cv');
 
-function renderHome(){
+function renderHome(animateProjects=false){
  const plus='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>';
  $('grid').innerHTML=`<button class="new" id="add" aria-label="Create project">${plus}<span>Create project</span></button>`+
-  projects.map((p,i)=>`<div class="proj" data-i="${i}"><button class="pj-open"><div class="th"><i></i><i></i><i></i></div><div class="m"><b>${ea(p.name)}</b><span>${(p.pages||[p]).reduce((a,x)=>a+(x.sections||[]).length,0)} sections · ${(p.pages||[1]).length} pages</span></div></button><div class="pj-act"><button class="chip" data-pa="dashboard">Dashboard</button><button class="chip" data-pa="more" aria-label="More options">⋯</button></div></div>`).join('');
+  projects.map((p,i)=>`<div class="proj"${animateProjects?' data-enter':''}${animateProjects?` style="animation-delay:${i*80}ms"`:''} data-i="${i}"><button class="pj-open"><div class="th"><i></i><i></i><i></i></div><div class="m"><b>${ea(p.name)}</b><span>${(p.pages||[p]).reduce((a,x)=>a+(x.sections||[]).length,0)} sections · ${(p.pages||[1]).length} pages</span></div></button><div class="pj-act"><button class="chip" data-pa="dashboard">Dashboard</button><button class="chip" data-pa="more" aria-label="More options">⋯</button></div></div>`).join('');
  const notice=$('projectNotice');
- notice.innerHTML=projectLoadState==='loading'?'Loading your saved projects…':projectLoadState==='error'?'Could not load your projects. Check your connection. <button class="chip" type="button" data-project-retry>Retry</button>':user&&!projects.length?'Your projects will be saved to your account automatically.':'';
+ notice.innerHTML=projectLoadState==='error'?'Could not load your projects. Check your connection. <button class="chip" type="button" data-project-retry>Retry</button>':projectLoadState==='ready'&&user&&!projects.length?'Your projects will be saved to your account automatically.':'';
  $('add').disabled=projectLoadState!=='ready';
  $('add').onclick=()=>{if(!user){auOpen('in');authMessage('Sign in to create and save projects to your account.');return}$('modal').classList.add('on');document.querySelectorAll('#tpls .tin').forEach(i=>i.style.transform=`scale(${i.parentElement.clientWidth/1000})`)};
  document.querySelectorAll('.pj-open').forEach(b=>b.onclick=()=>open(projects[b.parentElement.dataset.i]));
@@ -1104,7 +1107,7 @@ async function loadProjects(ownerId,loadId){
   if(error)throw error;
   if(loadId!==projectLoadId||ownerId!==currentUserId)return;
   projects=(data||[]).filter(row=>row.data&&typeof row.data==='object').map(row=>({...row.data,id:row.id,name:row.name}));
-  projectLoadState='ready';renderHome();
+  projectLoadState='ready';renderHome(true);
  }catch(error){
   if(loadId!==projectLoadId)return;
   console.error('Could not load saved projects from Supabase:',error);
