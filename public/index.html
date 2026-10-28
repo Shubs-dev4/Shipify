@@ -1440,19 +1440,38 @@ function design(b){dEl=b.querySelector('.s');dmr();$('dm').classList.add('on')}
 $('dm').onclick=e=>{const o=e.target.dataset.o;if(!o)return;if(o==='done')return $('dm').classList.remove('on');const q=o.split(':');if(q[1])dEl.dataset[q[0]]=q[1];else delete dEl.dataset[q[0]];sync();scheduleProjectSave();dmr()};
 addEventListener('keydown',e=>{if(e.key==='Escape')$('dm').classList.remove('on')});
 function fillProds(){if(!cur||!cur.products)return;cv.querySelectorAll('.prods .cols').forEach(g=>g.innerHTML=cur.products.some(x=>x.st!=='draft')?cur.products.filter(x=>x.st!=='draft').map(prodItem).join(''):'<p class="pe">No products yet. Add some from the project dashboard.</p>')}
-let pcur=null,mi=-1;
+let pcur=null,mi=-1,deletingProject=null;
 $('pr').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='rnin')$('pr').querySelector('[data-pm=rsave]').click()});
- $('pr').onclick=async e=>{if(e.target.id==='pr')return $('pr').classList.remove('on');const t=e.target.closest('[data-pm]');if(!t)return;
+ $('pr').onclick=async e=>{if(e.target.id==='pr'){deletingProject=null;$('pr').classList.remove('on');return}const t=e.target.closest('[data-pm]');if(!t)return;
  if(t.dataset.pm==='done')$('pr').classList.remove('on');
+ else if(t.dataset.pm==='cancel-delete'){deletingProject=null;$('pr').classList.remove('on')}
+ else if(t.dataset.pm==='confirm-delete'){
+  const project=deletingProject;if(!project)return;
+  if(!authClient||!currentUserId){toast('Please sign in again before deleting this project.');return}
+  t.disabled=true;t.textContent='Deleting…';
+  try{
+   const{error}=await authClient.from('projects').delete().eq('id',project.id).eq('owner',currentUserId);
+   if(error)throw error;
+   const index=projects.indexOf(project);if(index>=0)projects.splice(index,1);
+   deletingProject=null;$('pr').classList.remove('on');renderHome()
+  }catch(error){projectError(error,'delete');t.disabled=false;t.textContent='Delete project'}
+ }
  else if(t.dataset.pm==='rsave'){const old=pcur.name;pcur.name=$('rnin').value.trim()||pcur.name;if(await saveProjectRecord(pcur)){ $('pr').classList.remove('on');renderHome()}else pcur.name=old}};
 $('grid').addEventListener('click',e=>{const a=e.target.closest('[data-pa]');if(!a)return;const i=+a.closest('.proj').dataset.i,p=projects[i];
  if(a.dataset.pa==='dashboard'){dbOpen(p);return}
  mi=i;const m=$('pm'),r=a.getBoundingClientRect(),d=m.querySelector('[data-m=del]');d.textContent='Delete';d.dataset.arm='';m.hidden=false;m.style.left=Math.max(8,r.right-165)+'px';m.style.top=(r.bottom+6)+'px'});
 $('pm').onclick=async e=>{const b=e.target.closest('[data-m]');if(!b)return;const k=b.dataset.m,p=projects[mi];
- if(k==='del'){if(!b.dataset.arm){b.dataset.arm=1;b.textContent='Click to confirm';return}b.disabled=true;try{const{error}=await authClient.from('projects').delete().eq('id',p.id).eq('owner',currentUserId);if(error)throw error;projects.splice(mi,1);$('pm').hidden=true;renderHome()}catch(error){projectError(error,'delete')}finally{b.disabled=false}return}
+ if(k==='del'){
+  $('pm').hidden=true;deletingProject=p;
+  const card=$('pr').firstElementChild;card.className='card';card.style.maxWidth='460px';
+  $('pr').setAttribute('aria-label','Confirm project deletion');
+  card.innerHTML='<h2 id="deleteProjectTitle">Delete project?</h2><p id="deleteProjectMessage">Are you sure you want to delete “'+ea(p.name)+'”? This permanently removes the project and its saved data.</p><div class="ra"><button class="btn ghost" type="button" data-pm="cancel-delete">Cancel</button><button class="btn" type="button" data-pm="confirm-delete" style="background:#c0392b;border-color:#c0392b">Delete project</button></div>';
+  $('pr').setAttribute('aria-labelledby','deleteProjectTitle');$('pr').setAttribute('aria-describedby','deleteProjectMessage');$('pr').classList.add('on');card.querySelector('[data-pm=cancel-delete]').focus();return
+ }
  $('pm').hidden=true;
  if(k==='dup'){const c=JSON.parse(JSON.stringify(p));delete c.id;c.name=p.name+' copy';await createSavedProject(c)}
- else{pcur=p;$('pr').firstElementChild.className='card';$('pr').firstElementChild.style.maxWidth='460px';$('pr').firstElementChild.innerHTML='<h2>Rename project</h2><input id="rnin" value="'+ea(p.name)+'" style="width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);font:inherit"><div class="ra"><button class="btn ghost" data-pm="done">Cancel</button><button class="btn" data-pm="rsave">Save</button></div>';$('pr').classList.add('on');$('rnin').focus()}};
+ else{pcur=p;$('pr').removeAttribute('aria-labelledby');$('pr').removeAttribute('aria-describedby');$('pr').setAttribute('aria-label','Project options');$('pr').firstElementChild.className='card';$('pr').firstElementChild.style.maxWidth='460px';$('pr').firstElementChild.innerHTML='<h2>Rename project</h2><input id="rnin" value="'+ea(p.name)+'" style="width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);font:inherit"><div class="ra"><button class="btn ghost" data-pm="done">Cancel</button><button class="btn" data-pm="rsave">Save</button></div>';$('pr').classList.add('on');$('rnin').focus()}};
+addEventListener('keydown',e=>{if(e.key==='Escape'&&$('pr').classList.contains('on')){deletingProject=null;$('pr').classList.remove('on')}});
 document.addEventListener('click',e=>{if(!e.target.closest('#pm,[data-pa=more]'))$('pm').hidden=true});
 let psel=0,pqs='',plast=null;
 const productSaveTimers=new WeakMap();
