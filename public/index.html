@@ -73,6 +73,7 @@ button{font:inherit;cursor:pointer;color:inherit}
 .bar{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--bg)}
 .bar input{border:0;background:transparent;font:600 15px inherit;color:var(--fg);min-width:0;width:200px;padding:6px 8px;border-radius:6px}
 .bar input:hover{background:var(--soft)}
+.history-actions{display:flex;gap:4px;flex-shrink:0}.history-actions .btn{width:36px;height:36px;padding:8px;display:grid;place-items:center}.history-actions svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.history-actions .btn:disabled{opacity:.38;cursor:not-allowed}
 .sp{flex:1}
 .save-status{font-size:12px;color:var(--mut);white-space:nowrap}.save-status[data-state=error]{color:#b42318}
 .seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
@@ -198,6 +199,7 @@ body.dragging-section{user-select:none;cursor:grabbing}
 #lk select,.bar select{padding:5px 8px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--fg);font:inherit;font-size:13px}#lk select{margin-left:6px}.bar select{max-width:150px}
 .pgr{display:flex;gap:6px;align-items:center;margin-bottom:8px;padding:6px;border:1px solid var(--line);border-radius:10px}.pgr.on{border-color:var(--fg)}.pgr input{flex:1;min-width:0;border:0;background:transparent;font:inherit;font-weight:600;color:var(--fg);padding:4px 6px;border-radius:6px}.pgr .chip{padding:4px 10px}
 #editor.pv .side,#editor.pv .tip,#editor.pv #pname,#editor.pv #pub,#editor.pv #dl,#editor.pv #back{display:none}
+#editor.pv .history-actions{display:none}
 #editor.pv .bar{background:#1a1a1a;color:#fff;border-bottom:0;padding:8px 16px}
 #editor.pv .bar::before{content:"Preview";font-weight:600;font-size:13px;opacity:.7}
 #editor.pv .bar .btn.ghost{color:#fff;border-color:#666}#editor.pv .bar .btn.ghost:hover{border-color:#fff}
@@ -523,7 +525,7 @@ add('features')
 theme(2)
 sections()
 </code></pre>
-<p>If you do not like the result, type <code>undo()</code>.</p>
+<p>If you do not like the result, use the editor's Undo button or type <code>undo()</code>. Use Redo to restore a change you undid.</p>
 <h2>3. Command reference</h2>
 <h3>Building the page</h3>
 <div class="dg-t"><table>
@@ -628,7 +630,11 @@ sections()
 </tr>
 <tr>
 <td><code>undo()</code></td>
-<td>Undoes the last command</td>
+<td>Undoes the last project change; command scripts are grouped as one change</td>
+</tr>
+<tr>
+<td><code>redo()</code></td>
+<td>Restores the last project change undone with Undo or <code>undo()</code></td>
 </tr>
 <tr>
 <td><code>help()</code></td>
@@ -709,7 +715,7 @@ add('text', {}, 2)   // the empty {} keeps defaults; 2 is the position
 <li>Click the command bar (or press <code>/</code>).</li>
 <li>Paste, then press Enter. Pasting does not run it until you press Enter.</li>
 <li>Read the output panel. A successful script ends by listing the sections it built.</li>
-<li>Not happy? Type <code>undo()</code>. A whole script counts as one command, so a single undo reverts everything it did.</li>
+<li>Not happy? Use Undo or type <code>undo()</code>. A whole script counts as one change, so a single undo reverts everything it did.</li>
 </ol>
 <p>Scripts start with <code>clear()</code>, so they <strong>replace the entire project site</strong>: sections on every page and the project product catalog are removed. Page names remain. Anything you typed by hand will be removed. To keep a copy, duplicate the project first.</p>
 <blockquote>
@@ -889,7 +895,7 @@ return sections();  // show the result
 </tr>
 <tr>
 <td>The page looks wrong after a script</td>
-<td>Type <code>undo()</code> to go back one step (up to 30 steps are kept per project)</td>
+<td>Use Undo or type <code>undo()</code> to go back one step (up to 40 changes are kept per project)</td>
 </tr>
 <tr>
 <td>Animations or fonts missing in the carousel</td>
@@ -903,7 +909,7 @@ add('hero', {t:'', p:'', b:''})  add('text', {}, 2)
 html('&lt;h1&gt;Hello&lt;/h1&gt;')   code('&lt;button&gt;Hi&lt;/button&gt;', 300)
 sections()  remove(i)  move(i, j)
 pages()  go('About')  theme()  theme(3)
-qs('h1')  qsa('p')  print(x)  cls()  undo()  help()
+qs('h1')  qsa('p')  print(x)  cls()  undo()  redo()  help()
 </code></pre>
   </article>
 </section>
@@ -922,6 +928,7 @@ qs('h1')  qsa('p')  print(x)  cls()  undo()  help()
   <div class="bar">
     <button class="btn ghost" id="back">← Projects</button>
     <input id="pname" aria-label="Project name"><select id="pgsel" aria-label="Current page"></select>
+    <div class="history-actions" role="group" aria-label="Edit history"><button class="btn ghost" id="historyUndo" type="button" aria-label="Undo" title="Undo" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h9a7 7 0 0 1 0 14h-2"/></svg></button><button class="btn ghost" id="historyRedo" type="button" aria-label="Redo" title="Redo" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 14 5-5-5-5"/><path d="M20 9h-9a7 7 0 0 0 0 14h2"/></svg></button></div>
     <div class="sp"></div>
     <span id="saveStatus" class="save-status" role="status" aria-live="polite"></span>
     <button class="btn ghost" id="prv">Preview</button><div class="seg"><button id="dk" class="on">Desktop</button><button id="mb">Mobile</button></div>
@@ -1088,6 +1095,66 @@ let projects=[],cur=null,$=id=>document.getElementById(id),user=null,authClient=
 let projectLoadState='loading',saveTimer=0,saveQueue=Promise.resolve(),projectLoadId=0;
 const setSaveStatus=(text,state='')=>{const el=$('saveStatus');el.textContent=text;el.dataset.state=state};
 const cv=$('cv');
+const projectHistories=new WeakMap();
+let historyBatch=0,historyRestoring=false;
+function historySnapshot(project){return JSON.stringify(project)}
+function historyFor(project=cur){
+ if(!project)return null;
+ let state=projectHistories.get(project);
+ if(!state){state={entries:[historySnapshot(project)],index:0,timer:0};projectHistories.set(project,state)}
+ return state
+}
+function historyUpdate(){
+ const state=historyFor();
+ $('historyUndo').disabled=!state||state.index<=0;
+ $('historyRedo').disabled=!state||state.index>=state.entries.length-1
+}
+function historyCommit(project=cur){
+ const state=historyFor(project);if(!state)return false;
+ if(project===cur&&$('editor').classList.contains('on'))sync();
+ const snapshot=historySnapshot(project);
+ if(state.entries[state.index]===snapshot){historyUpdate();return false}
+ state.entries.splice(state.index+1);
+ state.entries.push(snapshot);
+ if(state.entries.length>40)state.entries.shift();
+ state.index=state.entries.length-1;historyUpdate();return true
+}
+function historyRebase(project=cur){
+ const state=historyFor(project);if(!state)return;
+ clearTimeout(state.timer);
+ if(project===cur&&$('editor').classList.contains('on'))sync();
+ state.entries[state.index]=historySnapshot(project);historyUpdate()
+}
+function historySchedule(project=cur){
+ if(!project||historyBatch||historyRestoring)return;
+ const state=historyFor(project);clearTimeout(state.timer);
+ state.timer=setTimeout(()=>historyCommit(project),450)
+}
+function historyMove(direction){
+ const project=cur,state=historyFor(project);if(!project||!state)return false;
+ clearTimeout(state.timer);historyCommit(project);
+ const index=state.index+direction;
+ if(index<0||index>=state.entries.length){historyUpdate();return false}
+ const snapshot=JSON.parse(state.entries[index]);
+ historyRestoring=true;
+ try{
+  Object.keys(project).forEach(key=>delete project[key]);Object.assign(project,snapshot);state.index=index;
+  $('pname').value=project.name||'Untitled project';
+  if(project.pages){project.pi=Math.min(project.pi||0,project.pages.length-1);project.sections=project.pages[project.pi].sections}
+  draw();applyTheme(project.theme||0);updSel();panel();
+  if($('editor').classList.contains('on')){sync();state.entries[index]=historySnapshot(project)}
+ }finally{historyRestoring=false}
+ scheduleProjectSave();historyUpdate();return true
+}
+$('historyUndo').onclick=()=>historyMove(-1);
+$('historyRedo').onclick=()=>historyMove(1);
+addEventListener('keydown',e=>{
+ if(!(e.ctrlKey||e.metaKey)||e.altKey||!$('editor').classList.contains('on'))return;
+ const target=e.target;
+ if(target.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))return;
+ if(e.key.toLowerCase()==='z'){e.preventDefault();historyMove(e.shiftKey?1:-1)}
+ else if(e.key.toLowerCase()==='y'){e.preventDefault();historyMove(1)}
+});
 
 function renderHome(animateProjects=false){
  const plus='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>';
@@ -1136,12 +1203,14 @@ async function loadProjects(ownerId,loadId){
 }
 function scheduleProjectSave(){
  if(!user||!currentUserId||!cur?.id||!authClient)return;
+ historySchedule(cur);
  setSaveStatus('Unsaved changes');
  clearTimeout(saveTimer);
  saveTimer=setTimeout(()=>persistCurrentProject(),650);
 }
 async function saveProjectRecord(project,ownerId=currentUserId){
  if(!user||!ownerId||!project?.id||!authClient)return false;
+ historySchedule(project);
  saveQueue=saveQueue.catch(()=>{}).then(async()=>{
   if(!user||ownerId!==currentUserId||!projects.includes(project))return false;
   const data=JSON.parse(JSON.stringify(project));
@@ -1396,8 +1465,8 @@ $('cs').onclick=()=>{ce.querySelector('.code').outerHTML=codeBlock($('cc').value
 $('cx').onclick=()=>$('cm').classList.remove('on');
 function builderViewMotion(el,name){el.classList.remove('view-enter','view-exit');void el.offsetWidth;el.classList.add(name);el.addEventListener('animationend',()=>el.classList.remove(name),{once:true})}
 function open(p){
- prev=false;cart=[];undo=null;cur=p;initPages(p);$('pname').value=p.name;draw();applyTheme(p.theme||0);setDev(false);updSel();
- $('home').style.display='none';$('editor').classList.add('on');builderViewMotion($('editor'),'view-enter');panel();cmdLoad();
+ prev=false;cart=[];undo=null;cur=p;initPages(p);historyFor(p);$('pname').value=p.name;draw();applyTheme(p.theme||0);setDev(false);updSel();historyUpdate();
+ $('home').style.display='none';$('editor').classList.add('on');builderViewMotion($('editor'),'view-enter');panel();cmdLoad();historyRebase(p);
 }
 $('back').onclick=async()=>{if(prev){prev=false;setPrev()}if(cur){sync();cur.name=$('pname').value.trim()||'Untitled project';if(!await persistCurrentProject())return}const editor=$('editor'),home=$('home');editor.classList.remove('view-enter');editor.classList.add('view-exit');setTimeout(()=>{editor.classList.remove('on','view-exit');home.style.display='';renderHome();builderViewMotion(home,'view-enter')},160)};
 function setDev(m){$('mn').classList.remove('on');$('ck').classList.remove('on');cv.classList.toggle('m',m);$('editor').classList.toggle('mob',m);$('mb').classList.toggle('on',m);$('dk').classList.toggle('on',!m)}
@@ -1477,6 +1546,7 @@ let psel=0,pqs='',plast=null;
 const productSaveTimers=new WeakMap();
 function scheduleProductSave(project=pcur){
  if(!project?.id)return;
+ historySchedule(project);
  clearTimeout(productSaveTimers.get(project));
  setSaveStatus('Unsaved changes');
  productSaveTimers.set(project,setTimeout(()=>saveProjectRecord(project),650));
@@ -1653,7 +1723,7 @@ const cmdI=$('cmdi'),cmdL=$('cmdl'),cmdO=$('cmdo');
 let cmdSkip=false;
 /* every project keeps its own command bar: output, history, undo steps and the half-typed command */
 const cmdMap=new WeakMap();
-function cs(){let x=cmdMap.get(cur);if(!x){x={hist:[],pos:0,undo:[],log:[],draft:'',hide:false};cmdMap.set(cur,x)}return x}
+function cs(){let x=cmdMap.get(cur);if(!x){x={hist:[],pos:0,log:[],draft:'',hide:false};cmdMap.set(cur,x)}return x}
 function cmdAppend(t,k){const d=document.createElement('div');d.className=k||'out';d.textContent=t;cmdL.appendChild(d)}
 function cmdClr(){cs().log=[];cmdL.innerHTML='';cmdO.hidden=true}
 function cmdLoad(){const x=cs();cmdL.innerHTML='';x.log.forEach(l=>cmdAppend(l.t,l.k));cmdO.hidden=!x.log.length||x.hide;cmdI.value=x.draft;cmdGrow();cmdO.scrollTop=cmdO.scrollHeight}
@@ -1668,7 +1738,6 @@ function fmt(v,c){
  if(Array.isArray(v)&&v.every(x=>typeof x==='string'))return v.join('\n')||'(empty)';
  try{return c?JSON.stringify(v):JSON.stringify(v,null,1)}catch(e){return String(v)}}
 function cmdPrint(...a){cmdLine(a.map(x=>fmt(x,1)).join(' '),'out')}
-function cmdSnap(){return JSON.stringify({s:cur.sections,pg:cur.pages||null,pi:cur.pi,nid:cur.nid,th:cur.theme,st:cur.st||null,pr:cur.products||null})}
 function cmdAt(t,at){const a=cur.sections;if(at!=null&&at>=0&&at<=a.length)return Math.floor(at);if(t==='header')return 0;const f=a.map(x=>x.includes('s ftr')).lastIndexOf(true);return t==='footer'||f<0?a.length:f}
 function cmdPut(h,t,at){sync();const i=cmdAt(t,at);cur.sections.splice(i,0,h);draw();return i}
 function cmdClear(keep){
@@ -1699,9 +1768,8 @@ function cmdSections(){sync();const N={hdr:'header',ftr:'footer',prods:'products
 function cmdPages(){return cur.pages?cur.pages.map((p,i)=>(i===cur.pi?'* ':'  ')+i+'  '+p.n):['* 0  Home']}
 function cmdGo(x){if(!cur.pages)throw new Error('This project has one page');const i=typeof x==='number'?x:cur.pages.findIndex(p=>p.n.toLowerCase()===String(x).toLowerCase());if(!cur.pages[i])throw new Error('No page "'+x+'". Try pages()');switchPage(i);return 'Now on '+cur.pages[i].n}
 function cmdTheme(i){if(i===undefined)return TH.map((t,k)=>(k===(cur.theme||0)?'* ':'  ')+k+'  '+t.n);if(!TH[i])throw new Error('No theme '+i+'. Try theme()');applyTheme(i);return 'Theme: '+TH[i].n}
-function cmdRevert(){const s=cs().undo.pop();if(!s)return 'Nothing to undo';cmdSkip=true;const o=JSON.parse(s);
- if(o.pg){cur.pages=o.pg;cur.nid=o.nid;cur.pi=Math.min(o.pi||0,o.pg.length-1);cur.sections=cur.pages[cur.pi].sections}else cur.sections=o.s;
- if(o.st)cur.st=o.st;if(o.pr)cur.products=o.pr;draw();applyTheme(o.th||0);updSel();panel();return 'Undid the last command'}
+function cmdRevert(){if(!historyMove(-1))return 'Nothing to undo';cmdSkip=true;return 'Undid the last change'}
+function cmdRestore(){if(!historyMove(1))return 'Nothing to redo';cmdSkip=true;return 'Redid the last change'}
 function cmdHelp(){return ['Command bar: type JavaScript and press Enter. Shift+Enter = new line, Up/Down = history, / = jump here.','',
  'clear()  clear(true)        clear the whole project (true keeps each page header/footer)',
  "add('hero',{t:'Title',p:'Text',b:'Button'})   add a section; add('text',{},2) puts it at position 2",
@@ -1713,10 +1781,10 @@ function cmdHelp(){return ['Command bar: type JavaScript and press Enter. Shift+
  'sections()   remove(i)   move(i,j)           list, delete and reorder sections',
  "pages()   go('About')   theme()   theme(3)   list or switch pages and themes",
  "qs('h1')   qsa('p')   cv                     the live page, e.g. qs('h1').textContent='Hi'",
- 'print(x)   cls()   undo()   help()',
+ 'print(x)   cls()   undo()   redo()   help()',
  '','Anything else you type is plain JavaScript, and await works.'].join('\n')}
 function cmdScope(src){
- const rc=window.console,clear=cmdClear,add=cmdAdd,html=cmdHTML,code=cmdCode,remove=cmdRemove,move=cmdMove,sections=cmdSections,pages=cmdPages,go=cmdGo,theme=cmdTheme,undo=cmdRevert,help=cmdHelp,print=cmdPrint,
+ const rc=window.console,clear=cmdClear,add=cmdAdd,html=cmdHTML,code=cmdCode,remove=cmdRemove,move=cmdMove,sections=cmdSections,pages=cmdPages,go=cmdGo,theme=cmdTheme,undo=cmdRevert,redo=cmdRestore,help=cmdHelp,print=cmdPrint,
  cls=cmdClr,qs=s=>cv.querySelector(s),qsa=s=>cv.querySelectorAll(s),
  console={log:(...a)=>{cmdPrint(...a);rc.log(...a)},info:(...a)=>{cmdPrint(...a);rc.info(...a)},warn:(...a)=>{cmdLine(a.map(fmt).join(' '),'warn');rc.warn(...a)},error:(...a)=>{cmdLine(a.map(fmt).join(' '),'err');rc.error(...a)}};
  let fn;try{fn=eval('(async()=>('+src+'\n))')}catch(e){try{fn=eval('(async()=>{'+src+'\n})')}catch(e2){try{new(Object.getPrototypeOf(async function(){}).constructor)(src)}catch(e3){e2=e3}if(/Unexpected (token '\}'|end of input)/.test(e2.message))throw new SyntaxError('The command ends too early. Is a bracket, quote or parenthesis left open?');throw e2}}
@@ -1728,10 +1796,11 @@ async function cmdRun(){
  if(st.hist[st.hist.length-1]!==src){st.hist.push(src);st.hist=st.hist.slice(-50)}
  st.pos=st.hist.length;
  cmdLine('> '+src,'in');
- sync();const snap=cmdSnap();cmdSkip=false;
+ sync();historyCommit(cur);const before=historySnapshot(cur);cmdSkip=false;historyBatch++;
  try{const r=await cmdScope(src);if(r!==undefined)cmdLine(fmt(r),'out')}
  catch(e){cmdLine(e&&e.message?(e.name||'Error')+': '+e.message:String(e),'err')}
- try{sync();if(cmdSnap()!==snap){if(!cmdSkip){st.undo.push(snap);if(st.undo.length>30)st.undo.shift()}draw();updSel();panel();scheduleProjectSave()}}catch(e){}}
+ finally{historyBatch--}
+ try{sync();if(historySnapshot(cur)!==before){draw();updSel();panel();scheduleProjectSave();if(!cmdSkip)historyCommit(cur)}}catch(e){}}
 cmdI.addEventListener('input',()=>{cs().draft=cmdI.value;cmdGrow()});
 cmdI.addEventListener('keydown',e=>{
  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();cmdRun();return}
@@ -2079,7 +2148,7 @@ async function dbRender(){
  <div class="gr"><div class="pn"><h3>Funnel</h3>${dbRows(fn,'n','v')}</div><div class="pn"><h3>Top pages</h3>${dbRows(s.top_pages,'path','views')}</div><div class="pn"><h3>Top products</h3>${dbRows(s.top_products,'name','revenue_cents',x=>dbMoney(x.revenue_cents))}</div><div class="pn"><h3>Traffic sources</h3>${dbRows(s.sources,'name','n')}</div><div class="pn"><h3>Devices</h3>${dbRows(s.devices,'name','n')}</div></div>
  ${o.live?'':'<p class="hint">This is made-up sample data. Fill in the BACKEND settings in the code to see real numbers.</p>'}`}
 function dbSetTab(tab){const products=tab==='products';$('dbTabAnalytics').classList.toggle('on',!products);$('dbTabAnalytics').setAttribute('aria-selected',String(!products));$('dbTabProducts').classList.toggle('on',products);$('dbTabProducts').setAttribute('aria-selected',String(products));$('dbAnalytics').hidden=products;$('dbProducts').hidden=!products;if(products)prRender();else dbRender()}
-function dbOpen(p){dbProject=p;pcur=p;p.products=p.products||[];$('dbTitle').textContent=p.name;$('dbSubtitle').textContent='Analytics for your configured Supabase site · products for this project';if(!DB.f)dbRange(30);$('db').classList.add('on');dbSetTab('analytics')}
+function dbOpen(p){dbProject=p;pcur=p;historyFor(p);p.products=p.products||[];$('dbTitle').textContent=p.name;$('dbSubtitle').textContent='Analytics for your configured Supabase site · products for this project';if(!DB.f)dbRange(30);$('db').classList.add('on');dbSetTab('analytics')}
 $('db').addEventListener('click',e=>{if(e.target.id==='db'||e.target.closest('[data-db-close]'))return $('db').classList.remove('on');const tab=e.target.closest('[data-db-tab]');if(tab)return dbSetTab(tab.dataset.dbTab);const range=e.target.closest('[data-db-range]');if(range){dbRange(+range.dataset.dbRange);dbRender()}});
 $('db').addEventListener('change',e=>{if(e.target.id!=='dbf'&&e.target.id!=='dbt')return;const f=$('dbf').value,t=$('dbt').value;if(!f||!t||f>t)return;DB.f=new Date(f+'T00:00:00Z');DB.t=new Date(+new Date(t+'T00:00:00Z')+864e5);DB.d=0;dbRender()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')$('db').classList.remove('on')});
