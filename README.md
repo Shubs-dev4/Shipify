@@ -58,7 +58,7 @@ This publishes the **Shipify builder**. A separate website exported from the bui
 ## Known limits right now
 
 - The Dashboard shows **sample data** until `siteId` is set. Live dashboard data requires signing in as the Supabase Auth user who owns that site, because row-level security blocks anonymous reads. Projects are stored in Supabase and scoped to the signed-in user by row-level security; project content is not stored in localStorage.
-- Every project card has a Dashboard with Analytics and Products tabs, regardless of template. A project's dashboard catalog is available only while at least one Products section exists in its pages; removing the last Products section clears the catalog, and adding a Products section makes product management available again. Product data is saved as part of its project; Analytics uses the configured Supabase site and is not separated by local project.
+- Every project card has a Dashboard with Analytics and Products tabs, regardless of template. Product management is always available from the dashboard. Removing the last Products section resets the catalog; adding a product from the dashboard then adds a Products section to the project. All Products sections show active products from the shared catalog, and dashboard edits update the editor preview immediately. Product data is saved as part of its project; Analytics uses the configured Supabase site and is not separated by local project.
 - The exported cart and checkout are still simulated, so revenue stays at $0 until Stripe is added.
 - The rate limiter is per edge instance (best effort, not a global cap).
 

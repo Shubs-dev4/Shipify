@@ -1125,7 +1125,6 @@ async function loadProjects(ownerId,loadId){
    const dataName=typeof row.data.name==='string'?row.data.name.trim():'',recordName=typeof row.name==='string'?row.name.trim():'';
    const name=dataName&&dataName!=='Untitled project'?dataName:recordName||dataName||'Untitled project';
    const project={...row.data,id:row.id,name};
-   reconcileProjectProducts(project);
    return project;
   });
   projectLoadState='ready';renderHome(true);
@@ -1145,7 +1144,6 @@ async function saveProjectRecord(project,ownerId=currentUserId){
  if(!user||!ownerId||!project?.id||!authClient)return false;
  saveQueue=saveQueue.catch(()=>{}).then(async()=>{
   if(!user||ownerId!==currentUserId||!projects.includes(project))return false;
-  reconcileProjectProducts(project);
   const data=JSON.parse(JSON.stringify(project));
   setSaveStatus('Saving…');
   const{error}=await authClient.from('projects').upsert({id:project.id,owner:ownerId,name:project.name,data,updated_at:new Date().toISOString()},{onConflict:'id'});
@@ -1165,7 +1163,6 @@ async function persistCurrentProject(){
 }
 async function createSavedProject(project){
  if(!user||!currentUserId||!authClient){auOpen('in');authMessage('Sign in to create and save projects to your account.');return false}
- reconcileProjectProducts(project);
  setSaveStatus('Saving…');
  try{
   const{data,error}=await authClient.from('projects').insert({owner:currentUserId,name:project.name,data:project}).select('id').single();
@@ -1228,7 +1225,7 @@ $('pn').onclick=e=>{
  else if(b.dataset.s){const q=b.dataset.s.split(':');cur.st[q[0]]=+q[1];applyTheme(cur.theme||0);if(prev)setPrev();scheduleProjectSave()}
  else if(b.id==='pa'){prev=true;setPrev()}
  else if(b.id==='pp'){prev=true;setPrev();pageTrans(()=>{})}
- else if(b.dataset.t){const t=T.find(x=>x.id===b.dataset.t);sync();undo={s:cur.sections.slice(),th:cur.theme,st:cur.st,pr:JSON.parse(JSON.stringify(cur.products||[]))};cur.sections=t.s.map(mk);cur.tpl=t.n;if(!hasProductsSection(cur.sections))cur.products=[];cur.st={f:0,r:0,a:0,h:0,...(t.st||{})};draw();applyTheme(t.th);toast('Template applied')}
+ else if(b.dataset.t){const t=T.find(x=>x.id===b.dataset.t);sync();undo={s:cur.sections.slice(),th:cur.theme,st:cur.st,pr:JSON.parse(JSON.stringify(cur.products||[]))};cur.sections=t.s.map(mk);cur.tpl=t.n;cur.st={f:0,r:0,a:0,h:0,...(t.st||{})};draw();reconcileProjectProducts(cur);applyTheme(t.th);toast('Template applied')}
  else if(undo){cur.sections=undo.s;const th=undo.th;if(undo.st)cur.st=undo.st;if(undo.pr)cur.products=undo.pr;undo=null;draw();applyTheme(th)}
 };
 $('tipx').onclick=()=>$('tip').style.display='none';
@@ -1237,7 +1234,6 @@ function sync(){cur.sections=[...cv.querySelectorAll('.blk>.s')].map(e=>e.outerH
 function draw(){
  $('dm').classList.remove('on');$('tb').hidden=true;
  if(cur.pages)cur.pages[cur.pi].sections=cur.sections;
- reconcileProjectProducts();
  cv.innerHTML=cur.sections.length?cur.sections.map((h,i)=>`<div class="drop-slot" data-insert="${i}" aria-hidden="true"></div><div class="blk${h.includes('s hdr')?' hd':''}" data-i="${i}">${h}<div class="tools"><button data-a="drag" title="Drag to move this section" aria-label="Drag section">Drag</button>${h.includes('class="s code"')?'<button data-a="e">Edit code</button>':''}<button data-a="s">Design</button><button data-a="u">Move up</button><button data-a="d">Move down</button><button data-a="c">Add code below</button><button data-a="x">Delete</button></div></div>`).join('')+`<div class="drop-slot" data-insert="${cur.sections.length}" aria-hidden="true"></div>`:'<div class="empty"><b>This page is empty</b><br>Drag a basic item or section here, or click one in the left panel to add it.</div>';
  const controls='.blk>.s a,.blk>.s .pb:not(.sb),.blk>.s .b,.blk>.s .btn,.blk>.s [role="button"],.blk>.s [role="link"],.blk>.s [onclick],.blk>.s [tabindex]:not([tabindex="-1"]),.blk>.s button:not(.add):not(.cartlink):not(.menubtn):not(.sb)';
  cv.querySelectorAll(controls).forEach(b=>{
@@ -1259,10 +1255,10 @@ $('pname').addEventListener('change',async()=>{if(!cur)return;const name=$('pnam
 cv.onclick=e=>{
  const a=e.target.dataset&&e.target.dataset.a;if(!a)return;
  if(a==='drag')return;
- sync();const i=+e.target.closest('.blk').dataset.i,s=cur.sections;
+ sync();const i=+e.target.closest('.blk').dataset.i,s=cur.sections,removedProducts=a==='x'&&hasProductsSection([s[i]]);
  if(a==='e')return editCode(e.target.closest('.blk'));if(a==='s')return design(e.target.closest('.blk'));if(a==='c')s.splice(i+1,0,codeBlock(CODE0,200));else if(a==='x')s.splice(i,1);
  else{const j=a==='u'?i-1:i+1;if(j<0||j>=s.length)return;[s[i],s[j]]=[s[j],s[i]]}
- draw();
+ draw();if(removedProducts)reconcileProjectProducts(cur);
 };
 function sectionDropIndex(y){
  const blocks=[...cv.querySelectorAll('.blk')];
@@ -1421,7 +1417,7 @@ function updSel(){$('pgsel').innerHTML=cur.pages.map((p,i)=>`<option value="${i}
 function switchPage(i,skip){if(!skip)sync();cur.pi=i;cur.sections=cur.pages[i].sections;undo=null;$('lk').hidden=true;draw();updSel();panel();cv.parentElement.scrollTop=0}
 function addPage(id){sync();const k=PG.find(x=>x.id===id),h=cur.pages[0].sections;let n=k.n,c=2;while(cur.pages.some(p=>p.n===n))n=k.n+' '+c++;
  cur.pages.push({id:'p'+(cur.nid++),n,sections:[...h.filter(x=>x.includes('s hdr')),...k.s.map(mk),...h.filter(x=>x.includes('s ftr'))]});autoLink();switchPage(cur.pages.length-1,true);toast(n+' page added')}
-function delPage(i){sync();const r=cur.pages.splice(i,1)[0];eachLink(el=>{if(el.dataset.link===r.id)delete el.dataset.link});if(i<cur.pi)cur.pi--;else if(i===cur.pi)cur.pi=Math.max(0,i-1);switchPage(cur.pi,true);toast('Page deleted')}
+function delPage(i){sync();const r=cur.pages.splice(i,1)[0],removedProducts=hasProductsSection(r.sections||[]);eachLink(el=>{if(el.dataset.link===r.id)delete el.dataset.link});if(i<cur.pi)cur.pi--;else if(i===cur.pi)cur.pi=Math.max(0,i-1);switchPage(cur.pi,true);if(removedProducts)reconcileProjectProducts(cur);toast('Page deleted')}
 $('pn').addEventListener('click',e=>{const b=e.target.closest('[data-pg],[data-np],[data-dp]');if(!b)return;
  if(b.dataset.pg)switchPage(+b.dataset.pg);else if(b.dataset.np)addPage(b.dataset.np);
  else if(b.dataset.arm)delPage(+b.dataset.dp);else{b.dataset.arm=1;b.textContent='Delete?';setTimeout(()=>{b.dataset.arm='';b.textContent='×'},2500)}});
@@ -1443,7 +1439,7 @@ function dmr(){const L=dEl.matches('.hdr,.ftr'),B=!!dEl.querySelector('.pb,[data
 function design(b){dEl=b.querySelector('.s');dmr();$('dm').classList.add('on')}
 $('dm').onclick=e=>{const o=e.target.dataset.o;if(!o)return;if(o==='done')return $('dm').classList.remove('on');const q=o.split(':');if(q[1])dEl.dataset[q[0]]=q[1];else delete dEl.dataset[q[0]];sync();scheduleProjectSave();dmr()};
 addEventListener('keydown',e=>{if(e.key==='Escape')$('dm').classList.remove('on')});
-function fillProds(){if(!cur||!cur.products)return;cv.querySelectorAll('.prods .cols').forEach(g=>g.innerHTML=cur.products.some(x=>x.st!=='draft')?cur.products.filter(x=>x.st!=='draft').map(prodItem).join(''):'<p class="pe">No products yet. Add some from the Projects screen, under Products.</p>')}
+function fillProds(){if(!cur||!cur.products)return;cv.querySelectorAll('.prods .cols').forEach(g=>g.innerHTML=cur.products.some(x=>x.st!=='draft')?cur.products.filter(x=>x.st!=='draft').map(prodItem).join(''):'<p class="pe">No products yet. Add some from the project dashboard.</p>')}
 let pcur=null,mi=-1;
 $('pr').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='rnin')$('pr').querySelector('[data-pm=rsave]').click()});
  $('pr').onclick=async e=>{if(e.target.id==='pr')return $('pr').classList.remove('on');const t=e.target.closest('[data-pm]');if(!t)return;
@@ -1459,6 +1455,27 @@ $('pm').onclick=async e=>{const b=e.target.closest('[data-m]');if(!b)return;cons
  else{pcur=p;$('pr').firstElementChild.className='card';$('pr').firstElementChild.style.maxWidth='460px';$('pr').firstElementChild.innerHTML='<h2>Rename project</h2><input id="rnin" value="'+ea(p.name)+'" style="width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);font:inherit"><div class="ra"><button class="btn ghost" data-pm="done">Cancel</button><button class="btn" data-pm="rsave">Save</button></div>';$('pr').classList.add('on');$('rnin').focus()}};
 document.addEventListener('click',e=>{if(!e.target.closest('#pm,[data-pa=more]'))$('pm').hidden=true});
 let psel=0,pqs='',plast=null;
+const productSaveTimers=new WeakMap();
+function scheduleProductSave(project=pcur){
+ if(!project?.id)return;
+ clearTimeout(productSaveTimers.get(project));
+ setSaveStatus('Unsaved changes');
+ productSaveTimers.set(project,setTimeout(()=>saveProjectRecord(project),650));
+}
+function refreshProjectProducts(project=pcur){if(cur===project)fillProds()}
+function ensureProductsSection(project=pcur){
+ if(!project)return;
+ if(Array.isArray(project.pages)&&project.pages.length){
+  const index=Number.isInteger(project.pi)&&project.pi>=0&&project.pi<project.pages.length?project.pi:0,page=project.pages[index];
+  if(hasProductsSection(page.sections||[]))return;
+  page.sections=[...(page.sections||[]),S.products.h({})];
+  if(index===(project.pi||0))project.sections=page.sections;
+  if(cur===project&&index===cur.pi){cur.sections=page.sections;if($('editor').classList.contains('on'))draw()}
+  return;
+ }
+ project.sections=project.sections||[];
+ if(!hasProductsSection(project.sections))project.sections.push(S.products.h({}));
+}
 const uid=()=>'i'+Math.random().toString(36).slice(2,8);
 const stk=x=>x.stock===''||x.stock==null?'':(+x.stock<=0?'Out of stock':x.stock+' in stock');
 function readImg(f,cb,m){if(!f||!/^image\//.test(f.type))return;const r=new FileReader();r.onload=()=>{const i=new Image();i.onload=()=>{const s=Math.min(1,(m||700)/Math.max(i.width,i.height)),c=document.createElement('canvas'),x=c.getContext('2d');c.width=Math.round(i.width*s);c.height=Math.round(i.height*s);x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(i,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',.82))};i.src=r.result};r.readAsDataURL(f)}
@@ -1474,22 +1491,21 @@ function pForm(){const x=pcur.products[psel],pe=$('pe');
 <div class="f"><label for="pf-t">Status</label><select id="pf-t" data-f="st"><option value="active"${x.st!=='draft'?' selected':''}>Active (shown on your site)</option><option value="draft"${x.st==='draft'?' selected':''}>Draft (hidden)</option></select></div>
 <div style="display:flex;justify-content:flex-end"><button class="btn ghost" data-pm="del">Delete product</button></div>`}
 function prRender(){const c=$('dbProducts');if(pcur!==plast){psel=0;pqs='';plast=pcur}
- if(!reconcileProjectProducts(pcur)){c.innerHTML='<div class="pmh"><div><h2>Products</h2><p>Add a Products section to this project in the editor to manage its product catalog.</p></div></div>';return}
- c.innerHTML='<div class="pmh"><div><h2>Products</h2><p>Manage what you sell. Every Products section on this site shows the active ones.</p></div></div><div class="pmb"><aside class="pml"><div class="tb"><input id="pq" placeholder="Search products" aria-label="Search products" value="'+ea(pqs)+'"><button class="btn" data-pm="add">+ Add product</button></div><div class="pll" id="pll"></div></aside><section class="pme" id="pe"></section></div>';
+ c.innerHTML='<div class="pmh"><div><h2>Products</h2><p>Manage what you sell. Products sections on this site show active products from this catalog.</p></div></div><div class="pmb"><aside class="pml"><div class="tb"><input id="pq" placeholder="Search products" aria-label="Search products" value="'+ea(pqs)+'"><button class="btn" data-pm="add">+ Add product</button></div><div class="pll" id="pll"></div></aside><section class="pme" id="pe"></section></div>';
  if(psel>=pcur.products.length)psel=Math.max(0,pcur.products.length-1);pList();pForm()}
 const dbProducts=$('dbProducts');
-dbProducts.oninput=e=>{const t=e.target;if(t.id==='pq'){pqs=t.value;return pList()}if(!t.dataset.f)return;pcur.products[psel][t.dataset.f]=t.dataset.f==='stock'?(t.value===''?'':Math.max(0,+t.value)):t.value;pList();scheduleProjectSave()};
-dbProducts.addEventListener('change',e=>{if(e.target.id==='pfi'){const x=pcur.products[psel];readImg(e.target.files[0],d=>{x.img=d;pList();pForm();scheduleProjectSave()})}});
+dbProducts.oninput=e=>{const t=e.target;if(t.id==='pq'){pqs=t.value;return pList()}if(!t.dataset.f)return;pcur.products[psel][t.dataset.f]=t.dataset.f==='stock'?(t.value===''?'':Math.max(0,+t.value)):t.value;pList();refreshProjectProducts();scheduleProductSave()};
+dbProducts.addEventListener('change',e=>{if(e.target.id==='pfi'){const x=pcur.products[psel];readImg(e.target.files[0],d=>{x.img=d;pList();pForm();refreshProjectProducts();scheduleProductSave()})}});
 dbProducts.addEventListener('dragover',e=>{if(e.target.closest('#pib'))e.preventDefault()});
-dbProducts.addEventListener('drop',e=>{if(!e.target.closest('#pib'))return;e.preventDefault();const x=pcur.products[psel];readImg(e.dataTransfer.files[0],d=>{x.img=d;pList();pForm();scheduleProjectSave()})});
+dbProducts.addEventListener('drop',e=>{if(!e.target.closest('#pib'))return;e.preventDefault();const x=pcur.products[psel];readImg(e.dataTransfer.files[0],d=>{x.img=d;pList();pForm();refreshProjectProducts();scheduleProductSave()})});
 dbProducts.onclick=e=>{
  const ps=e.target.closest('[data-ps]');if(ps){psel=+ps.dataset.ps;pList();pForm();return}
  const t=e.target.closest('[data-pm]');if(!t)return;const k=t.dataset.pm,x=pcur.products[psel];
  if(k==='done')dbSetTab('analytics');
- else if(k==='add'){pcur.products.push({id:uid(),n:'New product',price:'$0.00',st:'active'});psel=pcur.products.length-1;pqs='';prRender();$('pf-n').select();scheduleProjectSave()}
+ else if(k==='add'){pcur.products.push({id:uid(),n:'New product',price:'$0.00',st:'active'});ensureProductsSection(pcur);refreshProjectProducts();psel=pcur.products.length-1;pqs='';prRender();$('pf-n').select();scheduleProductSave()}
  else if(k==='img')$('pfi').click();
- else if(k==='rimg'){delete x.img;pList();pForm();scheduleProjectSave()}
- else if(k==='del'){if(!t.dataset.arm){t.dataset.arm=1;t.textContent='Click to confirm';return}pcur.products.splice(psel,1);psel=Math.max(0,psel-1);prRender();scheduleProjectSave()}};
+ else if(k==='rimg'){delete x.img;pList();pForm();refreshProjectProducts();scheduleProductSave()}
+ else if(k==='del'){if(!t.dataset.arm){t.dataset.arm=1;t.textContent='Click to confirm';return}pcur.products.splice(psel,1);psel=Math.max(0,psel-1);prRender();refreshProjectProducts();scheduleProductSave()}};
 function authUser(u){const email=u.email||'';return{name:u.user_metadata?.full_name||u.user_metadata?.name||email.split('@')[0]||'Account',email}}
 function hdrRender(){$('auth').innerHTML='<button class="dlink" data-nav="docs">Docs</button>'+(user?`<div class="account-control"><button class="account-trigger" type="button" data-account-menu aria-label="Open account menu for ${ea(user.name)}" aria-haspopup="true" aria-controls="accountMenu" aria-expanded="false"><span class="av" aria-hidden="true">${ea(user.name.charAt(0).toUpperCase())}</span><span class="un">${ea(user.name)}</span><svg class="account-chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="account-menu" id="accountMenu" hidden><div class="account-summary"><strong>${ea(user.name)}</strong><span>${ea(user.email)}</span></div><div class="account-divider"></div><button type="button" data-au="out"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8 3H4.5A1.5 1.5 0 0 0 3 4.5v11A1.5 1.5 0 0 0 4.5 17H8M12 6l4 4-4 4m4-4H7"/></svg><span>Log out</span></button></div></div>`:'<button class="btn ghost" data-au="in">Log in</button><button class="btn" data-au="up">Sign up</button>')}
 function auOpen(m){const up=m==='up',card=$('au').firstElementChild;card.innerHTML=`<button class="auth-close" type="button" data-au="x" aria-label="Close dialog">×</button><div class="auth-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="9" cy="9" r="1.5"/><path d="M21 16l-5-5-8 8"/></svg></div><p class="auth-eyebrow">${up?'Get started':'Your workspace'}</p><h2 id="authTitle">${up?'Create your account':'Welcome back'}</h2><p class="auth-intro">${up?'Create an account to start building and manage your projects.':'Sign in to continue to your projects.'}</p><div class="auth-fields">${up?'<div class="auth-field"><label for="a1">Full name</label><input id="a1" name="name" placeholder="Your name" autocomplete="name" required></div>':''}<div class="auth-field"><label for="a2">Email address</label><input id="a2" name="email" type="email" placeholder="you@example.com" autocomplete="email" required></div><div class="auth-field"><label for="a3">Password</label><input id="a3" name="password" type="password" placeholder="${up?'At least 6 characters':'Enter your password'}" autocomplete="${up?'new-password':'current-password'}" minlength="${up?6:1}" required></div></div><p class="auth-message" id="ae" role="status" aria-live="polite"></p><button class="btn auth-submit" type="button" data-au="go">${up?'Create account':'Sign in'}</button><p class="auth-switch">${up?'Already have an account? <a href="#" data-au="in">Sign in</a>':'New to Shipify? <a href="#" data-au="up">Create an account</a>'}</p><p class="auth-secure"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="4" y="8" width="12" height="9" rx="2"/><path d="M7 8V5a3 3 0 0 1 6 0v3"/></svg>Secure sign-in powered by Supabase</p>`;$('au').classList.add('on');$(up?'a1':'a2').focus()}
@@ -1656,7 +1672,7 @@ function cmdHTML(h,at){const t=document.createElement('template');t.innerHTML=St
  if(!e){e=document.createElement('section');e.className='s';e.append(t.content);e.querySelectorAll('h1,h2,h3,h4,h5,h6,p,li,blockquote').forEach(x=>x.setAttribute('contenteditable',''))}
  return 'Added HTML section at position '+cmdPut(e.outerHTML,'html',at)}
 function cmdCode(c,h,at){return 'Added custom code at position '+cmdPut(codeBlock(String(c),Math.min(1200,Math.max(40,+h||300))),'code',at)}
-function cmdRemove(i){sync();const a=cur.sections;if(!(i>=0&&i<a.length))throw new Error('No section at position '+i+' (there are '+a.length+')');a.splice(i,1);draw();return 'Removed section '+i}
+function cmdRemove(i){sync();const a=cur.sections;if(!(i>=0&&i<a.length))throw new Error('No section at position '+i+' (there are '+a.length+')');const removedProducts=hasProductsSection([a[i]]);a.splice(i,1);draw();if(removedProducts)reconcileProjectProducts(cur);return 'Removed section '+i}
 function cmdMove(i,j){sync();const a=cur.sections;if(!(i>=0&&i<a.length&&j>=0&&j<a.length))throw new Error('Positions must be between 0 and '+(a.length-1));a.splice(j,0,a.splice(i,1)[0]);draw();return 'Moved section '+i+' to '+j}
 function cmdSections(){sync();const N={hdr:'header',ftr:'footer',prods:'products'};
  return cur.sections.map((x,i)=>{const m=/class="s([^"]*)"/.exec(x),k=m&&m[1].trim().split(' ')[0]||'section',t=document.createElement('template');t.innerHTML=x;
@@ -2044,7 +2060,7 @@ async function dbRender(){
  <div class="gr"><div class="pn"><h3>Funnel</h3>${dbRows(fn,'n','v')}</div><div class="pn"><h3>Top pages</h3>${dbRows(s.top_pages,'path','views')}</div><div class="pn"><h3>Top products</h3>${dbRows(s.top_products,'name','revenue_cents',x=>dbMoney(x.revenue_cents))}</div><div class="pn"><h3>Traffic sources</h3>${dbRows(s.sources,'name','n')}</div><div class="pn"><h3>Devices</h3>${dbRows(s.devices,'name','n')}</div></div>
  ${o.live?'':'<p class="hint">This is made-up sample data. Fill in the BACKEND settings in the code to see real numbers.</p>'}`}
 function dbSetTab(tab){const products=tab==='products';$('dbTabAnalytics').classList.toggle('on',!products);$('dbTabAnalytics').setAttribute('aria-selected',String(!products));$('dbTabProducts').classList.toggle('on',products);$('dbTabProducts').setAttribute('aria-selected',String(products));$('dbAnalytics').hidden=products;$('dbProducts').hidden=!products;if(products)prRender();else dbRender()}
-function dbOpen(p){dbProject=p;pcur=p;reconcileProjectProducts(p);p.products=p.products||[];$('dbTitle').textContent=p.name;$('dbSubtitle').textContent='Analytics for your configured Supabase site · products for this project';if(!DB.f)dbRange(30);$('db').classList.add('on');dbSetTab('analytics')}
+function dbOpen(p){dbProject=p;pcur=p;p.products=p.products||[];$('dbTitle').textContent=p.name;$('dbSubtitle').textContent='Analytics for your configured Supabase site · products for this project';if(!DB.f)dbRange(30);$('db').classList.add('on');dbSetTab('analytics')}
 $('db').addEventListener('click',e=>{if(e.target.id==='db'||e.target.closest('[data-db-close]'))return $('db').classList.remove('on');const tab=e.target.closest('[data-db-tab]');if(tab)return dbSetTab(tab.dataset.dbTab);const range=e.target.closest('[data-db-range]');if(range){dbRange(+range.dataset.dbRange);dbRender()}});
 $('db').addEventListener('change',e=>{if(e.target.id!=='dbf'&&e.target.id!=='dbt')return;const f=$('dbf').value,t=$('dbt').value;if(!f||!t||f>t)return;DB.f=new Date(f+'T00:00:00Z');DB.t=new Date(+new Date(t+'T00:00:00Z')+864e5);DB.d=0;dbRender()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')$('db').classList.remove('on')});
