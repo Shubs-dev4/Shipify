@@ -1111,7 +1111,11 @@ async function loadProjects(ownerId,loadId){
   const{data,error}=await authClient.from('projects').select('id,name,data,updated_at').eq('owner',ownerId).order('updated_at',{ascending:false});
   if(error)throw error;
   if(loadId!==projectLoadId||ownerId!==currentUserId)return;
-  projects=(data||[]).filter(row=>row.data&&typeof row.data==='object').map(row=>({...row.data,id:row.id,name:row.name}));
+  projects=(data||[]).filter(row=>row.data&&typeof row.data==='object').map(row=>{
+   const dataName=typeof row.data.name==='string'?row.data.name.trim():'',recordName=typeof row.name==='string'?row.name.trim():'';
+   const name=dataName&&dataName!=='Untitled project'?dataName:recordName||dataName||'Untitled project';
+   return{...row.data,id:row.id,name};
+  });
   projectLoadState='ready';renderHome(true);
  }catch(error){
   if(loadId!==projectLoadId)return;
@@ -1244,7 +1248,8 @@ function draw(){
 }
 cv.addEventListener('input',()=>{if(!prev){sync();scheduleProjectSave()}});
 cv.addEventListener('change',()=>{if(!prev){sync();scheduleProjectSave()}});
-$('pname').addEventListener('input',()=>{if(!cur)return;cur.name=$('pname').value.trim()||'Untitled project';scheduleProjectSave()});
+$('pname').addEventListener('input',()=>{if(!cur)return;const name=$('pname').value.trim();if(!name)return;cur.name=name;scheduleProjectSave()});
+$('pname').addEventListener('change',async()=>{if(!cur)return;const name=$('pname').value.trim();if(!name){$('pname').value=cur.name;return}cur.name=name;await persistCurrentProject()});
 cv.onclick=e=>{
  const a=e.target.dataset&&e.target.dataset.a;if(!a)return;
  if(a==='drag')return;
