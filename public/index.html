@@ -1210,15 +1210,24 @@ $('pn').onclick=e=>{
  else if(b.dataset.s){const q=b.dataset.s.split(':');cur.st[q[0]]=+q[1];applyTheme(cur.theme||0);if(prev)setPrev();scheduleProjectSave()}
  else if(b.id==='pa'){prev=true;setPrev()}
  else if(b.id==='pp'){prev=true;setPrev();pageTrans(()=>{})}
- else if(b.dataset.t){const t=T.find(x=>x.id===b.dataset.t);sync();undo={s:cur.sections.slice(),th:cur.theme,st:cur.st};cur.sections=t.s.map(mk);cur.tpl=t.n;cur.st={f:0,r:0,a:0,h:0,...(t.st||{})};draw();applyTheme(t.th);toast('Template applied')}
- else if(undo){cur.sections=undo.s;const th=undo.th;if(undo.st)cur.st=undo.st;undo=null;draw();applyTheme(th)}
+ else if(b.dataset.t){const t=T.find(x=>x.id===b.dataset.t);sync();undo={s:cur.sections.slice(),th:cur.theme,st:cur.st,pr:JSON.parse(JSON.stringify(cur.products||[]))};cur.sections=t.s.map(mk);cur.tpl=t.n;if(!hasProductsSection(cur.sections))cur.products=[];cur.st={f:0,r:0,a:0,h:0,...(t.st||{})};draw();applyTheme(t.th);toast('Template applied')}
+ else if(undo){cur.sections=undo.s;const th=undo.th;if(undo.st)cur.st=undo.st;if(undo.pr)cur.products=undo.pr;undo=null;draw();applyTheme(th)}
 };
 $('tipx').onclick=()=>$('tip').style.display='none';
 
 function sync(){cur.sections=[...cv.querySelectorAll('.blk>.s')].map(e=>e.outerHTML);if(cur.pages)cur.pages[cur.pi].sections=cur.sections}
+function hasProductsSection(sections=[]){
+ return sections.some(html=>{const template=document.createElement('template');template.innerHTML=html;return !!template.content.querySelector('.prods')});
+}
+function reconcileProjectProducts(){
+ if(!cur)return;
+ const pages=cur.pages?.length?cur.pages:[{sections:cur.sections||[]}];
+ if(!pages.some(page=>hasProductsSection(page.sections||[])))cur.products=[];
+}
 function draw(){
  $('dm').classList.remove('on');$('tb').hidden=true;
  if(cur.pages)cur.pages[cur.pi].sections=cur.sections;
+ reconcileProjectProducts();
  cv.innerHTML=cur.sections.length?cur.sections.map((h,i)=>`<div class="drop-slot" data-insert="${i}" aria-hidden="true"></div><div class="blk${h.includes('s hdr')?' hd':''}" data-i="${i}">${h}<div class="tools"><button data-a="drag" title="Drag to move this section" aria-label="Drag section">Drag</button>${h.includes('class="s code"')?'<button data-a="e">Edit code</button>':''}<button data-a="s">Design</button><button data-a="u">Move up</button><button data-a="d">Move down</button><button data-a="c">Add code below</button><button data-a="x">Delete</button></div></div>`).join('')+`<div class="drop-slot" data-insert="${cur.sections.length}" aria-hidden="true"></div>`:'<div class="empty"><b>This page is empty</b><br>Drag a basic item or section here, or click one in the left panel to add it.</div>';
  const controls='.blk>.s a,.blk>.s .pb:not(.sb),.blk>.s .b,.blk>.s .btn,.blk>.s [role="button"],.blk>.s [role="link"],.blk>.s [onclick],.blk>.s [tabindex]:not([tabindex="-1"]),.blk>.s button:not(.add):not(.cartlink):not(.menubtn):not(.sb)';
  cv.querySelectorAll(controls).forEach(b=>{
