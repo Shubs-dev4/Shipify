@@ -1225,8 +1225,8 @@ $('pn').onclick=e=>{
  else if(b.dataset.s){const q=b.dataset.s.split(':');cur.st[q[0]]=+q[1];applyTheme(cur.theme||0);if(prev)setPrev();scheduleProjectSave()}
  else if(b.id==='pa'){prev=true;setPrev()}
  else if(b.id==='pp'){prev=true;setPrev();pageTrans(()=>{})}
- else if(b.dataset.t){const t=T.find(x=>x.id===b.dataset.t);sync();undo={s:cur.sections.slice(),th:cur.theme,st:cur.st,pr:JSON.parse(JSON.stringify(cur.products||[]))};cur.sections=t.s.map(mk);cur.tpl=t.n;cur.st={f:0,r:0,a:0,h:0,...(t.st||{})};draw();reconcileProjectProducts(cur);applyTheme(t.th);toast('Template applied')}
- else if(undo){cur.sections=undo.s;const th=undo.th;if(undo.st)cur.st=undo.st;if(undo.pr)cur.products=undo.pr;undo=null;draw();applyTheme(th)}
+ else if(b.dataset.t){const t=T.find(x=>x.id===b.dataset.t);sync();undo={s:cur.sections.slice(),pg:cur.pages?JSON.parse(JSON.stringify(cur.pages)):null,pi:cur.pi,th:cur.theme,st:JSON.parse(JSON.stringify(cur.st||{})),pr:JSON.parse(JSON.stringify(cur.products||[])),tpl:cur.tpl};cur.sections=t.s.map(mk);cur.tpl=t.n;cur.st={f:0,r:0,a:0,h:0,...(t.st||{})};if(cur.pages){cur.pages[cur.pi].sections=cur.sections;if(!hasProductsSection(cur.sections)){cur.pages.forEach((page,index)=>{if(index!==cur.pi)page.sections=(page.sections||[]).filter(section=>!hasProductsSection([section]))});cur.products=[]}}draw();applyTheme(t.th);toast('Template applied')}
+ else if(undo){cur.pages=undo.pg;cur.pi=undo.pi||0;cur.sections=cur.pages?cur.pages[cur.pi].sections:undo.s;if(undo.tpl!==undefined)cur.tpl=undo.tpl;if(undo.st)cur.st=undo.st;if(undo.pr)cur.products=undo.pr;const th=undo.th;undo=null;draw();updSel();applyTheme(th)}
 };
 $('tipx').onclick=()=>$('tip').style.display='none';
 
