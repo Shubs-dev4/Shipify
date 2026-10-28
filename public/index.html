@@ -536,11 +536,11 @@ sections()
 <tbody>
 <tr>
 <td><code>clear()</code></td>
-<td>Removes every section from the current page</td>
+<td>Removes every section from every page and clears the project catalog</td>
 </tr>
 <tr>
 <td><code>clear(true)</code></td>
-<td>Removes everything except the header and footer</td>
+<td>Removes every section except each page's header and footer, and clears the project catalog</td>
 </tr>
 <tr>
 <td><code>add(type, options, position)</code></td>
@@ -711,7 +711,7 @@ add('text', {}, 2)   // the empty {} keeps defaults; 2 is the position
 <li>Read the output panel. A successful script ends by listing the sections it built.</li>
 <li>Not happy? Type <code>undo()</code>. A whole script counts as one command, so a single undo reverts everything it did.</li>
 </ol>
-<p>Scripts start with <code>clear()</code>, so they <strong>replace the page you are on</strong>. Anything you typed by hand on that page will be removed. To keep a copy, duplicate the project first or use a fresh page.</p>
+<p>Scripts start with <code>clear()</code>, so they <strong>replace the entire project site</strong>: sections on every page and the project product catalog are removed. Page names remain. Anything you typed by hand will be removed. To keep a copy, duplicate the project first.</p>
 <blockquote>
 <p><strong>Only paste scripts you trust.</strong> The command bar runs real JavaScript with access to the whole editor. Treat a script like a program: read it, or get it from someone you know.</p>
 </blockquote>
@@ -729,7 +729,7 @@ add('text', {}, 2)   // the empty {} keeps defaults; 2 is the position
 <tr>
 <td>1</td>
 <td><code>clear(); theme(2);</code></td>
-<td>Empties the page and switches to the dark Midnight theme</td>
+<td>Empties every page and clears the product catalog, then switches to the dark Midnight theme</td>
 </tr>
 <tr>
 <td>2</td>
@@ -1636,7 +1636,20 @@ function cmdPrint(...a){cmdLine(a.map(x=>fmt(x,1)).join(' '),'out')}
 function cmdSnap(){return JSON.stringify({s:cur.sections,pg:cur.pages||null,pi:cur.pi,nid:cur.nid,th:cur.theme,st:cur.st||null,pr:cur.products||null})}
 function cmdAt(t,at){const a=cur.sections;if(at!=null&&at>=0&&at<=a.length)return Math.floor(at);if(t==='header')return 0;const f=a.map(x=>x.includes('s ftr')).lastIndexOf(true);return t==='footer'||f<0?a.length:f}
 function cmdPut(h,t,at){sync();const i=cmdAt(t,at);cur.sections.splice(i,0,h);draw();return i}
-function cmdClear(keep){sync();const n=cur.sections.length;cur.sections=keep?cur.sections.filter(x=>x.includes('s hdr')||x.includes('s ftr')):[];if(cur.pages)cur.pages[cur.pi].sections=cur.sections;draw();const k=n-cur.sections.length;return 'Cleared '+k+' section'+(k===1?'':'s')}
+function cmdClear(keep){
+ sync();
+ const persistent=h=>h.includes('s hdr')||h.includes('s ftr');
+ let removed=0;
+ if(cur.pages){
+  cur.pages.forEach(page=>{const before=page.sections.length;page.sections=keep?page.sections.filter(persistent):[];removed+=before-page.sections.length});
+  cur.sections=cur.pages[cur.pi].sections;
+ }else{
+  const before=cur.sections.length;cur.sections=keep?cur.sections.filter(persistent):[];removed=before-cur.sections.length;
+ }
+ cur.products=[];
+ draw();
+ return 'Cleared '+removed+' section'+(removed===1?'':'s')+' across the project';
+}
 function cmdAdd(t,o,at){if(!S[t])throw new Error('Unknown section "'+t+'". Types: '+Object.keys(S).join(', '));const i=cmdPut(S[t].h(o),t,at);return 'Added '+S[t].n+' at position '+i}
 function cmdHTML(h,at){const t=document.createElement('template');t.innerHTML=String(h).trim();
  let e=t.content.childElementCount===1&&t.content.firstElementChild.classList.contains('s')?t.content.firstElementChild:null;
@@ -1655,7 +1668,7 @@ function cmdRevert(){const s=cs().undo.pop();if(!s)return 'Nothing to undo';cmdS
  if(o.pg){cur.pages=o.pg;cur.nid=o.nid;cur.pi=Math.min(o.pi||0,o.pg.length-1);cur.sections=cur.pages[cur.pi].sections}else cur.sections=o.s;
  if(o.st)cur.st=o.st;if(o.pr)cur.products=o.pr;draw();applyTheme(o.th||0);updSel();panel();return 'Undid the last command'}
 function cmdHelp(){return ['Command bar: type JavaScript and press Enter. Shift+Enter = new line, Up/Down = history, / = jump here.','',
- 'clear()  clear(true)        clear the page (true keeps the header and footer)',
+ 'clear()  clear(true)        clear the whole project (true keeps each page header/footer)',
  "add('hero',{t:'Title',p:'Text',b:'Button'})   add a section; add('text',{},2) puts it at position 2",
  '   section types: '+Object.keys(S).join(', '),
  "html('<h1>Hello</h1><a href=\"#\">Learn more</a>')   add editable HTML (links and button-like controls can be linked to project pages)",
@@ -1683,7 +1696,7 @@ async function cmdRun(){
  sync();const snap=cmdSnap();cmdSkip=false;
  try{const r=await cmdScope(src);if(r!==undefined)cmdLine(fmt(r),'out')}
  catch(e){cmdLine(e&&e.message?(e.name||'Error')+': '+e.message:String(e),'err')}
- try{sync();if(!cmdSkip&&cmdSnap()!==snap){st.undo.push(snap);if(st.undo.length>30)st.undo.shift();draw();updSel();panel()}}catch(e){}}
+ try{sync();if(cmdSnap()!==snap){if(!cmdSkip){st.undo.push(snap);if(st.undo.length>30)st.undo.shift()}draw();updSel();panel();scheduleProjectSave()}}catch(e){}}
 cmdI.addEventListener('input',()=>{cs().draft=cmdI.value;cmdGrow()});
 cmdI.addEventListener('keydown',e=>{
  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();cmdRun();return}
