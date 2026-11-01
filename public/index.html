@@ -116,6 +116,8 @@ body.dragging-section{user-select:none;cursor:grabbing}
 .tools button{height:28px;padding:0 10px;border:1px solid #fff;border-radius:6px;background:#000;color:#fff;font-size:12px}
 .tools button[data-a=drag]{padding:0 7px}
 [contenteditable]{outline:none}
+#editor:not(.pv) #cv,#editor:not(.pv) #cv *{-webkit-user-select:none;user-select:none}
+#editor:not(.pv) #cv :is(input,textarea,select){-webkit-user-select:text;user-select:text}
 :where(#cv:not(.prev)) [contenteditable]:hover{background:rgba(127,127,127,.15);cursor:text}
 [contenteditable]:focus{box-shadow:0 0 0 2px #888;background:rgba(127,127,127,.15)}
 #cv img[data-builder-image-empty]{background:var(--ps);opacity:.5}
@@ -1399,6 +1401,12 @@ document.addEventListener('pointerdown',sectionDragTarget);
 document.addEventListener('pointermove',sectionDragMove,{passive:false});
 document.addEventListener('pointerup',sectionDragEnd);
 document.addEventListener('pointercancel',sectionDragEnd);
+document.addEventListener('selectionchange',()=>{
+ const selection=getSelection();
+ if(!selection||selection.isCollapsed||$('editor').classList.contains('pv'))return;
+ const inCanvas=node=>node instanceof Node&&cv.contains(node.nodeType===Node.ELEMENT_NODE?node:node.parentNode);
+ if(inCanvas(selection.anchorNode)||inCanvas(selection.focusNode))selection.removeAllRanges();
+});
 cv.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.target.closest('input,textarea,select,button'))e.preventDefault()});
 let cart=[],sym='$',prev=false;
 const money=n=>sym+n.toFixed(2);
