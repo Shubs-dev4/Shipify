@@ -160,8 +160,25 @@ body.dragging-section{user-select:none;cursor:grabbing}
 .prev.an3 .blk>.s{opacity:0;transform:scale(.94);transition:opacity .7s ease,transform .7s ease}
 .prev.an1 .blk>.s.in,.prev.an2 .blk>.s.in,.prev.an3 .blk>.s.in{opacity:1;transform:none}
 .hov .pb,.hov .plan,.hov .prod .im{transition:transform .2s ease}.hov .pb:hover,.hov .plan:hover{transform:translateY(-3px)}.hov .prod:hover .im{transform:scale(1.03)}
-.steps{list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;padding:0;margin:0 0 32px}
-.steps li{border:1px solid var(--line);border-radius:12px;padding:14px 16px;color:var(--mut);font-size:14px}.steps b{display:block;color:var(--fg);font-size:15px}
+#home .hm{max-width:1120px;margin:0 auto;padding:32px 24px 48px}
+.home-intro{position:relative;isolation:isolate;margin:0 -24px 30px;padding:28px 24px 26px;overflow:hidden;text-align:center;background:radial-gradient(ellipse at 0% 0%,rgba(0,0,0,.065),transparent 30%),radial-gradient(ellipse at 100% 100%,rgba(0,0,0,.045),transparent 32%),linear-gradient(135deg,#fafafa,#f2f2f2 54%,#fafafa)}
+.home-intro::before,.home-intro::after{position:absolute;z-index:-1;width:280px;height:180px;border-radius:50%;border:1px solid rgba(0,0,0,.045);content:""}
+.home-intro::before{top:-115px;left:-85px;transform:rotate(-25deg);box-shadow:0 0 0 30px rgba(0,0,0,.015),0 0 0 60px rgba(0,0,0,.012)}
+.home-intro::after{right:-100px;bottom:-130px;transform:rotate(-25deg);box-shadow:0 0 0 30px rgba(0,0,0,.015),0 0 0 60px rgba(0,0,0,.012)}
+.home-title{display:flex;align-items:center;justify-content:center;gap:16px;margin:0 0 10px}
+.home-title svg{width:54px;height:48px;flex-shrink:0;color:#000}
+#home .home-title h1{margin:0;color:#000;font-size:44px;line-height:1.05;letter-spacing:-.04em}
+#home .home-intro>p.sub{display:flex;align-items:center;justify-content:center;gap:20px;margin:0 auto 20px;color:#444;font-size:17px;font-weight:600}
+#home .home-intro>p.sub::before,#home .home-intro>p.sub::after{width:clamp(24px,8vw,100px);height:1px;background:linear-gradient(90deg,transparent,#aaa);content:""}
+#home .home-intro>p.sub::after{transform:rotate(180deg)}
+.steps{list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;padding:0;margin:0}
+.steps li{display:flex;align-items:center;gap:14px;min-height:88px;padding:16px 18px;border:1px solid rgba(0,0,0,.08);border-radius:20px;background:rgba(255,255,255,.82);box-shadow:0 10px 24px rgba(0,0,0,.07);color:#555;text-align:left;font-size:13px;line-height:1.35;backdrop-filter:blur(8px)}
+.steps .step-num{display:grid;width:32px;height:32px;place-items:center;flex:0 0 32px;border-radius:50%;background:#000;color:#fff;font-size:15px;font-weight:700}
+.steps .step-copy{min-width:0;flex:1}
+.steps b{display:block;margin-bottom:3px;color:#000;font-size:15px}
+.steps .step-icon{width:26px;height:26px;flex:0 0 26px;color:#000}
+@media(max-width:720px){.home-intro{margin:0 -18px 24px;padding:25px 18px}.steps{grid-template-columns:1fr;gap:10px}.steps li{min-height:72px;border-radius:16px}}
+@media(max-width:420px){.home-title{gap:10px}.home-title svg{width:42px;height:38px}#home .home-title h1{font-size:36px}#home .home-intro>p.sub{gap:10px;font-size:14px}}
 .sw{display:flex;gap:8px;margin-bottom:22px}
 .sw button{width:30px;height:30px;padding:0;margin:0;border-radius:50%;border:1px solid var(--line)}
 .sw button.on{outline:2px solid var(--fg);outline-offset:2px}
@@ -468,9 +485,15 @@ select option::checkmark{display:none}
 <main id="home">
   <header class="top"><div class="brand"><span class="logo wide" role="img" aria-label="Logo placeholder"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="1.5"/><path d="M21 16l-5-5-8 8"/></svg>Your logo</span></div><div id="auth"></div></header>
   <div class="hm">
-  <h1>Projects</h1>
+  <section class="home-intro" aria-labelledby="projectsTitle">
+  <div class="home-title"><svg viewBox="0 0 64 56" fill="none" aria-hidden="true"><path d="M5 11a6 6 0 0 1 6-6h15l7 7h20a6 6 0 0 1 6 6v26a6 6 0 0 1-6 6H11a6 6 0 0 1-6-6V11Z" fill="currentColor"/><path d="M5 19a6 6 0 0 1 6-6h38a6 6 0 0 1 6 6v25a6 6 0 0 1-6 6H11a6 6 0 0 1-6-6V19Z" fill="currentColor" opacity=".82"/></svg><h1 id="projectsTitle">Projects</h1></div>
   <p class="sub">Build a website in three steps. No coding needed.</p>
-  <ol class="steps"><li><b>1. Pick a template</b>Choose a ready-made layout.</li><li><b>2. Edit your page</b>Click any text to change it. Add or remove sections.</li><li><b>3. Publish</b>Share your finished site.</li></ol>
+  <ol class="steps">
+   <li><span class="step-num">1</span><span class="step-copy"><b>Pick a template</b>Choose a ready-made layout.</span><svg class="step-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg></li>
+   <li><span class="step-num">2</span><span class="step-copy"><b>Edit your page</b>Click any text to change it. Add or remove sections.</span><svg class="step-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10"/><path d="m15 5 4 4"/><path d="m10 14 8.5-8.5a2.1 2.1 0 0 1 3 3L13 17l-4 1 1-4Z"/></svg></li>
+   <li><span class="step-num">3</span><span class="step-copy"><b>Publish</b>Share your finished site.</span><svg class="step-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4c2.4-1.6 5-2 7-2 0 2-.4 4.6-2 7l-6 6-5-5 6-6Z"/><path d="m8 10-4 1-2 4 6 1"/><path d="m14 16-1 4-4 2-1-6"/><circle cx="16.5" cy="7.5" r="1.5"/><path d="M5 19c-1 1-2 1-3 1 0-1 0-2 1-3"/></svg></li>
+  </ol>
+  </section>
   <p id="projectNotice" class="sub" role="status" aria-live="polite"></p>
   <div class="grid" id="grid"></div>
   </div>
