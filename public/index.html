@@ -20,6 +20,10 @@ button{font:inherit;cursor:pointer;color:inherit}
 #home{max-width:960px;margin:0 auto;padding:48px 24px;-webkit-user-select:none;user-select:none}
 #home h1{font-size:32px;letter-spacing:-.02em;margin:0 0 4px}
 #home p.sub{color:var(--mut);margin:0 0 32px}
+#home #projectNotice{width:fit-content;max-width:min(100%,360px);margin:-8px 0 22px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--bg);font-size:13px;line-height:1.45}
+#home #projectNotice:empty{display:none}
+#home #projectNotice .chip{display:inline-block;margin:8px 0 0;padding:6px 11px;background:var(--bg)}
+#home #projectNotice .chip:hover{background:var(--soft)}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
 .new{aspect-ratio:4/3;border:1.5px dashed var(--mut);border-radius:14px;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--mut);transition:.15s}
 .new:hover{border-color:var(--fg);color:var(--fg);background:var(--soft)}
