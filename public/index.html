@@ -26,10 +26,8 @@ button{font:inherit;cursor:pointer;color:inherit}
 .new svg{width:36px;height:36px}
 .proj{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--bg);text-align:left;padding:0}
 .proj:hover{border-color:var(--fg)}
-.proj .th{aspect-ratio:4/3;background:var(--soft);border-bottom:1px solid var(--line);padding:14px;display:flex;flex-direction:column;gap:6px}
-.proj .th i{display:block;height:8px;border-radius:4px;background:var(--ph)}
-.proj .th i:nth-child(1){width:40%;background:var(--fg)}
-.proj .th i:nth-of-type(3){width:70%}
+.proj .th{position:relative;aspect-ratio:4/3;overflow:hidden;background:var(--soft);border-bottom:1px solid var(--line)}
+.proj .th iframe{position:absolute;inset:0 auto auto 0;width:1200px;height:900px;border:0;transform-origin:top left;pointer-events:none}
 .proj .edit-tag{position:absolute;top:10px;right:10px;z-index:1;max-width:calc(100% - 20px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:4px 8px;border:1px solid var(--line);border-radius:999px;background:var(--bg);color:var(--fg);font-size:11px;font-weight:600;line-height:1.2}
 .proj div.m{padding:12px 14px}.proj b{display:block}.proj span{color:var(--mut);font-size:13px}
 /* modal */
@@ -1162,16 +1160,65 @@ addEventListener('keydown',e=>{
 });
 
 function renderHome(animateProjects=false){
+ projectPreviewObserver?.disconnect();
  const plus='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>';
  projects.sort((a,b)=>(Date.parse(b.updated_at||'')||0)-(Date.parse(a.updated_at||'')||0));
  $('grid').innerHTML=`<button class="new" id="add" aria-label="Create project">${plus}<span>Create project</span></button>`+
-  projects.map((p,i)=>{const updated=Date.parse(p.updated_at||''),label=Number.isFinite(updated)?projectEditedLabel(updated):'Last edited unknown',datetime=Number.isFinite(updated)?new Date(updated).toISOString():'';return `<div class="proj"${animateProjects?' data-enter':''}${animateProjects?` style="animation-delay:${i*80}ms"`:''} data-i="${i}"><button class="pj-open"><div class="th"><time class="edit-tag"${datetime?` datetime="${datetime}" title="Last edited ${new Date(updated).toLocaleString()}"`:''}>${label}</time><i></i><i></i><i></i></div><div class="m"><b>${ea(p.name)}</b><span>${(p.pages||[p]).reduce((a,x)=>a+(x.sections||[]).length,0)} sections · ${(p.pages||[1]).length} pages</span></div></button><div class="pj-act"><button class="chip" data-pa="dashboard">Dashboard</button><button class="chip" data-pa="more" aria-label="More options">⋯</button></div></div>`}).join('');
+  projects.map((p,i)=>{const updated=Date.parse(p.updated_at||''),label=Number.isFinite(updated)?projectEditedLabel(updated):'Last edited unknown',datetime=Number.isFinite(updated)?new Date(updated).toISOString():'';return `<div class="proj"${animateProjects?' data-enter':''}${animateProjects?` style="animation-delay:${i*80}ms"`:''} data-i="${i}"><button class="pj-open"><div class="th"><iframe title="${ea(p.name||'Project')} preview" loading="lazy" sandbox="" tabindex="-1" aria-hidden="true"></iframe><time class="edit-tag"${datetime?` datetime="${datetime}" title="Last edited ${new Date(updated).toLocaleString()}"`:''}>${label}</time></div><div class="m"><b>${ea(p.name)}</b><span>${(p.pages||[p]).reduce((a,x)=>a+(x.sections||[]).length,0)} sections · ${(p.pages||[1]).length} pages</span></div></button><div class="pj-act"><button class="chip" data-pa="dashboard">Dashboard</button><button class="chip" data-pa="more" aria-label="More options">⋯</button></div></div>`}).join('');
+ fitProjectPreviews();
+ observeProjectPreviews();
  const notice=$('projectNotice');
  notice.innerHTML=projectLoadState==='error'?'Could not load your projects. Check your connection. <button class="chip" type="button" data-project-retry>Retry</button>':projectLoadState==='ready'&&user&&!projects.length?'Your projects will be saved to your account automatically.':'';
  $('add').disabled=projectLoadState!=='ready';
  $('add').onclick=()=>{if(!user){auOpen('in');authMessage('Sign in to create and save projects to your account.');return}$('modal').classList.add('on');document.querySelectorAll('#tpls .tin').forEach(i=>i.style.transform=`scale(${i.parentElement.clientWidth/1000})`)};
  document.querySelectorAll('.pj-open').forEach(b=>b.onclick=()=>open(projects[b.parentElement.dataset.i]));
 }
+let projectPreviewObserver=null;
+function loadProjectPreview(frame){
+ if(!frame.isConnected||frame.dataset.previewLoaded)return;
+ const project=projects[+frame.closest('.proj').dataset.i];if(!project)return;
+ frame.dataset.previewLoaded='true';frame.srcdoc=projectPreviewDoc(project);
+}
+function observeProjectPreviews(){
+ const frames=$('grid').querySelectorAll('.th iframe');
+ if(!('IntersectionObserver' in window)){frames.forEach(loadProjectPreview);return}
+ projectPreviewObserver=new IntersectionObserver(entries=>entries.forEach(entry=>{
+  if(!entry.isIntersecting)return;
+  loadProjectPreview(entry.target);projectPreviewObserver.unobserve(entry.target);
+ }),{rootMargin:'200px'});
+ frames.forEach(frame=>projectPreviewObserver.observe(frame));
+}
+function projectPreviewDoc(project){
+ const page=project.pages?.[0],sections=Array.isArray(page?.sections)?page.sections:project.sections||[];
+ const theme=TH[project.theme]||TH[0],style=siteCss(theme,project.st||{f:0,r:0,a:0,h:0});
+ const content=sections.map(html=>{
+  const template=document.createElement('template');template.innerHTML=String(html||'');
+  const section=template.content.firstElementChild;if(!section)return '';
+  section.querySelectorAll('script,iframe,object,embed,noscript').forEach(el=>el.remove());
+  [section,...section.querySelectorAll('*')].forEach(el=>{
+   ['contenteditable','data-builder-button','data-builder-control','data-builder-image','data-builder-image-empty','data-builder-position','data-link','data-phone'].forEach(attr=>el.removeAttribute(attr));
+   if(el.matches('img')&&(/^(data:image\/)/i.test(el.getAttribute('src')||'')||/data:image\//i.test(el.getAttribute('srcset')||''))){
+    el.removeAttribute('srcset');el.src='data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';el.style.background='var(--ps)';
+   }
+   if(/url\(["']?data:image\//i.test(el.getAttribute('style')||''))el.style.removeProperty('background-image');
+  });
+  if(section.matches('.hdr')&&!section.querySelector('.menubtn'))section.insertAdjacentHTML('afterbegin',MB);
+  section.querySelectorAll('.prods .cols').forEach(grid=>{
+   grid.innerHTML=(project.products||[]).filter(product=>product.st!=='draft').map(prodItem).join('');
+   grid.querySelectorAll('[style]').forEach(el=>{if(/url\(["']?data:image\//i.test(el.getAttribute('style')||''))el.style.removeProperty('background-image')});
+  });
+  return `<div class="blk${section.classList.contains('hdr')?' hd':''}">${section.outerHTML}</div>`;
+ }).join('');
+ const state=project.st||{};
+ const classes=[state.h?'hov':'',state.sh?'stk':'',state.p?'pt'+state.p:''].filter(Boolean).join(' ');
+ return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=1200,initial-scale=1"><style>${style}html,body{width:1200px;height:900px;min-height:900px;overflow:hidden}#cv{min-height:900px!important;overflow:hidden!important}</style></head><body><main id="cv"${classes?` class="${classes}"`:''}>${content}</main></body></html>`;
+}
+function fitProjectPreviews(){
+ $('grid').querySelectorAll('.th').forEach(th=>{
+  const frame=th.querySelector('iframe');if(frame)frame.style.transform=`scale(${th.clientWidth/1200})`;
+ });
+}
+addEventListener('resize',fitProjectPreviews);
 function projectRouteId(){return new URL(location.href).searchParams.get('project')||''}
 function setProjectRoute(id,replace=false){
  const url=new URL(location.href);
