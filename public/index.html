@@ -25,7 +25,7 @@ button{font:inherit;cursor:pointer;color:inherit}
 .new:hover{border-color:var(--fg);color:var(--fg);background:var(--soft)}
 .new svg{width:36px;height:36px}
 .proj{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--bg);text-align:left;padding:0}
-.proj:hover{border-color:var(--fg)}
+.proj:hover{border-color:var(--line)}
 .proj .th{position:relative;aspect-ratio:4/3;overflow:hidden;background:var(--soft);border-bottom:1px solid var(--line)}
 .proj .th iframe{position:absolute;inset:0 auto auto 0;width:1200px;height:900px;border:0;transform-origin:top left;pointer-events:none}
 .proj .publish-tag{position:absolute;right:10px;bottom:10px;z-index:1;padding:4px 8px;border:1px solid var(--line);border-radius:999px;background:var(--bg);color:var(--mut);font-size:11px;font-weight:600;line-height:1.2;pointer-events:none}
@@ -33,10 +33,13 @@ button{font:inherit;cursor:pointer;color:inherit}
 .proj .edit-tag{position:absolute;top:10px;right:10px;z-index:1;max-width:calc(100% - 20px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:4px 8px;border:1px solid var(--line);border-radius:999px;background:var(--bg);color:var(--fg);font-size:11px;font-weight:600;line-height:1.2}
 .proj div.m{padding:12px 14px}.proj b{display:block}.proj span{color:var(--mut);font-size:13px}
 /* modal */
-#modal,#cm,#ck,#db{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:20px;z-index:20}
-#modal.on,#cm.on,#ck.on,#db.on{display:flex}
-#db .db-card{max-width:1100px;width:100%;height:min(88vh,900px);padding:0;display:flex;flex-direction:column;overflow:hidden}
+#modal,#cm,#ck{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:20px;z-index:20}
+#modal.on,#cm.on,#ck.on{display:flex}
+#db{position:fixed;inset:0;z-index:10;display:none;overflow:auto;background:var(--bg);color:var(--fg)}
+#db.on{display:flex}
+#db .db-card{max-width:none;max-height:none;width:100%;height:100vh;min-height:100vh;padding:0;border:0;border-radius:0;display:flex;flex-direction:column;overflow:hidden}
 #db .db-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 24px 16px;border-bottom:1px solid var(--line)}
+#db .db-head>div{flex:1}
 #db .db-head h2{margin:0;font-size:22px}
 #db .db-head p{margin:0;color:var(--mut)}
 #db .db-head .db-eyebrow{font-size:11px;letter-spacing:.1em;font-weight:700;margin-bottom:3px}
@@ -293,7 +296,7 @@ body.dragging-section{user-select:none;cursor:grabbing}
 .pme{flex:1;overflow:auto;padding:22px;min-width:0}.pme label{display:block;font-size:13px;font-weight:600;margin:0 0 6px}.pme .f{margin-bottom:16px}.pme .f2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.pme textarea{min-height:110px;resize:vertical}
 .pimgb{width:180px;height:180px;border:1.5px dashed var(--mut);border-radius:14px;background:var(--soft) center/cover no-repeat;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--mut);font-size:13px;padding:10px}.pimgb.has{border-style:solid;border-color:var(--line)}
 .pe0{text-align:center;padding:80px 20px;color:var(--mut)}.pe0 h3{color:var(--fg);margin:0 0 6px}
-@media(max-width:720px){#db .db-card{height:94vh}#db .db-head{padding:16px}#db .db-tabs{padding:0 16px}#db .db-analytics{padding:16px}.pmb{flex-direction:column}.pml{width:100%;max-height:38%;border-right:0;border-bottom:1px solid var(--line)}}
+@media(max-width:720px){#db .db-head{padding:16px}#db .db-tabs{padding:0 16px}#db .db-analytics{padding:16px}.pmb{flex-direction:column}.pml{width:100%;max-height:38%;border-right:0;border-bottom:1px solid var(--line)}}
 .prod .im{background-size:cover;background-position:center}.prod .pr{display:flex;gap:8px;align-items:baseline}.prod .pr s{color:var(--pm);font-size:13px}
 .s .prod .pd{font-size:14px;color:var(--pm);margin:4px 0 0;max-width:none;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.add:disabled{opacity:.5;cursor:not-allowed}.add:disabled:hover{background:transparent;color:var(--pa)}
 #home{max-width:none;padding:0}.hm{max-width:960px;margin:0 auto;padding:40px 24px 48px}
@@ -343,10 +346,10 @@ body.dragging-section{user-select:none;cursor:grabbing}
 @keyframes auth-enter{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:none}}
 @media(max-width:480px){#au{padding:12px}#au .auth-card{padding:28px 22px;border-radius:18px}#au .auth-card h2{font-size:25px}#au .auth-mark{margin-bottom:20px}}
 @media(prefers-reduced-motion:reduce){#au .auth-card{animation:none}}
-#modal,#cm,#db,#pr,#au{display:flex;visibility:hidden;opacity:0;pointer-events:none;transition:opacity .22s ease,visibility 0s linear .22s}
-#modal.on,#cm.on,#db.on,#pr.on,#au.on{display:flex;visibility:visible;opacity:1;pointer-events:auto;transition-delay:0s}
-#modal>.card,#cm>.card,#db>.db-card,#pr>.card{opacity:0;transform:translateY(12px) scale(.985);transition:opacity .24s ease,transform .24s cubic-bezier(.2,.75,.25,1)}
-#modal.on>.card,#cm.on>.card,#db.on>.db-card,#pr.on>.card{opacity:1;transform:translateY(0) scale(1)}
+#modal,#cm,#pr,#au{display:flex;visibility:hidden;opacity:0;pointer-events:none;transition:opacity .22s ease,visibility 0s linear .22s}
+#modal.on,#cm.on,#pr.on,#au.on{display:flex;visibility:visible;opacity:1;pointer-events:auto;transition-delay:0s}
+#modal>.card,#cm>.card,#pr>.card{opacity:0;transform:translateY(12px) scale(.985);transition:opacity .24s ease,transform .24s cubic-bezier(.2,.75,.25,1)}
+#modal.on>.card,#cm.on>.card,#pr.on>.card{opacity:1;transform:translateY(0) scale(1)}
 #db .db-panel:not([hidden]){animation:builder-content-in .2s ease both}
 .account-menu:not([hidden]){transform-origin:top right;animation:builder-menu-in .16s ease-out both}
 .proj{transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
@@ -366,8 +369,8 @@ body.dragging-section{user-select:none;cursor:grabbing}
 @keyframes builder-content-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @keyframes builder-menu-in{from{opacity:0;transform:translateY(-5px) scale(.98)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){
- #modal,#cm,#db,#pr,#au{transition:none!important}
- #modal>.card,#cm>.card,#db>.db-card,#pr>.card{transition:none!important;transform:none!important}
+ #modal,#cm,#pr,#au{transition:none!important}
+ #modal>.card,#cm>.card,#pr>.card{transition:none!important;transform:none!important}
  #db .db-panel:not([hidden]),.account-menu:not([hidden]),#editor.view-enter,#editor.view-exit,#home.view-enter,#editor #pn>*{animation:none!important}
  .proj,.btn,.chip,.tpl,.rail button{transition:none!important}
  .proj[data-enter]{animation:none!important}
@@ -978,12 +981,12 @@ qs('h1')  qsa('p')  print(x)  cls()  undo()  redo()  help()
 <div id="tb" hidden role="toolbar" aria-label="Text and element style"><select id="tf" aria-label="Font"></select><span class="sep"></span><button class="tbtn" id="tdn" aria-label="Smaller text">−</button><input id="tz" type="number" min="8" max="160" aria-label="Font size in pixels"><button class="tbtn" id="tup" aria-label="Larger text">+</button><span class="sep"></span><button class="tbtn" id="tbd" aria-label="Bold"><b>B</b></button><button class="tbtn" id="tit" aria-label="Italic"><i style="font-family:Georgia,serif">I</i></button><span class="sep"></span><span class="talabel">Position</span><button class="tbtn talign" id="tposl" aria-label="Move element to the left" title="Move element to the left"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 4h14M3 8h9M3 12h14M3 16h9"/></svg></button><button class="tbtn talign" id="tposc" aria-label="Center element" title="Center element"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 4h14M5 8h10M3 12h14M5 16h10"/></svg></button><button class="tbtn talign" id="tposr" aria-label="Move element to the right" title="Move element to the right"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 4h14M8 8h9M3 12h14M8 16h9"/></svg></button><span class="sep"></span><span class="talabel">Text</span><button class="tbtn talign" id="tal" aria-label="Align text left" title="Align text left"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 4h14M3 8h9M3 12h14M3 16h9"/></svg></button><button class="tbtn talign" id="tac" aria-label="Center text" title="Center text"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 4h14M5 8h10M3 12h14M5 16h10"/></svg></button><button class="tbtn talign" id="tar" aria-label="Align text right" title="Align text right"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 4h14M8 8h9M3 12h14M8 16h9"/></svg></button><input id="tc" type="color" aria-label="Text color" title="Text color"><span class="sep"></span><label class="tcl" title="Background of this item"><span>Fill</span><input id="tbg" type="color" aria-label="Fill color"></label><button class="tbtn" id="tbx" title="Remove fill" aria-label="Remove fill">×</button><label class="tcl" title="Background of the whole section"><span>Section</span><input id="tsg" type="color" aria-label="Section background color"></label><button class="tbtn" id="tsx" title="Remove section color" aria-label="Remove section color">×</button><button class="tbtn" id="tgbtn" type="button" aria-label="Gradient colors" aria-expanded="false">Gradient</button><div id="gpop" hidden role="group" aria-label="Gradient settings"><label for="gwhere">Apply to</label><select id="gwhere"><option value="fill">Fill</option><option value="text">Text</option><option value="section">Section</option></select><label for="gfrom">From</label><input id="gfrom" type="color" value="#8b5cf6" aria-label="Gradient start color"><label for="gto">To</label><input id="gto" type="color" value="#ec4899" aria-label="Gradient end color"><label for="gangle">Angle</label><input id="gangle" type="range" min="0" max="360" value="100" aria-label="Gradient angle"><output id="gangleValue" for="gangle">100°</output><button class="btn" id="gapply" type="button">Apply gradient</button><button class="btn ghost" id="gclear" type="button">Remove gradient</button></div><button class="tbtn" id="trs" title="Reset text style" aria-label="Reset text style">↺</button></div>
 <div id="dm"><div class="card"></div></div>
 <div id="pr" role="dialog" aria-modal="true" aria-label="Project options"><div class="card" style="max-width:460px"></div></div>
-<div id="db" role="dialog" aria-modal="true" aria-label="Project dashboard"><div class="card db-card">
-  <header class="db-head"><div><p class="db-eyebrow">PROJECT DASHBOARD</p><h2 id="dbTitle">Dashboard</h2><p id="dbSubtitle">Analytics and products for this project</p></div><button class="btn ghost" type="button" data-db-close aria-label="Close dashboard">Close</button></header>
+<section id="db" aria-label="Project dashboard"><div class="card db-card">
+  <header class="db-head"><button class="btn ghost" type="button" data-db-close>Back to projects</button><div><p class="db-eyebrow">PROJECT DASHBOARD</p><h2 id="dbTitle">Dashboard</h2><p id="dbSubtitle">Analytics and products for this project</p></div></header>
   <nav class="db-tabs" role="tablist" aria-label="Dashboard sections"><button class="db-tab on" type="button" role="tab" id="dbTabAnalytics" aria-controls="dbAnalytics" aria-selected="true" data-db-tab="analytics">Analytics</button><button class="db-tab" type="button" role="tab" id="dbTabProducts" aria-controls="dbProducts" aria-selected="false" data-db-tab="products">Products</button></nav>
   <section class="db-panel db-analytics" id="dbAnalytics" role="tabpanel" aria-labelledby="dbTabAnalytics"></section>
   <section class="db-panel db-products" id="dbProducts" role="tabpanel" aria-labelledby="dbTabProducts" hidden></section>
-</div></div>
+</div></section>
 <div id="au" role="dialog" aria-modal="true" aria-label="Account"><div class="card auth-card"></div></div>
 <div id="pm" hidden><button data-m="ren">Rename</button><button data-m="dup">Duplicate</button><button data-m="del">Delete</button></div>
 <div id="toast"></div>
@@ -1246,10 +1249,18 @@ function fitProjectPreviews(){
 }
 addEventListener('resize',fitProjectPreviews);
 function projectRouteId(){return new URL(location.href).searchParams.get('project')||''}
+function dashboardRouteId(){return new URL(location.href).searchParams.get('dashboard')||''}
 function setProjectRoute(id,replace=false){
  const url=new URL(location.href);
  if(id)url.searchParams.set('project',id);else url.searchParams.delete('project');
+ url.searchParams.delete('dashboard');
  history[replace?'replaceState':'pushState']({shipifyProjectId:id||null},'',url);
+}
+function setDashboardRoute(id,replace=false){
+ const url=new URL(location.href);
+ if(id){url.searchParams.set('dashboard',id);url.searchParams.delete('project')}
+ else url.searchParams.delete('dashboard');
+ history[replace?'replaceState':'pushState']({shipifyDashboardId:id||null},'',url);
 }
 function projectEditedLabel(updated){
  const age=Math.max(0,Date.now()-updated);
@@ -1577,15 +1588,32 @@ async function closeProjectEditor({updateUrl=true}={}){
 $('back').onclick=()=>closeProjectEditor();
 let routeChangeId=0;
 async function restoreProjectRoute(){
- const changeId=++routeChangeId,id=projectRouteId();
- if(!id){if($('editor').classList.contains('on')&&!await closeProjectEditor({updateUrl:false})&&cur?.id)setProjectRoute(cur.id,true);return}
+ const changeId=++routeChangeId,id=projectRouteId(),dashboardId=dashboardRouteId();
+ if(dashboardId){
+  if(!currentUserId){auOpen('in');authMessage('Sign in to open this project dashboard.');return}
+  if(projectLoadState!=='ready')return;
+  const project=projects.find(item=>item.id===dashboardId);
+  if(!project){toast('This project dashboard could not be found in your account.');setDashboardRoute('',true);$('db').classList.remove('on');$('home').style.display='';renderHome();return}
+  if(cur&&$('editor').classList.contains('on')&&!await persistCurrentProject()){setProjectRoute(cur.id,true);return}
+  if(changeId!==routeChangeId||dashboardRouteId()!==dashboardId)return;
+  dbOpen(project,{updateUrl:false});
+  return;
+ }
+ if(!id){
+  if($('editor').classList.contains('on')){if(!await closeProjectEditor({updateUrl:false})&&cur?.id)setProjectRoute(cur.id,true);return}
+  if($('db').classList.contains('on')){$('db').classList.remove('on');$('home').style.display='';renderHome()}
+  return;
+ }
+ if($('db').classList.contains('on'))$('db').classList.remove('on');
+ $('home').style.display='';
  if(cur?.id===id&&$('editor').classList.contains('on'))return;
  if(!currentUserId){auOpen('in');authMessage('Sign in to open this project.');return}
  if(projectLoadState!=='ready')return;
  const project=projects.find(item=>item.id===id);
- if(!project){toast('This project could not be found in your account.');setProjectRoute('',true);return}
+ if(!project){toast('This project could not be found in your account.');setProjectRoute('',true);renderHome();return}
  if(cur&&$('editor').classList.contains('on')&&!await persistCurrentProject()){setProjectRoute(cur.id,true);return}
  if(changeId!==routeChangeId||projectRouteId()!==id)return;
+ $('home').style.display='none';
  open(project,{updateUrl:false});
 }
 addEventListener('popstate',()=>restoreProjectRoute());
@@ -1752,11 +1780,11 @@ async function applyAuthSession(session){
  const nextId=session?.user?.id||'';
  const accountChanged=currentUserId!==nextId;
  if(currentUserId&&currentUserId!==nextId&&cur){
-  clearTimeout(saveTimer);cur=null;$('editor').classList.remove('on','view-enter','view-exit');$('home').style.display='';
+  clearTimeout(saveTimer);cur=null;$('editor').classList.remove('on','view-enter','view-exit');$('db').classList.remove('on');$('home').style.display='';
  }
  currentUserId=nextId;user=session?.user?authUser(session.user):null;BACKEND.token=session?.access_token||'';hdrRender();
  if($('au').classList.contains('on')&&session)$('au').classList.remove('on');
- if(!currentUserId){projectLoadId++;projects=[];projectLoadState='ready';setSaveStatus('');renderHome();if(projectRouteId())restoreProjectRoute();return}
+ if(!currentUserId){projectLoadId++;projects=[];projectLoadState='ready';setSaveStatus('');$('db').classList.remove('on');$('home').style.display='';renderHome();if(projectRouteId()||dashboardRouteId())restoreProjectRoute();return}
  if(!accountChanged&&projectLoadState==='ready'){restoreProjectRoute();return}
  await loadProjects(currentUserId,++projectLoadId);
 }
@@ -2312,10 +2340,18 @@ async function dbRender(){
  <div class="gr"><div class="pn"><h3>Funnel</h3>${dbRows(fn,'n','v')}</div><div class="pn"><h3>Top pages</h3>${dbRows(s.top_pages,'path','views')}</div><div class="pn"><h3>Top products</h3>${dbRows(s.top_products,'name','revenue_cents',x=>dbMoney(x.revenue_cents))}</div><div class="pn"><h3>Traffic sources</h3>${dbRows(s.sources,'name','n')}</div><div class="pn"><h3>Devices</h3>${dbRows(s.devices,'name','n')}</div></div>
  ${o.live?'':'<p class="hint">This is made-up sample data. Fill in the BACKEND settings in the code to see real numbers.</p>'}`}
 function dbSetTab(tab){const products=tab==='products';$('dbTabAnalytics').classList.toggle('on',!products);$('dbTabAnalytics').setAttribute('aria-selected',String(!products));$('dbTabProducts').classList.toggle('on',products);$('dbTabProducts').setAttribute('aria-selected',String(products));$('dbAnalytics').hidden=products;$('dbProducts').hidden=!products;if(products)prRender();else dbRender()}
-function dbOpen(p){dbProject=p;pcur=p;historyFor(p);p.products=p.products||[];$('dbTitle').textContent=p.name;$('dbSubtitle').textContent='Analytics for your configured Supabase site · products for this project';if(!DB.f)dbRange(30);$('db').classList.add('on');dbSetTab('analytics')}
-$('db').addEventListener('click',e=>{if(e.target.id==='db'||e.target.closest('[data-db-close]'))return $('db').classList.remove('on');const tab=e.target.closest('[data-db-tab]');if(tab)return dbSetTab(tab.dataset.dbTab);const range=e.target.closest('[data-db-range]');if(range){dbRange(+range.dataset.dbRange);dbRender()}});
+function dbOpen(p,{updateUrl=true}={}){dbProject=p;pcur=p;historyFor(p);p.products=p.products||[];$('dbTitle').textContent=p.name;$('dbSubtitle').textContent='Analytics for your configured Supabase site · products for this project';if(!DB.f)dbRange(30);$('home').style.display='none';$('editor').classList.remove('on','view-enter','view-exit');$('db').classList.add('on');if(updateUrl&&p.id)setDashboardRoute(p.id);dbSetTab('analytics')}
+function dbClose({updateUrl=true}={}){
+ const id=dashboardRouteId();
+ if(updateUrl&&id){
+  if(history.state?.shipifyDashboardId===id){history.back();return}
+  setDashboardRoute('',true);
+ }
+ $('db').classList.remove('on');$('home').style.display='';renderHome();
+}
+$('db').addEventListener('click',e=>{if(e.target.closest('[data-db-close]'))return dbClose();const tab=e.target.closest('[data-db-tab]');if(tab)return dbSetTab(tab.dataset.dbTab);const range=e.target.closest('[data-db-range]');if(range){dbRange(+range.dataset.dbRange);dbRender()}});
 $('db').addEventListener('change',e=>{if(e.target.id!=='dbf'&&e.target.id!=='dbt')return;const f=$('dbf').value,t=$('dbt').value;if(!f||!t||f>t)return;DB.f=new Date(f+'T00:00:00Z');DB.t=new Date(+new Date(t+'T00:00:00Z')+864e5);DB.d=0;dbRender()});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')$('db').classList.remove('on')});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('db').classList.contains('on'))dbClose()});
 
 /* Colors tab: presets, split into light and dark */
 function colorsPanel(){
