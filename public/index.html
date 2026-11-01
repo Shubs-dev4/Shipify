@@ -28,6 +28,8 @@ button{font:inherit;cursor:pointer;color:inherit}
 .proj:hover{border-color:var(--fg)}
 .proj .th{position:relative;aspect-ratio:4/3;overflow:hidden;background:var(--soft);border-bottom:1px solid var(--line)}
 .proj .th iframe{position:absolute;inset:0 auto auto 0;width:1200px;height:900px;border:0;transform-origin:top left;pointer-events:none}
+.proj .publish-tag{position:absolute;right:10px;bottom:10px;z-index:1;padding:4px 8px;border:1px solid var(--line);border-radius:999px;background:var(--bg);color:var(--mut);font-size:11px;font-weight:600;line-height:1.2;pointer-events:none}
+.proj .publish-tag[data-status=published]{border-color:#b7dfc2;background:#eef8f0;color:#24713a}
 .proj .edit-tag{position:absolute;top:10px;right:10px;z-index:1;max-width:calc(100% - 20px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:4px 8px;border:1px solid var(--line);border-radius:999px;background:var(--bg);color:var(--fg);font-size:11px;font-weight:600;line-height:1.2}
 .proj div.m{padding:12px 14px}.proj b{display:block}.proj span{color:var(--mut);font-size:13px}
 /* modal */
@@ -1164,7 +1166,7 @@ function renderHome(animateProjects=false){
  const plus='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>';
  projects.sort((a,b)=>(Date.parse(b.updated_at||'')||0)-(Date.parse(a.updated_at||'')||0));
  $('grid').innerHTML=`<button class="new" id="add" aria-label="Create project">${plus}<span>Create project</span></button>`+
-  projects.map((p,i)=>{const updated=Date.parse(p.updated_at||''),label=Number.isFinite(updated)?projectEditedLabel(updated):'Last edited unknown',datetime=Number.isFinite(updated)?new Date(updated).toISOString():'';return `<div class="proj"${animateProjects?' data-enter':''}${animateProjects?` style="animation-delay:${i*80}ms"`:''} data-i="${i}"><button class="pj-open"><div class="th"><iframe title="${ea(p.name||'Project')} preview" loading="lazy" sandbox="" tabindex="-1" aria-hidden="true"></iframe><time class="edit-tag"${datetime?` datetime="${datetime}" title="Last edited ${new Date(updated).toLocaleString()}"`:''}>${label}</time></div><div class="m"><b>${ea(p.name)}</b><span>${(p.pages||[p]).reduce((a,x)=>a+(x.sections||[]).length,0)} sections · ${(p.pages||[1]).length} pages</span></div></button><div class="pj-act"><button class="chip" data-pa="dashboard">Dashboard</button><button class="chip" data-pa="more" aria-label="More options">⋯</button></div></div>`}).join('');
+  projects.map((p,i)=>{const updated=Date.parse(p.updated_at||''),label=Number.isFinite(updated)?projectEditedLabel(updated):'Last edited unknown',datetime=Number.isFinite(updated)?new Date(updated).toISOString():'',published=p.published===true;return `<div class="proj"${animateProjects?' data-enter':''}${animateProjects?` style="animation-delay:${i*80}ms"`:''} data-i="${i}"><button class="pj-open"><div class="th"><iframe title="${ea(p.name||'Project')} preview" loading="lazy" sandbox="" tabindex="-1" aria-hidden="true"></iframe><time class="edit-tag"${datetime?` datetime="${datetime}" title="Last edited ${new Date(updated).toLocaleString()}"`:''}>${label}</time><span class="publish-tag" data-status="${published?'published':'unpublished'}">${published?'Published':'Unpublished'}</span></div><div class="m"><b>${ea(p.name)}</b><span>${(p.pages||[p]).reduce((a,x)=>a+(x.sections||[]).length,0)} sections · ${(p.pages||[1]).length} pages</span></div></button><div class="pj-act"><button class="chip" data-pa="dashboard">Dashboard</button><button class="chip" data-pa="more" aria-label="More options">⋯</button></div></div>`}).join('');
  fitProjectPreviews();
  observeProjectPreviews();
  const notice=$('projectNotice');
@@ -1565,7 +1567,7 @@ async function restoreProjectRoute(){
 addEventListener('popstate',()=>restoreProjectRoute());
 function setDev(m){$('mn').classList.remove('on');$('ck').classList.remove('on');cv.classList.toggle('m',m);$('editor').classList.toggle('mob',m);$('mb').classList.toggle('on',m);$('dk').classList.toggle('on',!m)}
 $('dk').onclick=()=>setDev(false);$('mb').onclick=()=>setDev(true);
-$('pub').onclick=()=>{const t=$('toast');t.textContent='Published! (demo only, no real link yet)';t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1800)};
+$('pub').onclick=()=>{cur.published=true;scheduleProjectSave();const t=$('toast');t.textContent='Published! (demo only, no real link yet)';t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1800)};
 const LK='.hdr nav>span[contenteditable],.ftr span[contenteditable],span.pb[contenteditable]:not(.sb),[data-builder-button]';
 function eachLink(fn){cur.pages.forEach(p=>{p.sections=p.sections.map(h=>{const t=document.createElement('template');t.innerHTML=h;const e=t.content.firstElementChild,l=e.querySelectorAll(LK);if(!l.length)return h;l.forEach(fn);return e.outerHTML})});cur.sections=cur.pages[cur.pi].sections}
 function autoLink(){eachLink(el=>{if(el.dataset.link)return;const a=el.textContent.trim().toLowerCase();if(a.length<3)return;const m=cur.pages.find(p=>{const b=p.n.toLowerCase();return a===b||(a.length>3&&(b.includes(a)||a.includes(b)))});if(m)el.dataset.link=m.id})}
