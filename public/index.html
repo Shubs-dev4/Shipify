@@ -1496,6 +1496,7 @@ function open(p,{updateUrl=true}={}){
 async function closeProjectEditor({updateUrl=true}={}){
  if(prev){prev=false;setPrev()}
  if(cur){sync();cur.name=$('pname').value.trim()||'Untitled project';if(!await persistCurrentProject())return false}
+ $('lk').hidden=true;$('tb').hidden=true;$('ip').hidden=true;$('mn').classList.remove('on');$('dm').classList.remove('on');$('cm').classList.remove('on');
  if(updateUrl&&projectRouteId())setProjectRoute('',true);
  const editor=$('editor'),home=$('home'),closingProject=cur;editor.classList.remove('view-enter');editor.classList.add('view-exit');setTimeout(()=>{if(cur!==closingProject||projectRouteId())return;editor.classList.remove('on','view-exit');home.style.display='';renderHome();builderViewMotion(home,'view-enter')},160);
  return true;
@@ -1560,6 +1561,27 @@ $('dm').onclick=e=>{const o=e.target.closest('[data-o]')?.dataset.o;if(!o)return
 addEventListener('keydown',e=>{if(e.key==='Escape')$('dm').classList.remove('on')});
 function fillProds(){if(!cur||!cur.products)return;cv.querySelectorAll('.prods .cols').forEach(g=>g.innerHTML=cur.products.some(x=>x.st!=='draft')?cur.products.filter(x=>x.st!=='draft').map(prodItem).join(''):'<p class="pe">No products yet. Add some from the project dashboard.</p>')}
 let pcur=null,menuProject=null,deletingProject=null;
+function projectCardPositions(){
+ return new Map([...$('grid').querySelectorAll('.proj')].map(card=>[projects[+card.dataset.i]?.id,card.getBoundingClientRect()]).filter(([id])=>id));
+}
+async function removeProjectWithAnimation(project){
+ const grid=$('grid'),positions=projectCardPositions(),reduceMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const card=[...grid.querySelectorAll('.proj')].find(item=>projects[+item.dataset.i]===project);
+ $('pr').classList.remove('on');grid.inert=true;
+ try{
+  if(card&&!reduceMotion)await card.animate([{opacity:1},{opacity:0}],{duration:220,easing:'ease-out',fill:'forwards'}).finished;
+  const index=projects.indexOf(project);if(index>=0)projects.splice(index,1);
+  deletingProject=null;renderHome();
+  if(reduceMotion)return;
+  const moves=[...grid.querySelectorAll('.proj')].map(item=>{
+   const previous=positions.get(projects[+item.dataset.i]?.id);if(!previous)return null;
+   const next=item.getBoundingClientRect(),x=previous.left-next.left,y=previous.top-next.top;
+   if(Math.abs(x)+Math.abs(y)<1)return null;
+   return item.animate([{transform:`translate(${x}px, ${y}px)`},{transform:'translate(0, 0)'}],{duration:360,easing:'cubic-bezier(.2,.75,.25,1)'});
+  }).filter(Boolean);
+  await Promise.all(moves.map(animation=>animation.finished));
+ }finally{grid.inert=false}
+}
 $('pr').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='rnin')$('pr').querySelector('[data-pm=rsave]').click()});
  $('pr').onclick=async e=>{if(e.target.id==='pr'){deletingProject=null;$('pr').classList.remove('on');return}const t=e.target.closest('[data-pm]');if(!t)return;
  if(t.dataset.pm==='done')$('pr').classList.remove('on');
@@ -1571,8 +1593,7 @@ $('pr').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='rnin')
   try{
    const{error}=await authClient.from('projects').delete().eq('id',project.id).eq('owner',currentUserId);
    if(error)throw error;
-   const index=projects.indexOf(project);if(index>=0)projects.splice(index,1);
-   deletingProject=null;$('pr').classList.remove('on');renderHome()
+   await removeProjectWithAnimation(project)
   }catch(error){projectError(error,'delete');t.disabled=false;t.textContent='Delete project'}
  }
  else if(t.dataset.pm==='rsave'){const old=pcur.name;pcur.name=$('rnin').value.trim()||pcur.name;if(await saveProjectRecord(pcur)){ $('pr').classList.remove('on');renderHome()}else pcur.name=old}};
