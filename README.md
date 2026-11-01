@@ -30,7 +30,7 @@ This publishes the **Shipify builder**. A separate website exported from the bui
 ## Go live (about 20 minutes)
 
 1. **Create a Supabase project** at supabase.com (free tier is fine), unless you already have one.
-2. **Run the SQL.** Open SQL Editor, paste all of `supabase/migrations/001_init.sql`, and click Run. A `Success. No rows returned` result is expected: this file creates tables and policies rather than selecting data. Do not run it again if it already succeeded.
+2. **Run the SQL.** Open SQL Editor, paste and run `supabase/migrations/001_init.sql`, then paste and run `supabase/migrations/002_project_plans.sql`. If you already ran `001_init.sql`, run only `002_project_plans.sql`. A `Success. No rows returned` result is expected: these files create tables, policies and project-limit triggers rather than selecting data. Do not run a migration again if it already succeeded.
 3. **Deploy the endpoint.** Install the Supabase CLI, then from the folder that contains `supabase/`:
    ```
    supabase login
@@ -52,12 +52,20 @@ This publishes the **Shipify builder**. A separate website exported from the bui
    ```
    The URL and publishable/anon key are intended for browser use. `siteId` and `siteKey` are returned by the insert query; the site key is included in the exported tracking script, so restrict the site's domain in the database once you know its hostname. Never use the service-role key here.
    The builder's sign-up and sign-in use Supabase Auth with this same publishable/anon key. In Supabase, set **Authentication → URL Configuration → Site URL** to `https://shubs-dev4.github.io/Shipify/` and add that URL under **Redirect URLs** so email-confirmation links can return to the builder. Email confirmations can be enabled in the Supabase Auth provider settings; when enabled, signup asks the user to confirm by email before signing in. Signed-in users' projects are loaded from and autosaved to the `projects` table. Opening a project adds its ID to the builder URL (`?project=<id>`), so refreshing or opening that URL while signed into the owning account reopens the project. The existing `projects` table and `own_projects` row-level security policy from step 2 must be applied; project saving does not use browser storage.
-6. **Export and host.** Click Download site, upload the folder to any static host (Netlify, Cloudflare Pages, GitHub Pages). The export now contains `track.js`.
-7. **Test.** Visit the hosted site, click around, then check Table Editor > `events` in Supabase. Rows should appear.
+6. **Set up Pro billing in Stripe.** Create a Stripe Product named **Shipify Pro** with a **$25 USD monthly recurring** price. Copy the price ID. Enable Stripe's customer billing portal and allow customers to cancel subscriptions. Add a webhook at `https://YOUR_PROJECT_REF.supabase.co/functions/v1/stripe-webhook` for `customer.subscription.created`, `customer.subscription.updated`, and `customer.subscription.deleted`; copy its signing secret. From the project folder, configure server-only secrets and deploy the functions:
+   ```
+   supabase secrets set STRIPE_SECRET_KEY=sk_live_... STRIPE_PRO_PRICE_ID=price_... STRIPE_WEBHOOK_SECRET=whsec_... SHIPIFY_APP_URL=https://shubs-dev4.github.io/Shipify/
+   supabase functions deploy billing
+   supabase functions deploy stripe-webhook --no-verify-jwt
+   ```
+   Use Stripe test keys and a test price while testing, then switch to live keys/price before charging customers. Never put Stripe secrets in `public/index.html`. The app gives each account one free project; an active Pro subscription unlocks unlimited creations. Existing projects remain saved if a subscription expires or is canceled. The database trigger enforces the limit even if a browser bypasses the UI. Pro status is synchronized from verified Stripe webhooks. Customers can open Stripe's Billing Portal from the account's plan notice to manage or cancel their subscription.
+7. **Export and host.** Click Download site, upload the folder to any static host (Netlify, Cloudflare Pages, GitHub Pages). The export now contains `track.js`.
+8. **Test.** Visit the hosted site, click around, then check Table Editor > `events` in Supabase. Rows should appear. Test Pro in Stripe test mode before enabling live charges.
 
 ## Known limits right now
 
 - The Dashboard shows **sample data** until `siteId` is set. Live dashboard data requires signing in as the Supabase Auth user who owns that site, because row-level security blocks anonymous reads. Projects are stored in Supabase and scoped to the signed-in user by row-level security; project content is not stored in localStorage.
+- Accounts get one free project; **Pro costs $25/month and allows unlimited projects**. Creating a second project requires an active Stripe subscription. Stripe checkout and the verified webhook must be deployed and configured as described above; until then, the upgrade option reports that billing is unavailable.
 - Every project card has a Dashboard that opens as a full page with a left-hand menu for Analytics and Products, regardless of template. The dashboard can be bookmarked and restored by URL, and its Back to projects button returns to the project list. Product management is always available from the dashboard. Removing the last Products section or switching to a template without products resets the catalog and removes leftover Products sections from other pages; adding a product from the dashboard then adds a Products section to the project. All Products sections show active products from the shared catalog, and dashboard edits update the editor preview immediately. Product data is saved as part of its project; Analytics uses the configured Supabase site and is not separated by local project.
 - Project cards show an Unpublished/Published badge. Clicking Publish marks the project Published in its saved project data, but Publish is still a demo and does not deploy the site.
 - Contact and email signup sections can be connected in the editor: open the section's Design menu, enter a hosted form provider's HTTPS endpoint, and save it. Exported sites submit form data directly to that provider and show status feedback. Use a provider endpoint that permits browser CORS requests and accepts POST form data, such as a compatible Formspree endpoint. Shipify does not receive or store form submissions.
@@ -71,8 +79,9 @@ This publishes the **Shipify builder**. A separate website exported from the bui
 1. **Accounts and saved projects** (Supabase Auth and per-user Supabase project storage): done
 2. **Publish button** (upload the export to Cloudflare Pages or Netlify via API, auto-create the `sites` row)
 3. Tracking + dashboard: **done** (this package)
-4. **Stripe Checkout + webhook** writing to `orders` / `order_items` (revenue, AOV, top products come from here)
-5. Extras: live visitors, CSV export, daily rollup tables once volume grows
+4. **Stripe Pro subscriptions** (one free project, unlimited on the $25/month plan): implemented; configure the Stripe product, secrets and webhook above.
+5. **Stripe Checkout + webhook** writing to `orders` / `order_items` (revenue, AOV, top products come from here)
+6. Extras: live visitors, CSV export, daily rollup tables once volume grows
 
 ## Privacy notes
 

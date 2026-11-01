@@ -33,8 +33,8 @@ button{font:inherit;cursor:pointer;color:inherit}
 .proj .edit-tag{position:absolute;top:10px;right:10px;z-index:1;max-width:calc(100% - 20px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:4px 8px;border:1px solid var(--line);border-radius:999px;background:var(--bg);color:var(--fg);font-size:11px;font-weight:600;line-height:1.2}
 .proj div.m{padding:12px 14px}.proj b{display:block}.proj span{color:var(--mut);font-size:13px}
 /* modal */
-#modal,#cm,#ck{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:20px;z-index:20}
-#modal.on,#cm.on,#ck.on{display:flex}
+#modal,#cm,#ck,#upgrade{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:20px;z-index:20}
+#modal.on,#cm.on,#ck.on,#upgrade.on{display:flex}
 #db{position:fixed;inset:0;z-index:10;display:none;overflow:auto;background:var(--bg);color:var(--fg)}
 #db.on{display:flex}
 #db .db-card{max-width:none;max-height:none;width:100%;height:100vh;min-height:100vh;padding:0;border:0;border-radius:0;display:flex;overflow:hidden}
@@ -311,6 +311,20 @@ body.dragging-section{user-select:none;cursor:grabbing}
 #auth{display:flex;align-items:center;gap:8px}.account-control{position:relative}.account-trigger{display:flex;align-items:center;gap:8px;padding:5px 9px;border:1px solid transparent;border-radius:999px;background:transparent;color:inherit;cursor:pointer;transition:background .15s,border-color .15s}.account-trigger:hover,.account-trigger[aria-expanded=true]{background:rgba(127,127,127,.16);border-color:var(--iline)}.account-trigger:focus-visible{outline:2px solid currentColor;outline-offset:2px}.av{width:30px;height:30px;border-radius:50%;background:var(--ifg);color:var(--ibg);display:grid;place-items:center;font-weight:600;font-size:13px}.un{font-weight:600;font-size:14px}.account-chevron{width:14px;height:14px;transition:transform .15s}.account-trigger[aria-expanded=true] .account-chevron{transform:rotate(180deg)}.account-menu{position:absolute;top:calc(100% + 9px);right:0;z-index:10;width:260px;padding:7px;border:1px solid var(--iline);border-radius:14px;background:var(--ibg);color:var(--ifg);box-shadow:0 14px 40px rgba(0,0,0,.22)}.account-menu[hidden]{display:none}.account-summary{padding:11px 12px 13px}.account-summary strong,.account-summary span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.account-summary strong{font-size:14px}.account-summary span{margin-top:2px;color:var(--imut);font-size:12px}.account-divider{height:1px;margin:0 5px 5px;background:var(--iline)}.account-menu button{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border:0;border-radius:8px;background:transparent;color:inherit;text-align:left;font:inherit;font-size:14px;cursor:pointer}.account-menu button:hover,.account-menu button:focus-visible{outline:0;background:rgba(127,127,127,.18)}.account-menu button svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 @media(max-width:560px){.un,.top .brand small{display:none}}
 #au{position:fixed;inset:0;background:rgba(12,14,18,.62);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px;z-index:20;opacity:0;transition:opacity .2s}#au.on{display:flex;opacity:1}#au a{color:var(--fg);font-weight:600}
+#upgrade{background:rgba(12,14,18,.62);backdrop-filter:blur(8px)}
+#upgrade .upgrade-card{position:relative;width:min(100%,460px);max-height:min(92vh,760px);overflow:auto;padding:34px;border-radius:22px;border-color:rgba(127,127,127,.22);box-shadow:0 24px 80px rgba(0,0,0,.28)}
+#upgrade .upgrade-close{position:absolute;top:15px;right:15px;width:36px;height:36px;border:1px solid var(--line);border-radius:50%;background:var(--bg);color:var(--mut);font-size:21px;line-height:1}
+#upgrade .upgrade-eyebrow{margin:0 0 7px!important;color:var(--mut);font-size:12px;font-weight:700;letter-spacing:.11em;text-transform:uppercase}
+#upgrade .upgrade-card h2{margin:0 0 8px;font-size:28px;letter-spacing:-.04em}
+#upgrade .upgrade-price{display:flex;align-items:baseline;gap:7px;margin:22px 0;padding:16px;border:1px solid var(--line);border-radius:12px;background:var(--soft)}
+#upgrade .upgrade-price strong{font-size:34px;letter-spacing:-.04em}
+#upgrade .upgrade-benefits{display:grid;gap:9px;margin:0 0 22px;padding:0;list-style:none;color:var(--mut)}
+#upgrade .upgrade-benefits li:before{content:"✓";margin-right:9px;color:var(--fg);font-weight:700}
+#upgrade .upgrade-submit{width:100%;min-height:46px}
+#upgrade .upgrade-message{min-height:22px;margin:12px 0!important;color:#b42318;font-size:13px}
+#upgrade .upgrade-message.success{color:#24713a}
+#upgrade [hidden]{display:none}
+#upgrade.on .upgrade-card{animation:auth-enter .22s ease-out}
 #au .auth-card{position:relative;width:min(100%,440px);max-height:min(92vh,760px);overflow:auto;padding:36px;border-radius:22px;border-color:rgba(127,127,127,.22);box-shadow:0 24px 80px rgba(0,0,0,.28);animation:auth-enter .22s ease-out}
 #au .auth-close{position:absolute;top:17px;right:17px;width:36px;height:36px;display:grid;place-items:center;border:1px solid var(--line);border-radius:50%;background:var(--bg);color:var(--mut);font-size:21px;line-height:1}
 #au .auth-close:hover{color:var(--fg);background:var(--soft)}
@@ -349,12 +363,12 @@ body.dragging-section{user-select:none;cursor:grabbing}
 #au .verify-actions .auth-submit{margin-top:0}
 #au .verify-actions .btn{min-height:44px}
 @keyframes auth-enter{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:none}}
-@media(max-width:480px){#au{padding:12px}#au .auth-card{padding:28px 22px;border-radius:18px}#au .auth-card h2{font-size:25px}#au .auth-mark{margin-bottom:20px}}
-@media(prefers-reduced-motion:reduce){#au .auth-card{animation:none}}
-#modal,#cm,#pr,#au{display:flex;visibility:hidden;opacity:0;pointer-events:none;transition:opacity .22s ease,visibility 0s linear .22s}
-#modal.on,#cm.on,#pr.on,#au.on{display:flex;visibility:visible;opacity:1;pointer-events:auto;transition-delay:0s}
-#modal>.card,#cm>.card,#pr>.card{opacity:0;transform:translateY(12px) scale(.985);transition:opacity .24s ease,transform .24s cubic-bezier(.2,.75,.25,1)}
-#modal.on>.card,#cm.on>.card,#pr.on>.card{opacity:1;transform:translateY(0) scale(1)}
+@media(max-width:480px){#au{padding:12px}#au .auth-card{padding:28px 22px;border-radius:18px}#au .auth-card h2{font-size:25px}#au .auth-mark{margin-bottom:20px}#upgrade{padding:12px}#upgrade .upgrade-card{padding:28px 22px;border-radius:18px}#upgrade .upgrade-card h2{font-size:25px}}
+@media(prefers-reduced-motion:reduce){#au .auth-card,#upgrade.on .upgrade-card{animation:none}}
+#modal,#cm,#pr,#au,#upgrade{display:flex;visibility:hidden;opacity:0;pointer-events:none;transition:opacity .22s ease,visibility 0s linear .22s}
+#modal.on,#cm.on,#pr.on,#au.on,#upgrade.on{display:flex;visibility:visible;opacity:1;pointer-events:auto;transition-delay:0s}
+#modal>.card,#cm>.card,#pr>.card,#upgrade>.card{opacity:0;transform:translateY(12px) scale(.985);transition:opacity .24s ease,transform .24s cubic-bezier(.2,.75,.25,1)}
+#modal.on>.card,#cm.on>.card,#pr.on>.card,#upgrade.on>.card{opacity:1;transform:translateY(0) scale(1)}
 #db .db-panel:not([hidden]){animation:builder-content-in .2s ease both}
 .account-menu:not([hidden]){transform-origin:top right;animation:builder-menu-in .16s ease-out both}
 .proj{transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
@@ -374,8 +388,8 @@ body.dragging-section{user-select:none;cursor:grabbing}
 @keyframes builder-content-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @keyframes builder-menu-in{from{opacity:0;transform:translateY(-5px) scale(.98)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){
- #modal,#cm,#pr,#au{transition:none!important}
- #modal>.card,#cm>.card,#pr>.card{transition:none!important;transform:none!important}
+ #modal,#cm,#pr,#au,#upgrade{transition:none!important}
+ #modal>.card,#cm>.card,#pr>.card,#upgrade>.card{transition:none!important;transform:none!important}
  #db .db-panel:not([hidden]),.account-menu:not([hidden]),#editor.view-enter,#editor.view-exit,#home.view-enter,#editor #pn>*{animation:none!important}
  .proj,.btn,.chip,.tpl,.rail button{transition:none!important}
  .proj[data-enter]{animation:none!important}
@@ -960,6 +974,19 @@ qs('h1')  qsa('p')  print(x)  cls()  undo()  redo()  help()
     <div style="margin-top:20px;text-align:right"><button class="btn ghost" id="cancel">Cancel</button></div>
   </div>
 </div>
+<div id="upgrade" role="dialog" aria-modal="true" aria-labelledby="upgradeTitle" aria-describedby="upgradeDescription">
+  <div class="card upgrade-card">
+    <button class="upgrade-close" type="button" data-upgrade-close aria-label="Close upgrade dialog">×</button>
+    <p class="upgrade-eyebrow">SHIPIFY PRO</p>
+    <h2 id="upgradeTitle">Build without limits</h2>
+    <p id="upgradeDescription">You’ve used your free project. Upgrade to keep creating.</p>
+    <div class="upgrade-price"><strong>$25</strong><span>per month</span></div>
+    <ul class="upgrade-benefits"><li>Unlimited projects</li><li>Keep all your existing projects</li><li>Manage or cancel your subscription anytime</li></ul>
+    <p id="upgradeMessage" class="upgrade-message" role="status" aria-live="polite"></p>
+    <button class="btn upgrade-submit" type="button" data-billing-action="checkout">Upgrade to Pro</button>
+    <button class="btn ghost upgrade-submit" type="button" data-billing-action="portal" hidden>Manage billing</button>
+  </div>
+</div>
 
 <section id="editor">
   <div class="bar">
@@ -1129,7 +1156,7 @@ const TOS=[['1. Acceptance of terms','By using this website you agree to these t
 const PRV=[['1. Information we collect','We collect what you give us, such as your name, email and order details, plus basic usage data.'],['2. How we use it','We use your information to run the site, process orders, answer questions and improve our service.'],['3. Sharing','We do not sell your personal information. We share it only with services that help us operate, or when the law requires.'],['4. Cookies','This site may use cookies to remember your preferences and understand how the site is used.'],['5. Your choices','You can ask to see, correct or delete your information at any time by contacting us.'],['6. Contact us','Questions about privacy? Reach out using the contact details on this site.']];
 const PG=[{id:'tos',n:'Terms of Service',s:[['legal',{t:'Terms of Service',i:TOS}]]},{id:'prv',n:'Privacy Policy',s:[['legal',{t:'Privacy Policy',i:PRV}]]},{id:'abt',n:'About',s:[['text',{t:'About us',p:'Tell your story here.'}],'team']},{id:'cnt',n:'Contact',s:['contact']},{id:'new',n:'New page',s:[['text',{t:'New page',p:'Click any text to edit it, or add sections from the Sections tab.'}]]}];
 function applyTheme(i){cur.theme=i;const t=TH[i];for(const k in t)if(k!=='n')cv.style.setProperty('--'+k,t[k]);applyStyle();if($('pn'))panel();scheduleProjectSave()}
-let projects=[],cur=null,$=id=>document.getElementById(id),user=null,authClient=null,currentUserId='';
+let projects=[],cur=null,$=id=>document.getElementById(id),user=null,authClient=null,currentUserId='',planStatus='unknown',planLoading=false,planError='';
 let projectLoadState='loading',saveTimer=0,saveQueue=Promise.resolve(),projectLoadId=0;
 const setSaveStatus=(text,state='')=>{const el=$('saveStatus');el.textContent=text;el.dataset.state=state};
 const cv=$('cv');
@@ -1203,9 +1230,16 @@ function renderHome(animateProjects=false){
  fitProjectPreviews();
  observeProjectPreviews();
  const notice=$('projectNotice');
- notice.innerHTML=projectLoadState==='error'?'Could not load your projects. Check your connection. <button class="chip" type="button" data-project-retry>Retry</button>':projectLoadState==='ready'&&user&&!projects.length?'Your projects will be saved to your account automatically.':'';
- $('add').disabled=projectLoadState!=='ready';
- $('add').onclick=()=>{if(!user){auOpen('in');authMessage('Sign in to create and save projects to your account.');return}$('modal').classList.add('on');document.querySelectorAll('#tpls .tin').forEach(i=>i.style.transform=`scale(${i.parentElement.clientWidth/1000})`)};
+ if(projectLoadState==='error')notice.innerHTML='Could not load your projects. Check your connection. <button class="chip" type="button" data-project-retry>Retry</button>';
+ else if(projectLoadState==='ready'&&user){
+  if(planStatus==='pro')notice.innerHTML='Pro plan · Unlimited projects. <button class="chip" type="button" data-plan-manage>Manage billing</button>';
+  else if(planLoading)notice.textContent='Checking your plan…';
+  else if(planStatus==='unknown')notice.innerHTML=`Could not verify your plan${projects.length?'':' — your first project is still available'}. <button class="chip" type="button" data-plan-retry>Retry</button>`;
+  else if(projects.length>=1)notice.innerHTML='You’ve used your 1 free project. Upgrade to Pro for unlimited projects at $25/month. <button class="chip" type="button" data-upgrade>Upgrade to Pro</button>';
+  else notice.textContent='Free plan · 0 of 1 projects used.';
+ }else notice.innerHTML=projectLoadState==='ready'&&!projects.length?'Sign in to save your first project to your account.':'';
+ $('add').disabled=projectLoadState!=='ready'||(user&&projects.length>=1&&planLoading);
+ $('add').onclick=()=>{if(!user){auOpen('in');authMessage('Sign in to create and save projects to your account.');return}if(projects.length>=1&&planStatus!=='pro'){openUpgradeDialog();return}$('modal').classList.add('on');document.querySelectorAll('#tpls .tin').forEach(i=>i.style.transform=`scale(${i.parentElement.clientWidth/1000})`)};
  document.querySelectorAll('.pj-open').forEach(b=>b.onclick=()=>open(projects[b.parentElement.dataset.i]));
 }
 let projectPreviewObserver=null;
@@ -1276,7 +1310,83 @@ function projectEditedLabel(updated){
  if(age<604800000)return `Edited ${Math.floor(age/86400000)}d ago`;
  return `Edited ${new Intl.DateTimeFormat(undefined,{month:'short',day:'numeric'}).format(updated)}`;
 }
-$('projectNotice').onclick=async e=>{if(!e.target.closest('[data-project-retry]'))return;projectLoadState='loading';renderHome();try{const{data,error}=await authClient.auth.getSession();if(error)throw error;await applyAuthSession(data.session)}catch(error){console.error('Could not reload saved projects:',error);projectLoadState='error';renderHome()}};
+$('projectNotice').onclick=async e=>{
+ if(e.target.closest('[data-upgrade]'))return openUpgradeDialog();
+ if(e.target.closest('[data-plan-manage]'))return openUpgradeDialog();
+ if(e.target.closest('[data-plan-retry]'))return refreshPlan(currentUserId,projectLoadId);
+ if(!e.target.closest('[data-project-retry]'))return;
+ projectLoadState='loading';renderHome();
+ try{const{data,error}=await authClient.auth.getSession();if(error)throw error;await applyAuthSession(data.session)}
+ catch(error){console.error('Could not reload saved projects:',error);projectLoadState='error';renderHome()}
+};
+function openUpgradeDialog(){
+ if(!currentUserId){auOpen('in');authMessage('Sign in to upgrade your plan.');return}
+ $('modal').classList.remove('on');
+ $('upgradeMessage').textContent=planError||'';
+ $('upgradeMessage').classList.toggle('success',planStatus==='pro');
+ $('upgrade').querySelector('[data-billing-action="checkout"]').hidden=planStatus==='pro';
+ $('upgrade').querySelector('[data-billing-action="portal"]').hidden=planStatus!=='pro';
+ $('upgrade').classList.add('on');
+}
+async function refreshPlan(ownerId=currentUserId,loadId=projectLoadId){
+ if(!ownerId||!authClient)return;
+ planLoading=true;planError='';renderHome();
+ const url=new URL(location.href),billingResult=url.searchParams.get('billing');
+ try{
+  const attempts=billingResult==='success'?6:1;
+  for(let attempt=0;attempt<attempts;attempt++){
+   const{data,error}=await authClient.from('subscriptions').select('status,current_period_end,cancel_at_period_end').eq('owner',ownerId).maybeSingle();
+   if(error)throw error;
+   if(ownerId!==currentUserId||loadId!==projectLoadId)return;
+   planStatus=data?.status==='active'||data?.status==='trialing'?'pro':'free';
+   if(planStatus==='pro'||attempt===attempts-1)break;
+   await new Promise(resolve=>setTimeout(resolve,1500));
+  }
+  if(ownerId!==currentUserId||loadId!==projectLoadId)return;
+  planLoading=false;renderHome();
+  if(billingResult==='success'){
+   url.searchParams.delete('billing');history.replaceState(history.state,'',url);
+   toast(planStatus==='pro'?'Welcome to Pro! Unlimited projects are now unlocked.':'Payment received. Your Pro plan is still activating; refresh in a moment.');
+  }else if(billingResult==='cancelled'){
+   url.searchParams.delete('billing');history.replaceState(history.state,'',url);toast('Checkout canceled. You can upgrade whenever you’re ready.');
+  }
+ }catch(error){
+  if(ownerId!==currentUserId||loadId!==projectLoadId)return;
+  console.error('Could not verify the subscription status:',error);
+  planStatus='unknown';planLoading=false;planError='Could not check your plan. Please retry before starting checkout.';
+  renderHome();
+ }
+}
+async function startBillingAction(action,button){
+ if(!authClient||!currentUserId){openUpgradeDialog();return}
+ const message=$('upgradeMessage');message.textContent='';message.classList.remove('success');button.disabled=true;
+ try{
+  const{data,error}=await authClient.functions.invoke('billing',{body:{action}});
+  if(error){
+   let detail=data?.error;
+   if(!detail&&error.context instanceof Response){
+    try{const responseBody=await error.context.clone().json();if(typeof responseBody?.error==='string')detail=responseBody.error}
+    catch(parseError){console.error('Could not read the billing error response:',parseError)}
+   }
+   throw new Error(detail||error.message||'Billing request failed.');
+  }
+  if(typeof data?.url!=='string')throw new Error(data?.error||'Billing service did not return a secure checkout link.');
+  const destination=new URL(data.url);
+  if(destination.protocol!=='https:'||!destination.hostname.endsWith('.stripe.com'))throw new Error('Billing service returned an invalid link.');
+  location.assign(destination.href);
+ }catch(error){
+  console.error('Billing action failed:',error);
+  message.textContent=error instanceof Error?error.message:'Could not open billing. Please try again.';
+  button.disabled=false;
+ }
+}
+document.addEventListener('click',e=>{
+ if(e.target.id==='upgrade'||e.target.closest('[data-upgrade-close]')){$('upgrade').classList.remove('on');return}
+ if(e.target.closest('[data-upgrade]')){openUpgradeDialog();return}
+ const button=e.target.closest('[data-billing-action]');
+ if(button)startBillingAction(button.dataset.billingAction,button);
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')$('upgrade').classList.remove('on')});
 function projectError(err,action){
  console.error('Could not '+action+' project:',err);
  setSaveStatus(action.charAt(0).toUpperCase()+action.slice(1)+' failed','error');
@@ -1304,11 +1414,11 @@ async function loadProjects(ownerId,loadId){
    const project={...row.data,id:row.id,name,updated_at:row.updated_at||row.data.updated_at||null};
    return project;
   });
-  projectLoadState='ready';renderHome(true);restoreProjectRoute();
+  projectLoadState='ready';planLoading=true;renderHome(true);await refreshPlan(ownerId,loadId);if(loadId!==projectLoadId||ownerId!==currentUserId)return;restoreProjectRoute();
  }catch(error){
   if(loadId!==projectLoadId)return;
   console.error('Could not load saved projects from Supabase:',error);
-  projects=[];projectLoadState='error';renderHome();
+  projects=[];projectLoadState='error';planLoading=false;planStatus='unknown';renderHome();
  }
 }
 function scheduleProjectSave(){
@@ -1345,13 +1455,17 @@ async function persistCurrentProject(){
 }
 async function createSavedProject(project){
  if(!user||!currentUserId||!authClient){auOpen('in');authMessage('Sign in to create and save projects to your account.');return false}
+ if(projects.length>=1&&planStatus!=='pro'){openUpgradeDialog();return false}
  setSaveStatus('Saving…');
  try{
   const updatedAt=new Date().toISOString(),savedProject={...project,updated_at:updatedAt};
   const{data,error}=await authClient.from('projects').insert({owner:currentUserId,name:project.name,data:savedProject,updated_at:updatedAt}).select('id,updated_at').single();
   if(error)throw error;
   project.id=data.id;project.updated_at=data.updated_at||updatedAt;projects.unshift(project);projectLoadState='ready';setSaveStatus('Saved');renderHome();return true;
- }catch(error){projectError(error,'create');return false}
+ }catch(error){
+  if(String(error?.message||'').includes('free_plan_project_limit')){openUpgradeDialog();return false}
+  projectError(error,'create');return false
+ }
 }
 const FONTS=[['Theme default'],['Modern',`'Instrument Sans',system-ui,sans-serif`,`'Instrument Sans',system-ui,sans-serif`],['Classic',`Georgia,serif`,`Georgia,serif`],['Elegant',`'Playfair Display',Georgia,serif`,`'Instrument Sans',system-ui,sans-serif`],['Friendly',`Poppins,system-ui,sans-serif`,`Poppins,system-ui,sans-serif`],['Techy',`'Space Grotesk',system-ui,sans-serif`,`'Space Grotesk',system-ui,sans-serif`],['Editorial',`'DM Serif Display',Georgia,serif`,`'Instrument Sans',system-ui,sans-serif`]];
 const RAD=[['Theme default'],['Sharp','0px'],['Rounded','12px'],['Very round','24px']],ANI=['None','Fade in','Slide up','Zoom in'],HOV=['Off','On'];
@@ -1785,12 +1899,13 @@ function authMessage(message,type='error'){const el=$('ae');if(!el)return;el.tex
 async function applyAuthSession(session){
  const nextId=session?.user?.id||'';
  const accountChanged=currentUserId!==nextId;
+ if(accountChanged){planStatus='unknown';planLoading=!!nextId;planError=''}
  if(currentUserId&&currentUserId!==nextId&&cur){
   clearTimeout(saveTimer);cur=null;$('editor').classList.remove('on','view-enter','view-exit');$('db').classList.remove('on');$('home').style.display='';
  }
  currentUserId=nextId;user=session?.user?authUser(session.user):null;BACKEND.token=session?.access_token||'';hdrRender();
  if($('au').classList.contains('on')&&session)$('au').classList.remove('on');
- if(!currentUserId){projectLoadId++;projects=[];projectLoadState='ready';setSaveStatus('');$('db').classList.remove('on');$('home').style.display='';renderHome();if(projectRouteId()||dashboardRouteId())restoreProjectRoute();return}
+ if(!currentUserId){projectLoadId++;projects=[];projectLoadState='ready';planStatus='unknown';planLoading=false;planError='';$('upgrade').classList.remove('on');setSaveStatus('');$('db').classList.remove('on');$('home').style.display='';renderHome();if(projectRouteId()||dashboardRouteId())restoreProjectRoute();return}
  if(!accountChanged&&projectLoadState==='ready'){restoreProjectRoute();return}
  await loadProjects(currentUserId,++projectLoadId);
 }
