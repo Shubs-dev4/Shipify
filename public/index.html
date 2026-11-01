@@ -259,7 +259,7 @@ body.dragging-section{user-select:none;cursor:grabbing}
 .pj-act{position:absolute;right:10px;bottom:12px;display:flex;gap:6px}.pj-act .chip{padding:5px 11px;font-size:12px;background:var(--bg)}
 #pr{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:20px;z-index:20}#pr.on{display:flex}
 .prr{display:flex;gap:8px;margin-bottom:8px}.prr input{flex:1;min-width:0;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);font:inherit}
-#pm{position:fixed;z-index:25;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:4px;min-width:160px;box-shadow:0 8px 28px rgba(0,0,0,.2)}#pm[hidden]{display:none}#pm button{display:block;width:100%;text-align:left;border:0;background:transparent;padding:8px 12px;border-radius:6px}#pm button:hover{background:var(--soft)}#pm button[data-m=del]{color:#c0392b}
+#pm{position:fixed;z-index:25;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:4px;min-width:160px;max-height:calc(100vh - 16px);overflow:auto;box-shadow:0 8px 28px rgba(0,0,0,.2)}#pm[hidden]{display:none}#pm button{display:block;width:100%;text-align:left;border:0;background:transparent;padding:8px 12px;border-radius:6px}#pm button:hover{background:var(--soft)}#pm button[data-m=del]{color:#c0392b}
 .s .pe{grid-column:1/-1;color:var(--pm)}
 #db .db-products .pmh{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:18px 22px;border-bottom:1px solid var(--line);flex-shrink:0}
 #db .db-products .pmh h2{margin:0}
@@ -1578,7 +1578,11 @@ $('pr').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='rnin')
  else if(t.dataset.pm==='rsave'){const old=pcur.name;pcur.name=$('rnin').value.trim()||pcur.name;if(await saveProjectRecord(pcur)){ $('pr').classList.remove('on');renderHome()}else pcur.name=old}};
 $('grid').addEventListener('click',e=>{const a=e.target.closest('[data-pa]');if(!a)return;const i=+a.closest('.proj').dataset.i,p=projects[i];
  if(a.dataset.pa==='dashboard'){dbOpen(p);return}
- menuProject=p;const m=$('pm'),r=a.getBoundingClientRect(),d=m.querySelector('[data-m=del]');d.textContent='Delete';d.dataset.arm='';m.hidden=false;m.style.left=Math.max(8,r.right-165)+'px';m.style.top=(r.bottom+6)+'px'});
+ menuProject=p;const m=$('pm'),d=m.querySelector('[data-m=del]');d.textContent='Delete';d.dataset.arm='';m.hidden=false;
+ const r=a.getBoundingClientRect(),gap=6,pad=8,height=m.offsetHeight,width=m.offsetWidth,below=innerHeight-r.bottom,above=r.top;
+ const top=below>=height+pad||below>=above?r.bottom+gap:r.top-height-gap;
+ m.style.left=Math.max(pad,Math.min(r.right-width,innerWidth-width-pad))+'px';
+ m.style.top=Math.max(pad,Math.min(top,innerHeight-height-pad))+'px'});
 $('pm').onclick=async e=>{const b=e.target.closest('[data-m]');if(!b)return;const k=b.dataset.m,p=menuProject;
  if(k==='del'){
   $('pm').hidden=true;deletingProject=p;
