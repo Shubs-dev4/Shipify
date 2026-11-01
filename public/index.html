@@ -377,8 +377,10 @@ body.dragging-section{user-select:none;cursor:grabbing}
 .account-menu:not([hidden]){transform-origin:top right;animation:builder-menu-in .16s ease-out both}
 .proj{transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
 .proj:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.08)}
-.proj[data-enter]{animation:project-enter .42s cubic-bezier(.2,.75,.25,1) both}
-@keyframes project-enter{from{opacity:0;transform:translateX(-28px) translateY(4px) scale(.98)}to{opacity:1;transform:none}}
+.proj[data-enter],.new[data-enter]{animation:project-enter .48s cubic-bezier(.2,.75,.25,1) both}
+#projectNotice[data-enter]{animation:plan-notice-enter .45s cubic-bezier(.2,.75,.25,1) both}
+@keyframes project-enter{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes plan-notice-enter{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
 .btn,.chip,.tpl,.rail button{transition:transform .16s ease,background-color .16s ease,color .16s ease,border-color .16s ease,box-shadow .16s ease}
 .btn:hover,.chip:hover,.tpl:hover{transform:translateY(-1px)}
 .btn:active,.chip:active,.tpl:active{transform:translateY(0) scale(.985)}
@@ -396,7 +398,7 @@ body.dragging-section{user-select:none;cursor:grabbing}
  #modal>.card,#cm>.card,#pr>.card,#upgrade>.card{transition:none!important;transform:none!important}
  #db .db-panel:not([hidden]),.account-menu:not([hidden]),#editor.view-enter,#editor.view-exit,#home.view-enter,#editor #pn>*{animation:none!important}
  .proj,.btn,.chip,.tpl,.rail button{transition:none!important}
- .proj[data-enter]{animation:none!important}
+ .proj[data-enter],.new[data-enter],#projectNotice[data-enter]{animation:none!important}
 }
 :root{--ibg:#000;--ifg:#fff;--imut:#a8a8a8;--iline:#3a3a3a}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--ibg:#fff;--ifg:#000;--imut:#555;--iline:#ccc}}
@@ -1225,24 +1227,38 @@ addEventListener('keydown',e=>{
  else if(e.key.toLowerCase()==='y'){e.preventDefault();historyMove(1)}
 });
 
+function renderPlanNotice(){
+ const notice=$('projectNotice');
+ let content='';
+ if(projectLoadState==='error')content='Could not load your projects. Check your connection. <button class="chip" type="button" data-project-retry>Retry</button>';
+ else if(projectLoadState==='ready'&&user){
+  if(planStatus==='pro')content='Pro plan · Unlimited projects. <button class="chip" type="button" data-plan-manage>Manage billing</button>';
+  else if(planLoading)content='Checking your plan…';
+  else if(planStatus==='unknown')content=`Could not verify your plan${projects.length?'':' — your first project is still available'}. <button class="chip" type="button" data-plan-retry>Retry</button>`;
+  else if(projects.length>=1)content='You’ve used your 1 free project. Upgrade to Pro for unlimited projects at $25/month. <button class="chip" type="button" data-upgrade>Upgrade to Pro</button>';
+  else content='Free plan · 0 of 1 projects used.';
+ }else if(projectLoadState==='ready'&&!projects.length)content='Sign in to save your first project to your account.';
+ if(notice.innerHTML!==content){
+  notice.innerHTML=content;
+  notice.removeAttribute('data-enter');
+  if(content&&matchMedia('(prefers-reduced-motion: no-preference)').matches){
+   void notice.offsetWidth;
+   notice.dataset.enter='';
+   notice.addEventListener('animationend',()=>notice.removeAttribute('data-enter'),{once:true});
+  }
+ }
+ const add=$('add');
+ if(add)add.disabled=projectLoadState!=='ready'||(user&&projects.length>=1&&planLoading);
+}
 function renderHome(animateProjects=false){
  projectPreviewObserver?.disconnect();
  const plus='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>';
  projects.sort((a,b)=>(Date.parse(b.updated_at||'')||0)-(Date.parse(a.updated_at||'')||0));
- $('grid').innerHTML=`<button class="new" id="add" aria-label="Create project">${plus}<span>Create project</span></button>`+
-  projects.map((p,i)=>{const updated=Date.parse(p.updated_at||''),label=Number.isFinite(updated)?projectEditedLabel(updated):'Last edited unknown',datetime=Number.isFinite(updated)?new Date(updated).toISOString():'',published=p.published===true;return `<div class="proj"${animateProjects?' data-enter':''}${animateProjects?` style="animation-delay:${i*80}ms"`:''} data-i="${i}"><button class="pj-open"><div class="th"><iframe title="${ea(p.name||'Project')} preview" loading="lazy" sandbox="" tabindex="-1" aria-hidden="true"></iframe><time class="edit-tag"${datetime?` datetime="${datetime}" title="Last edited ${new Date(updated).toLocaleString()}"`:''}>${label}</time><span class="publish-tag" data-status="${published?'published':'unpublished'}">${published?'Published':'Unpublished'}</span></div><div class="m"><b>${ea(p.name)}</b><span>${(p.pages||[p]).reduce((a,x)=>a+(x.sections||[]).length,0)} sections · ${(p.pages||[1]).length} pages</span></div></button><div class="pj-act"><button class="chip" data-pa="dashboard">Dashboard</button><button class="chip" data-pa="more" aria-label="More options">⋯</button></div></div>`}).join('');
+ $('grid').innerHTML=`<button class="new" id="add" aria-label="Create project"${animateProjects?' data-enter style="animation-delay:0ms"':''}>${plus}<span>Create project</span></button>`+
+  projects.map((p,i)=>{const updated=Date.parse(p.updated_at||''),label=Number.isFinite(updated)?projectEditedLabel(updated):'Last edited unknown',datetime=Number.isFinite(updated)?new Date(updated).toISOString():'',published=p.published===true;return `<div class="proj"${animateProjects?' data-enter':''}${animateProjects?` style="animation-delay:${(i+1)*80}ms"`:''} data-i="${i}"><button class="pj-open"><div class="th"><iframe title="${ea(p.name||'Project')} preview" loading="lazy" sandbox="" tabindex="-1" aria-hidden="true"></iframe><time class="edit-tag"${datetime?` datetime="${datetime}" title="Last edited ${new Date(updated).toLocaleString()}"`:''}>${label}</time><span class="publish-tag" data-status="${published?'published':'unpublished'}">${published?'Published':'Unpublished'}</span></div><div class="m"><b>${ea(p.name)}</b><span>${(p.pages||[p]).reduce((a,x)=>a+(x.sections||[]).length,0)} sections · ${(p.pages||[1]).length} pages</span></div></button><div class="pj-act"><button class="chip" data-pa="dashboard">Dashboard</button><button class="chip" data-pa="more" aria-label="More options">⋯</button></div></div>`}).join('');
  fitProjectPreviews();
  observeProjectPreviews();
- const notice=$('projectNotice');
- if(projectLoadState==='error')notice.innerHTML='Could not load your projects. Check your connection. <button class="chip" type="button" data-project-retry>Retry</button>';
- else if(projectLoadState==='ready'&&user){
-  if(planStatus==='pro')notice.innerHTML='Pro plan · Unlimited projects. <button class="chip" type="button" data-plan-manage>Manage billing</button>';
-  else if(planLoading)notice.textContent='Checking your plan…';
-  else if(planStatus==='unknown')notice.innerHTML=`Could not verify your plan${projects.length?'':' — your first project is still available'}. <button class="chip" type="button" data-plan-retry>Retry</button>`;
-  else if(projects.length>=1)notice.innerHTML='You’ve used your 1 free project. Upgrade to Pro for unlimited projects at $25/month. <button class="chip" type="button" data-upgrade>Upgrade to Pro</button>';
-  else notice.textContent='Free plan · 0 of 1 projects used.';
- }else notice.innerHTML=projectLoadState==='ready'&&!projects.length?'Sign in to save your first project to your account.':'';
- $('add').disabled=projectLoadState!=='ready'||(user&&projects.length>=1&&planLoading);
+ renderPlanNotice();
  $('add').onclick=()=>{if(!user){auOpen('in');authMessage('Sign in to create and save projects to your account.');return}if(projects.length>=1&&planStatus!=='pro'){openUpgradeDialog();return}$('modal').classList.add('on');document.querySelectorAll('#tpls .tin').forEach(i=>i.style.transform=`scale(${i.parentElement.clientWidth/1000})`)};
  document.querySelectorAll('.pj-open').forEach(b=>b.onclick=()=>open(projects[b.parentElement.dataset.i]));
 }
@@ -1334,7 +1350,9 @@ function openUpgradeDialog(){
 }
 async function refreshPlan(ownerId=currentUserId,loadId=projectLoadId){
  if(!ownerId||!authClient)return;
- planLoading=true;planError='';renderHome();
+ const alreadyLoading=planLoading;
+ planLoading=true;planError='';
+ if(!alreadyLoading)renderPlanNotice();
  const url=new URL(location.href),billingResult=url.searchParams.get('billing');
  try{
   const attempts=billingResult==='success'?6:1;
@@ -1347,7 +1365,7 @@ async function refreshPlan(ownerId=currentUserId,loadId=projectLoadId){
    await new Promise(resolve=>setTimeout(resolve,1500));
   }
   if(ownerId!==currentUserId||loadId!==projectLoadId)return;
-  planLoading=false;renderHome();
+  planLoading=false;renderPlanNotice();
   if(billingResult==='success'){
    url.searchParams.delete('billing');history.replaceState(history.state,'',url);
    toast(planStatus==='pro'?'Welcome to Pro! Unlimited projects are now unlocked.':'Payment received. Your Pro plan is still activating; refresh in a moment.');
@@ -1358,7 +1376,7 @@ async function refreshPlan(ownerId=currentUserId,loadId=projectLoadId){
   if(ownerId!==currentUserId||loadId!==projectLoadId)return;
   console.error('Could not verify the subscription status:',error);
   planStatus='unknown';planLoading=false;planError='Could not check your plan. Please retry before starting checkout.';
-  renderHome();
+  renderPlanNotice();
  }
 }
 async function startBillingAction(action,button){
