@@ -59,6 +59,8 @@ This publishes the **Shipify builder**. A separate website exported from the bui
 
 - The Dashboard shows **sample data** until `siteId` is set. Live dashboard data requires signing in as the Supabase Auth user who owns that site, because row-level security blocks anonymous reads. Projects are stored in Supabase and scoped to the signed-in user by row-level security; project content is not stored in localStorage.
 - Every project card has a Dashboard with Analytics and Products tabs, regardless of template. Product management is always available from the dashboard. Removing the last Products section or switching to a template without products resets the catalog and removes leftover Products sections from other pages; adding a product from the dashboard then adds a Products section to the project. All Products sections show active products from the shared catalog, and dashboard edits update the editor preview immediately. Product data is saved as part of its project; Analytics uses the configured Supabase site and is not separated by local project.
+- Contact and email signup sections can be connected in the editor: open the section's Design menu, enter a hosted form provider's HTTPS endpoint, and save it. Exported sites submit form data directly to that provider and show status feedback. Use a provider endpoint that permits browser CORS requests and accepts POST form data, such as a compatible Formspree endpoint. Shipify does not receive or store form submissions.
+- Forms without an endpoint remain disconnected and display an editor setup message when submitted.
 - The exported cart and checkout are still simulated, so revenue stays at $0 until Stripe is added.
 - The rate limiter is per edge instance (best effort, not a global cap).
 

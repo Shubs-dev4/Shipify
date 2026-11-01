@@ -29,7 +29,8 @@ button{font:inherit;cursor:pointer;color:inherit}
 .proj .th{aspect-ratio:4/3;background:var(--soft);border-bottom:1px solid var(--line);padding:14px;display:flex;flex-direction:column;gap:6px}
 .proj .th i{display:block;height:8px;border-radius:4px;background:var(--ph)}
 .proj .th i:nth-child(1){width:40%;background:var(--fg)}
-.proj .th i:nth-child(3){width:70%}
+.proj .th i:nth-of-type(3){width:70%}
+.proj .edit-tag{position:absolute;top:10px;right:10px;z-index:1;max-width:calc(100% - 20px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:4px 8px;border:1px solid var(--line);border-radius:999px;background:var(--bg);color:var(--fg);font-size:11px;font-weight:600;line-height:1.2}
 .proj div.m{padding:12px 14px}.proj b{display:block}.proj span{color:var(--mut);font-size:13px}
 /* modal */
 #modal,#cm,#ck,#db{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:20px;z-index:20}
@@ -1158,13 +1159,22 @@ addEventListener('keydown',e=>{
 
 function renderHome(animateProjects=false){
  const plus='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>';
+ projects.sort((a,b)=>(Date.parse(b.updated_at||'')||0)-(Date.parse(a.updated_at||'')||0));
  $('grid').innerHTML=`<button class="new" id="add" aria-label="Create project">${plus}<span>Create project</span></button>`+
-  projects.map((p,i)=>`<div class="proj"${animateProjects?' data-enter':''}${animateProjects?` style="animation-delay:${i*80}ms"`:''} data-i="${i}"><button class="pj-open"><div class="th"><i></i><i></i><i></i></div><div class="m"><b>${ea(p.name)}</b><span>${(p.pages||[p]).reduce((a,x)=>a+(x.sections||[]).length,0)} sections · ${(p.pages||[1]).length} pages</span></div></button><div class="pj-act"><button class="chip" data-pa="dashboard">Dashboard</button><button class="chip" data-pa="more" aria-label="More options">⋯</button></div></div>`).join('');
+  projects.map((p,i)=>{const updated=Date.parse(p.updated_at||''),label=Number.isFinite(updated)?projectEditedLabel(updated):'Last edited unknown',datetime=Number.isFinite(updated)?new Date(updated).toISOString():'';return `<div class="proj"${animateProjects?' data-enter':''}${animateProjects?` style="animation-delay:${i*80}ms"`:''} data-i="${i}"><button class="pj-open"><div class="th"><time class="edit-tag"${datetime?` datetime="${datetime}" title="Last edited ${new Date(updated).toLocaleString()}"`:''}>${label}</time><i></i><i></i><i></i></div><div class="m"><b>${ea(p.name)}</b><span>${(p.pages||[p]).reduce((a,x)=>a+(x.sections||[]).length,0)} sections · ${(p.pages||[1]).length} pages</span></div></button><div class="pj-act"><button class="chip" data-pa="dashboard">Dashboard</button><button class="chip" data-pa="more" aria-label="More options">⋯</button></div></div>`}).join('');
  const notice=$('projectNotice');
  notice.innerHTML=projectLoadState==='error'?'Could not load your projects. Check your connection. <button class="chip" type="button" data-project-retry>Retry</button>':projectLoadState==='ready'&&user&&!projects.length?'Your projects will be saved to your account automatically.':'';
  $('add').disabled=projectLoadState!=='ready';
  $('add').onclick=()=>{if(!user){auOpen('in');authMessage('Sign in to create and save projects to your account.');return}$('modal').classList.add('on');document.querySelectorAll('#tpls .tin').forEach(i=>i.style.transform=`scale(${i.parentElement.clientWidth/1000})`)};
  document.querySelectorAll('.pj-open').forEach(b=>b.onclick=()=>open(projects[b.parentElement.dataset.i]));
+}
+function projectEditedLabel(updated){
+ const age=Math.max(0,Date.now()-updated);
+ if(age<60000)return 'Edited just now';
+ if(age<3600000)return `Edited ${Math.floor(age/60000)}m ago`;
+ if(age<86400000)return `Edited ${Math.floor(age/3600000)}h ago`;
+ if(age<604800000)return `Edited ${Math.floor(age/86400000)}d ago`;
+ return `Edited ${new Intl.DateTimeFormat(undefined,{month:'short',day:'numeric'}).format(updated)}`;
 }
 $('projectNotice').onclick=async e=>{if(!e.target.closest('[data-project-retry]'))return;projectLoadState='loading';renderHome();try{const{data,error}=await authClient.auth.getSession();if(error)throw error;await applyAuthSession(data.session)}catch(error){console.error('Could not reload saved projects:',error);projectLoadState='error';renderHome()}};
 function projectError(err,action){
@@ -1191,7 +1201,7 @@ async function loadProjects(ownerId,loadId){
   projects=(data||[]).filter(row=>row.data&&typeof row.data==='object').map(row=>{
    const dataName=typeof row.data.name==='string'?row.data.name.trim():'',recordName=typeof row.name==='string'?row.name.trim():'';
    const name=dataName&&dataName!=='Untitled project'?dataName:recordName||dataName||'Untitled project';
-   const project={...row.data,id:row.id,name};
+   const project={...row.data,id:row.id,name,updated_at:row.updated_at||row.data.updated_at||null};
    return project;
   });
   projectLoadState='ready';renderHome(true);
@@ -1213,10 +1223,13 @@ async function saveProjectRecord(project,ownerId=currentUserId){
  historySchedule(project);
  saveQueue=saveQueue.catch(()=>{}).then(async()=>{
   if(!user||ownerId!==currentUserId||!projects.includes(project))return false;
-  const data=JSON.parse(JSON.stringify(project));
+  const updatedAt=new Date().toISOString(),data=JSON.parse(JSON.stringify(project));
+  data.updated_at=updatedAt;
   setSaveStatus('Saving…');
-  const{error}=await authClient.from('projects').upsert({id:project.id,owner:ownerId,name:project.name,data,updated_at:new Date().toISOString()},{onConflict:'id'});
+  const{error}=await authClient.from('projects').upsert({id:project.id,owner:ownerId,name:project.name,data,updated_at:updatedAt},{onConflict:'id'});
   if(error)throw error;
+  project.updated_at=updatedAt;
+  projects.sort((a,b)=>(Date.parse(b.updated_at||'')||0)-(Date.parse(a.updated_at||'')||0));
   if(cur===project||!cur)setSaveStatus('Saved');
   renderHome();
   return true;
@@ -1234,9 +1247,10 @@ async function createSavedProject(project){
  if(!user||!currentUserId||!authClient){auOpen('in');authMessage('Sign in to create and save projects to your account.');return false}
  setSaveStatus('Saving…');
  try{
-  const{data,error}=await authClient.from('projects').insert({owner:currentUserId,name:project.name,data:project}).select('id').single();
+  const updatedAt=new Date().toISOString(),savedProject={...project,updated_at:updatedAt};
+  const{data,error}=await authClient.from('projects').insert({owner:currentUserId,name:project.name,data:savedProject,updated_at:updatedAt}).select('id,updated_at').single();
   if(error)throw error;
-  project.id=data.id;projects.unshift(project);projectLoadState='ready';setSaveStatus('Saved');renderHome();return true;
+  project.id=data.id;project.updated_at=data.updated_at||updatedAt;projects.unshift(project);projectLoadState='ready';setSaveStatus('Saved');renderHome();return true;
  }catch(error){projectError(error,'create');return false}
 }
 const FONTS=[['Theme default'],['Modern',`'Instrument Sans',system-ui,sans-serif`,`'Instrument Sans',system-ui,sans-serif`],['Classic',`Georgia,serif`,`Georgia,serif`],['Elegant',`'Playfair Display',Georgia,serif`,`'Instrument Sans',system-ui,sans-serif`],['Friendly',`Poppins,system-ui,sans-serif`,`Poppins,system-ui,sans-serif`],['Techy',`'Space Grotesk',system-ui,sans-serif`,`'Space Grotesk',system-ui,sans-serif`],['Editorial',`'DM Serif Display',Georgia,serif`,`'Instrument Sans',system-ui,sans-serif`]];
@@ -1504,12 +1518,13 @@ cv.addEventListener('click',e=>{if(!prev)return;const t=e.target.closest('[data-
 addEventListener('keydown',e=>{if(e.key==='Escape'&&prev){prev=false;setPrev()}});
 let dEl=null;
 const DO=[['ls','Link style',[['','Plain text'],['ul','Underlined'],['btn','Outline button'],['fill','Filled button']],1],['lh','Link hover',[['','None'],['ul','Underline'],['bold','Bold'],['fade','Fade'],['lift','Lift']],1],['bh','Button hover',[['','Darker'],['light','Lighter']],2],['na','Navigation alignment',[['left','Left'],['center','Center'],['right','Right']],3],['ca','Content alignment',[['left','Left'],['center','Center'],['right','Right']]],['bg','Background',[['','Default'],['soft','Soft'],['accent','Accent']]],['sp','Spacing',[['compact','Compact'],['','Normal'],['roomy','Roomy']]]];
-function dmr(){const L=dEl.matches('.hdr,.ftr'),B=!!dEl.querySelector('.pb,[data-builder-control]'),N=dEl.matches('.hdr')||!!dEl.querySelector('nav');$('dm').firstElementChild.innerHTML='<h2>Section design</h2><p>Changes apply to this section only.'+(L?'':' Use alignment to position this section’s content.')+'</p>'+DO.filter(o=>o[3]===1?(L||B):o[3]===2?B:o[3]===3?N:true).map(o=>`<h3>${o[1]}</h3><div class="row2">${o[2].map(v=>`<button class="chip${(dEl.dataset[o[0]]||'')===v[0]?' on':''}" data-o="${o[0]}:${v[0]}">${v[1]}</button>`).join('')}</div>`).join('')+'<div class="ra"><button class="btn" data-o="done">Done</button></div>'}
+function validFormEndpoint(value){try{const url=new URL(String(value||'').trim());return url.protocol==='https:'?url.href:''}catch{return ''}}
+function dmr(){const L=dEl.matches('.hdr,.ftr'),B=!!dEl.querySelector('.pb,[data-builder-control]'),N=dEl.matches('.hdr')||!!dEl.querySelector('nav'),F=!!dEl.querySelector('.fld');$('dm').firstElementChild.innerHTML='<h2>Section design</h2><p>Changes apply to this section only.'+(L?'':' Use alignment to position this section’s content.')+'</p>'+DO.filter(o=>o[3]===1?(L||B):o[3]===2?B:o[3]===3?N:true).map(o=>`<h3>${o[1]}</h3><div class="row2">${o[2].map(v=>`<button class="chip${(dEl.dataset[o[0]]||'')===v[0]?' on':''}" data-o="${o[0]}:${v[0]}">${v[1]}</button>`).join('')}</div>`).join('')+(F?'<h3>Form destination</h3><label for="formEndpoint">Hosted form endpoint</label><input id="formEndpoint" type="url" autocomplete="url" placeholder="https://formspree.io/f/your-form-id" value="'+ea(dEl.dataset.formAction||'')+'" style="width:100%;margin:6px 0;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);font:inherit"><p class="ph">Use an HTTPS endpoint from a hosted form provider that accepts browser submissions.</p><p id="formEndpointError" role="status" style="color:#b42318"></p><button class="chip" type="button" data-o="form-save">Save form endpoint</button>':'')+'<div class="ra"><button class="btn" data-o="done">Done</button></div>'}
 function design(b){dEl=b.querySelector('.s');dmr();$('dm').classList.add('on')}
-$('dm').onclick=e=>{const o=e.target.dataset.o;if(!o)return;if(o==='done')return $('dm').classList.remove('on');const q=o.split(':');if(q[1])dEl.dataset[q[0]]=q[1];else delete dEl.dataset[q[0]];sync();scheduleProjectSave();dmr()};
+$('dm').onclick=e=>{const o=e.target.closest('[data-o]')?.dataset.o;if(!o)return;if(o==='done')return $('dm').classList.remove('on');if(o==='form-save'){const input=$('formEndpoint'),value=input.value.trim(),endpoint=value?validFormEndpoint(value):'';if(value&&!endpoint){$('formEndpointError').textContent='Enter a valid HTTPS endpoint from your form provider.';input.focus();return}if(endpoint)dEl.dataset.formAction=endpoint;else delete dEl.dataset.formAction;sync();historySchedule(cur);scheduleProjectSave();toast(endpoint?'Form endpoint saved':'Form endpoint removed');dmr();return}const q=o.split(':');if(q[1])dEl.dataset[q[0]]=q[1];else delete dEl.dataset[q[0]];sync();scheduleProjectSave();dmr()};
 addEventListener('keydown',e=>{if(e.key==='Escape')$('dm').classList.remove('on')});
 function fillProds(){if(!cur||!cur.products)return;cv.querySelectorAll('.prods .cols').forEach(g=>g.innerHTML=cur.products.some(x=>x.st!=='draft')?cur.products.filter(x=>x.st!=='draft').map(prodItem).join(''):'<p class="pe">No products yet. Add some from the project dashboard.</p>')}
-let pcur=null,mi=-1,deletingProject=null;
+let pcur=null,menuProject=null,deletingProject=null;
 $('pr').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='rnin')$('pr').querySelector('[data-pm=rsave]').click()});
  $('pr').onclick=async e=>{if(e.target.id==='pr'){deletingProject=null;$('pr').classList.remove('on');return}const t=e.target.closest('[data-pm]');if(!t)return;
  if(t.dataset.pm==='done')$('pr').classList.remove('on');
@@ -1528,8 +1543,8 @@ $('pr').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='rnin')
  else if(t.dataset.pm==='rsave'){const old=pcur.name;pcur.name=$('rnin').value.trim()||pcur.name;if(await saveProjectRecord(pcur)){ $('pr').classList.remove('on');renderHome()}else pcur.name=old}};
 $('grid').addEventListener('click',e=>{const a=e.target.closest('[data-pa]');if(!a)return;const i=+a.closest('.proj').dataset.i,p=projects[i];
  if(a.dataset.pa==='dashboard'){dbOpen(p);return}
- mi=i;const m=$('pm'),r=a.getBoundingClientRect(),d=m.querySelector('[data-m=del]');d.textContent='Delete';d.dataset.arm='';m.hidden=false;m.style.left=Math.max(8,r.right-165)+'px';m.style.top=(r.bottom+6)+'px'});
-$('pm').onclick=async e=>{const b=e.target.closest('[data-m]');if(!b)return;const k=b.dataset.m,p=projects[mi];
+ menuProject=p;const m=$('pm'),r=a.getBoundingClientRect(),d=m.querySelector('[data-m=del]');d.textContent='Delete';d.dataset.arm='';m.hidden=false;m.style.left=Math.max(8,r.right-165)+'px';m.style.top=(r.bottom+6)+'px'});
+$('pm').onclick=async e=>{const b=e.target.closest('[data-m]');if(!b)return;const k=b.dataset.m,p=menuProject;
  if(k==='del'){
   $('pm').hidden=true;deletingProject=p;
   const card=$('pr').firstElementChild;card.className='card';card.style.maxWidth='460px';
@@ -2029,8 +2044,17 @@ document.addEventListener('click',function(e){
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){var m=q('#ck');if(m)m.classList.remove('on');var n=q('#mn');if(n)n.classList.remove('on')}});
 addEventListener('resize',function(){var n=q('#mn'),v=q('#cv');if(n&&v&&v.offsetWidth>600)n.classList.remove('on')});
 document.addEventListener('submit',function(e){
- var f=e.target;if(!f.matches||!f.matches('form.cf')||f.getAttribute('action'))return;
- e.preventDefault();var m=f.querySelector('.cfm');if(m)m.textContent=f.classList.contains('sf')?'Sign-ups are not connected yet. The site owner needs to add an email service address to this form.':'This form is not connected yet. The site owner needs to add a form service address to it.'});
+ var f=e.target;if(!f.matches||!f.matches('form.cf'))return;
+ e.preventDefault();var m=f.querySelector('.cfm'),b=f.querySelector('[type=submit]'),action=f.getAttribute('action');
+ if(!action){if(m)m.textContent='This form is not connected yet. The site owner can connect it in the editor’s Section Design settings.';return}
+ if(!/^https:\/\//i.test(action)){if(m)m.textContent='This form endpoint is invalid. Please contact the site owner.';return}
+ if(b){b.disabled=true;b.dataset.label=b.textContent;b.textContent='Sending…'}
+ if(m)m.textContent='';
+ fetch(action,{method:'POST',body:new FormData(f),headers:{Accept:'application/json'},mode:'cors',credentials:'omit'})
+  .then(function(r){if(!r.ok)throw new Error('Form provider returned HTTP '+r.status);if(m)m.textContent=f.classList.contains('sf')?'Thanks for subscribing!':'Thanks! Your message has been sent.';f.reset()})
+  .catch(function(err){console.error('Hosted form submission failed:',err);if(m)m.textContent='Could not send this form. Check your connection or try again later.'})
+  .finally(function(){if(b){b.disabled=false;b.textContent=b.dataset.label||'Submit';delete b.dataset.label}});
+});
 var cv=q('#cv'),els=document.querySelectorAll('.blk>.s');
 if(cv&&/\ban\d\b/.test(cv.className)){
  if('IntersectionObserver' in window){var io=new IntersectionObserver(function(es){es.forEach(function(x){if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target)}})},{threshold:.1});els.forEach(function(e){io.observe(e)})}
@@ -2061,7 +2085,8 @@ function buildSite(){
    y.img='images/product-'+(++ic)+'.'+(m[1]==='jpeg'?'jpg':m[1]);add(y.img,u)}
   return y});
  const clean=s=>{
-  s.querySelectorAll('[contenteditable]').forEach(e=>e.removeAttribute('contenteditable'));
+   const formEndpoint=validFormEndpoint(s.dataset.formAction);
+   s.querySelectorAll('[contenteditable]').forEach(e=>e.removeAttribute('contenteditable'));
   s.querySelectorAll('[data-builder-button],[data-builder-image],[data-builder-image-empty],[data-builder-position]').forEach(e=>{e.removeAttribute('data-builder-button');e.removeAttribute('data-builder-image');e.removeAttribute('data-builder-image-empty');e.removeAttribute('data-builder-position')});
   s.removeAttribute('contenteditable');s.classList.remove('in');s.removeAttribute('data-code');s.removeAttribute('data-h');
   s.querySelectorAll('.prods .cols').forEach(g=>g.innerHTML=prods.map(prodItem).join(''));
@@ -2074,6 +2099,7 @@ function buildSite(){
   const fl=s.querySelectorAll('.fld');
   if(fl.length){
    const f=document.createElement('form');f.className='cf'+(s.classList.contains('signup')?' sf':'');f.method='post';fl[0].before(f);
+   if(formEndpoint)f.action=formEndpoint;
    fl.forEach(d=>{const t=d.textContent.trim(),tall=d.classList.contains('tall'),el=document.createElement(tall?'textarea':'input');
     el.className='fld';el.required=true;el.placeholder=t;el.setAttribute('aria-label',t);
     if(tall)el.name='message';else if(/mail/i.test(t)){el.type='email';el.name='email'}else{el.type='text';el.name='name'}
@@ -2089,7 +2115,7 @@ function buildSite(){
  add('style.css',siteCss(th,st));
  add('site.js',SITE_JS);
  if(TRACK.key)add('track.js',trackJs(TRACK.url,TRACK.key));
- add('README.txt',name+'\n'+'='.repeat(name.length)+'\n\nOpen index.html in a browser to view the site. Every page is its own .html file and they all share style.css and site.js. Product photos are in the images folder.\n\nTo put it online, upload this whole folder to any static host (Netlify, GitHub Pages, Cloudflare Pages, and so on).\n\nGood to know:\n- Contact forms: add a form service address (for example from Formspree) as the action attribute on the <form class="cf"> tag, and they will send for real. Until then they show a "not connected" message.\n- Email sign-up boxes: add an email service address (for example from Formspree, Mailchimp or Buttondown) as the action attribute on the <form class="cf sf"> tag. Until then they show a "not connected" message.\n- Checkout is a demo and takes no payment. To accept real payments, replace it with a Stripe or PayPal button.\n- The cart is remembered in the visitor\'s browser. Some browsers do not share it between pages when files are opened straight from disk, but it works once the site is hosted or served from a local server.\n- Review the starter Terms of Service and Privacy Policy text with a professional before you publish.\n');
+ add('README.txt',name+'\n'+'='.repeat(name.length)+'\n\nOpen index.html in a browser to view the site. Every page is its own .html file and they all share style.css and site.js. Product photos are in the images folder.\n\nTo put it online, upload this whole folder to any static host (Netlify, GitHub Pages, Cloudflare Pages, and so on).\n\nGood to know:\n- Contact and email signup forms can be connected in the builder: open the section Design menu, enter the HTTPS form endpoint from a hosted provider such as Formspree, and save it. The provider must allow browser submissions (CORS) and accept POST form data with an HTTP success response. Form submissions go directly to that provider, not Shipify.\n- Forms without a saved endpoint do not send submissions and show a setup message.\n- Checkout is a demo and takes no payment. To accept real payments, replace it with a Stripe or PayPal button.\n- The cart is remembered in the visitor\'s browser. Some browsers do not share it between pages when files are opened straight from disk, but it works once the site is hosted or served from a local server.\n- Review the starter Terms of Service and Privacy Policy text with a professional before you publish.\n');
  return{blob:makeZip(files),name:slug(name)+'.zip'}}
 $('dl').onclick=()=>{
  try{const r=buildSite(),a=document.createElement('a');a.href=URL.createObjectURL(r.blob);a.download=r.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),5000);toast('Site downloaded as '+r.name)}
