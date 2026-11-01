@@ -1170,6 +1170,12 @@ function renderHome(animateProjects=false){
  $('add').onclick=()=>{if(!user){auOpen('in');authMessage('Sign in to create and save projects to your account.');return}$('modal').classList.add('on');document.querySelectorAll('#tpls .tin').forEach(i=>i.style.transform=`scale(${i.parentElement.clientWidth/1000})`)};
  document.querySelectorAll('.pj-open').forEach(b=>b.onclick=()=>open(projects[b.parentElement.dataset.i]));
 }
+function projectRouteId(){return new URL(location.href).searchParams.get('project')||''}
+function setProjectRoute(id,replace=false){
+ const url=new URL(location.href);
+ if(id)url.searchParams.set('project',id);else url.searchParams.delete('project');
+ history[replace?'replaceState':'pushState']({shipifyProjectId:id||null},'',url);
+}
 function projectEditedLabel(updated){
  const age=Math.max(0,Date.now()-updated);
  if(age<60000)return 'Edited just now';
@@ -1206,7 +1212,7 @@ async function loadProjects(ownerId,loadId){
    const project={...row.data,id:row.id,name,updated_at:row.updated_at||row.data.updated_at||null};
    return project;
   });
-  projectLoadState='ready';renderHome(true);
+  projectLoadState='ready';renderHome(true);restoreProjectRoute();
  }catch(error){
   if(loadId!==projectLoadId)return;
   console.error('Could not load saved projects from Supabase:',error);
@@ -1480,11 +1486,33 @@ function editCode(b){ce=b;const c=b.querySelector('.code');$('cc').value=c.datas
 $('cs').onclick=()=>{ce.querySelector('.code').outerHTML=codeBlock($('cc').value,Math.min(1200,Math.max(40,+$('ch').value||200)));$('cm').classList.remove('on');sync();draw()};
 $('cx').onclick=()=>$('cm').classList.remove('on');
 function builderViewMotion(el,name){el.classList.remove('view-enter','view-exit');void el.offsetWidth;el.classList.add(name);el.addEventListener('animationend',()=>el.classList.remove(name),{once:true})}
-function open(p){
+function open(p,{updateUrl=true}={}){
  prev=false;cart=[];undo=null;cur=p;initPages(p);historyFor(p);$('pname').value=p.name;draw();applyTheme(p.theme||0);setDev(false);updSel();historyUpdate();
  $('home').style.display='none';$('editor').classList.add('on');builderViewMotion($('editor'),'view-enter');panel();cmdLoad();historyRebase(p);
+ if(updateUrl&&p.id)setProjectRoute(p.id);
 }
-$('back').onclick=async()=>{if(prev){prev=false;setPrev()}if(cur){sync();cur.name=$('pname').value.trim()||'Untitled project';if(!await persistCurrentProject())return}const editor=$('editor'),home=$('home');editor.classList.remove('view-enter');editor.classList.add('view-exit');setTimeout(()=>{editor.classList.remove('on','view-exit');home.style.display='';renderHome();builderViewMotion(home,'view-enter')},160)};
+async function closeProjectEditor({updateUrl=true}={}){
+ if(prev){prev=false;setPrev()}
+ if(cur){sync();cur.name=$('pname').value.trim()||'Untitled project';if(!await persistCurrentProject())return false}
+ if(updateUrl&&projectRouteId())setProjectRoute('',true);
+ const editor=$('editor'),home=$('home'),closingProject=cur;editor.classList.remove('view-enter');editor.classList.add('view-exit');setTimeout(()=>{if(cur!==closingProject||projectRouteId())return;editor.classList.remove('on','view-exit');home.style.display='';renderHome();builderViewMotion(home,'view-enter')},160);
+ return true;
+}
+$('back').onclick=()=>closeProjectEditor();
+let routeChangeId=0;
+async function restoreProjectRoute(){
+ const changeId=++routeChangeId,id=projectRouteId();
+ if(!id){if($('editor').classList.contains('on')&&!await closeProjectEditor({updateUrl:false})&&cur?.id)setProjectRoute(cur.id,true);return}
+ if(cur?.id===id&&$('editor').classList.contains('on'))return;
+ if(!currentUserId){auOpen('in');authMessage('Sign in to open this project.');return}
+ if(projectLoadState!=='ready')return;
+ const project=projects.find(item=>item.id===id);
+ if(!project){toast('This project could not be found in your account.');setProjectRoute('',true);return}
+ if(cur&&$('editor').classList.contains('on')&&!await persistCurrentProject()){setProjectRoute(cur.id,true);return}
+ if(changeId!==routeChangeId||projectRouteId()!==id)return;
+ open(project,{updateUrl:false});
+}
+addEventListener('popstate',()=>restoreProjectRoute());
 function setDev(m){$('mn').classList.remove('on');$('ck').classList.remove('on');cv.classList.toggle('m',m);$('editor').classList.toggle('mob',m);$('mb').classList.toggle('on',m);$('dk').classList.toggle('on',!m)}
 $('dk').onclick=()=>setDev(false);$('mb').onclick=()=>setDev(true);
 $('pub').onclick=()=>{const t=$('toast');t.textContent='Published! (demo only, no real link yet)';t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1800)};
@@ -1625,8 +1653,8 @@ async function applyAuthSession(session){
  }
  currentUserId=nextId;user=session?.user?authUser(session.user):null;BACKEND.token=session?.access_token||'';hdrRender();
  if($('au').classList.contains('on')&&session)$('au').classList.remove('on');
- if(!currentUserId){projectLoadId++;projects=[];projectLoadState='ready';setSaveStatus('');renderHome();return}
- if(!accountChanged&&projectLoadState==='ready')return;
+ if(!currentUserId){projectLoadId++;projects=[];projectLoadState='ready';setSaveStatus('');renderHome();if(projectRouteId())restoreProjectRoute();return}
+ if(!accountChanged&&projectLoadState==='ready'){restoreProjectRoute();return}
  await loadProjects(currentUserId,++projectLoadId);
 }
 function authInit(){
