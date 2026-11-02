@@ -151,7 +151,7 @@ body.dragging-section{user-select:none;cursor:grabbing}
 .cta .pb{background:var(--pt);color:var(--pa)}
 .ftr{background:var(--ps);display:flex;justify-content:space-between;color:var(--pm);font-size:14px;padding:28px 48px}
 .hg{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center}
-.him{aspect-ratio:4/3;border-radius:var(--pr);background:linear-gradient(135deg,var(--ps),var(--pa))}
+.him{aspect-ratio:4/3;border-radius:var(--pr);background:linear-gradient(135deg,var(--ps),var(--pa))}.him.inline-image{width:min(100%,280px);max-width:100%;margin:12px 0}#cv .image-drop-target{outline:2px dashed var(--pa);outline-offset:-6px}
 .s.center{padding-top:88px;padding-bottom:88px}
 .s.ftr{display:grid;grid-template-columns:2fr 1fr 1fr;gap:32px;align-items:start;font-size:14px}
 .ftr b{display:block;color:var(--pf);margin-bottom:8px}.ftr span{display:block;margin-bottom:6px}.ftr p{margin:0;max-width:30ch}
@@ -704,7 +704,7 @@ sections()
 <p>Anything that is not one of these is treated as plain JavaScript, and <code>await</code> works. For example, <code>qs('h1').textContent = 'Hi'</code> changes the first headline.</p>
 <h2>4. Ready-made sections with <code>add()</code></h2>
 <p><code>add('hero')</code> creates a section with sample content. Pass an options object to change the text:</p>
-<p>In the editor, drag a basic item or section from the left panel onto the page to place it between existing sections. Drag a section by its <strong>Drag</strong> handle to reorder it. The <strong>Basics</strong> group includes a text block, button, image container, text field, message box and divider.</p>
+<p>In the editor, drag a basic item or section from the left panel onto the page to place it between existing sections. Drop an image container inside an existing section to add a smaller image slot there, or click it to add a full-width section. Drag a section by its <strong>Drag</strong> handle to reorder it. The <strong>Basics</strong> group includes a text block, button, image container, text field, message box and divider.</p>
 <pre><code class="language-js">add('hero', {t: 'Title', p: 'Paragraph text', b: 'Button label'})
 add('text', {}, 2)   // the empty {} keeps defaults; 2 is the position
 </code></pre>
@@ -1041,6 +1041,7 @@ const hero=(c,o)=>{const b=`<span class="pb" contenteditable>${o.b||'Get started
 const cols=(c,a)=>`<section class="s"><div class="cols ${c}">${a.map(f=>`<div><div class="im"></div><b contenteditable>${f[0]}</b>${E(f[1])}</div>`).join('')}</div></section>`;
 const SAMPLE=[['Classic tee','$32'],['Canvas tote','$24'],['Daily mug','$18'],['Wool beanie','$28'],['Notebook set','$15'],['Water bottle','$22']].map(x=>({n:x[0],price:x[1]}));
 const XCSS=String.raw`.kick{display:inline-block;font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--pa);margin-bottom:14px}
+.him.inline-image{width:min(100%,280px);max-width:100%;margin:12px 0}
 .btns{display:flex;gap:12px;flex-wrap:wrap}.center .btns{justify-content:center}
 .basic-form label{display:block;max-width:420px;color:var(--pm);font-size:14px}.basic-form input.fld,.basic-form textarea.fld{display:block;width:100%;margin:6px 0 0;background:transparent;color:var(--pf);font:inherit}.basic-form textarea.fld{min-height:120px;resize:vertical}
 .basic-divider hr{border:0;border-top:1px solid var(--pl)}
@@ -1589,6 +1590,7 @@ function sectionDropIndex(y){
 }
 function clearSectionDrop(){
  cv.querySelectorAll('.drop-slot.active').forEach(x=>x.classList.remove('active'));
+ cv.querySelectorAll('.image-drop-target').forEach(x=>x.classList.remove('image-drop-target'));
  cv.querySelector('.empty')?.classList.remove('drag-over-empty');
  document.querySelectorAll('.section-drag-source').forEach(x=>x.classList.remove('section-drag-source'));
  $('editor').classList.remove('dragging-section');
@@ -1613,8 +1615,36 @@ function sectionDragMove(e){
  $('editor').classList.add('dragging-section');document.body.classList.add('dragging-section');
  const r=cv.getBoundingClientRect(),inside=e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom;
  cv.querySelectorAll('.drop-slot.active').forEach(x=>x.classList.remove('active'));
+ cv.querySelectorAll('.image-drop-target').forEach(x=>x.classList.remove('image-drop-target'));
+ if(drag.key==='image'&&inside){
+  const section=document.elementFromPoint(e.clientX,e.clientY)?.closest('.blk>.s');
+  if(section&&cv.contains(section))section.classList.add('image-drop-target');
+  return;
+ }
  cv.querySelector('.empty')?.classList.toggle('drag-over-empty',inside&&!cur.sections.length);
  if(inside&&cur.sections.length)cv.querySelector(`.drop-slot[data-insert="${sectionDropIndex(e.clientY)}"]`)?.classList.add('active');
+}
+function insertInlineImage(section,target,y){
+ const component=target.closest('.cols>div,.wi,.posts article,.plan,.prod,.hg>div,.row');
+ const layout=target.closest('.cols,.wg,.posts,.plans,.hg,.st');
+ const textBlock=target.closest('p,h1,h2,h3,h4,blockquote,li');
+ const isImageSlot=target.matches(SLOT);
+ let parent=section,anchorTarget=target;
+ if(isImageSlot&&textBlock&&section.contains(textBlock)){parent=textBlock.parentElement;anchorTarget=textBlock}
+ else if(isImageSlot&&component&&section.contains(component)){parent=component===target?component.parentElement:component}
+ else if(isImageSlot)parent=target.parentElement;
+ else if(component&&section.contains(component))parent=component;
+ else if(layout&&section.contains(layout)&&target===layout)parent=layout;
+ else if(textBlock&&section.contains(textBlock)){parent=textBlock.parentElement;anchorTarget=textBlock}
+ let anchor=anchorTarget;
+ while(anchor&&anchor.parentElement!==parent)anchor=anchor.parentElement;
+ if(anchor===parent)anchor=null;
+ const image=document.createElement('div');
+ image.className='him inline-image';image.setAttribute('role','img');image.setAttribute('aria-label','Image container');
+ if(anchor){
+  const rect=anchor.getBoundingClientRect();
+  parent.insertBefore(image,y<rect.top+rect.height/2?anchor:anchor.nextSibling);
+ }else parent.append(image);
 }
 function sectionDragEnd(e){
  const drag=sectionDrag;if(!drag||drag.pointerId!==e.pointerId)return;
@@ -1622,12 +1652,21 @@ function sectionDragEnd(e){
   if(drag.key){suppressSectionClick=drag.source;clearTimeout(suppressSectionClickTimer);suppressSectionClickTimer=setTimeout(()=>{suppressSectionClick=null},500)}
   const r=cv.getBoundingClientRect(),inside=e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom;
   if(inside){
-   const index=sectionDropIndex(e.clientY);sync();
-   if(drag.key&&S[drag.key]){
-    cur.sections.splice(index,0,S[drag.key].h({}));draw();toast(S[drag.key].n+' added');
-   }else if(Number.isInteger(drag.from)&&drag.from>=0&&drag.from<cur.sections.length){
-    const [section]=cur.sections.splice(drag.from,1),to=index-(drag.from<index?1:0);
-    cur.sections.splice(Math.max(0,Math.min(to,cur.sections.length)),0,section);draw();
+   const targetElement=document.elementFromPoint(e.clientX,e.clientY);
+   const section=drag.key==='image'?targetElement?.closest('.blk>.s'):null;
+   if(section&&cv.contains(section)){
+    section.classList.remove('image-drop-target');
+    sync();
+    insertInlineImage(section,targetElement||section,e.clientY);
+    sync();draw();scheduleProjectSave();historyCommit(cur);toast('Image container added');
+   }else{
+    const index=sectionDropIndex(e.clientY);sync();
+    if(drag.key&&S[drag.key]){
+     cur.sections.splice(index,0,S[drag.key].h({}));draw();toast(S[drag.key].n+' added');
+    }else if(Number.isInteger(drag.from)&&drag.from>=0&&drag.from<cur.sections.length){
+     const [section]=cur.sections.splice(drag.from,1),to=index-(drag.from<index?1:0);
+     cur.sections.splice(Math.max(0,Math.min(to,cur.sections.length)),0,section);draw();
+    }
    }
   }
   e.preventDefault();
