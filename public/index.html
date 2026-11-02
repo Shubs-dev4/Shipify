@@ -704,11 +704,11 @@ sections()
 <p>Anything that is not one of these is treated as plain JavaScript, and <code>await</code> works. For example, <code>qs('h1').textContent = 'Hi'</code> changes the first headline.</p>
 <h2>4. Ready-made sections with <code>add()</code></h2>
 <p><code>add('hero')</code> creates a section with sample content. Pass an options object to change the text:</p>
-<p>In the editor, drag a basic item or section from the left panel onto the page to place it between existing sections. Drag a section by its <strong>Drag</strong> handle to reorder it. The <strong>Basics</strong> group includes a text block, button, text field, message box and divider.</p>
+<p>In the editor, drag a basic item or section from the left panel onto the page to place it between existing sections. Drag a section by its <strong>Drag</strong> handle to reorder it. The <strong>Basics</strong> group includes a text block, button, image container, text field, message box and divider.</p>
 <pre><code class="language-js">add('hero', {t: 'Title', p: 'Paragraph text', b: 'Button label'})
 add('text', {}, 2)   // the empty {} keeps defaults; 2 is the position
 </code></pre>
-<p>The available section types are <code>header</code>, <code>hero</code>, <code>herocenter</code>, <code>products</code>, <code>posts</code>, <code>menu</code>, <code>features</code>, <code>team</code>, <code>gallery</code>, <code>pricing</code>, <code>quote</code>, <code>text</code>, <code>cta</code>, <code>contact</code>, <code>signup</code>, <code>legal</code>, <code>code</code>, <code>footer</code>, <code>basictext</code>, <code>basicbutton</code>, <code>textfield</code>, <code>messagebox</code> and <code>divider</code>.</p>
+<p>The available section types are <code>header</code>, <code>hero</code>, <code>herocenter</code>, <code>products</code>, <code>posts</code>, <code>menu</code>, <code>features</code>, <code>team</code>, <code>gallery</code>, <code>pricing</code>, <code>quote</code>, <code>text</code>, <code>cta</code>, <code>contact</code>, <code>signup</code>, <code>legal</code>, <code>code</code>, <code>footer</code>, <code>basictext</code>, <code>basicbutton</code>, <code>image</code>, <code>textfield</code>, <code>messagebox</code> and <code>divider</code>.</p>
 <p>Options that are understood:</p>
 <div class="dg-t"><table>
 <thead>
@@ -1095,6 +1095,7 @@ const S={
  text:{n:'Text',h:o=>`<section class="s"><h2 contenteditable>${o.t||'About us'}</h2><p contenteditable>${o.p||'Tell your story here. Click any text on the page to edit it.'}</p></section>`},
  basictext:{n:'Text block',h:o=>`<section class="s basic"><p contenteditable>${o.t||'Add your text here.'}</p></section>`},
  basicbutton:{n:'Button',h:o=>`<section class="s basic"><button class="pb" type="button" contenteditable>${o.t||'Click me'}</button></section>`},
+ image:{n:'Image container',h:()=>'<section class="s basic"><div class="him" role="img" aria-label="Image container"></div></section>'},
  textfield:{n:'Text field',h:o=>`<section class="s basic basic-form"><label><span contenteditable>${o.t||'Your name'}</span><input class="fld" type="text" placeholder="${o.ph||'Enter your name'}" aria-label="${o.t||'Your name'}"></label></section>`},
  messagebox:{n:'Message box',h:o=>`<section class="s basic basic-form"><label><span contenteditable>${o.t||'Your message'}</span><textarea class="fld" rows="4" placeholder="${o.ph||'Type your message'}" aria-label="${o.t||'Your message'}"></textarea></label></section>`},
  divider:{n:'Divider',h:()=>'<section class="s basic basic-divider"><hr></section>'},
@@ -1526,8 +1527,8 @@ function panel(){
  const p=$('pn'),t=TH[cur.theme||0];let h='';
  if(tab==='sec'){
   const item=k=>`<button class="it" data-k="${k}">${thumb(k==='code'?'<div style="padding:70px;text-align:center;font:600 70px monospace">&lt;/&gt;</div>':S[k].h({}),t,66)}<span>${S[k].n}</span></button>`;
-  const basics=['basictext','basicbutton','textfield','messagebox','divider'];
-  h='<section class="basics"><h2>Basics</h2><p class="ph">Simple text, buttons, fields and dividers.</p><div class="g2">'+basics.map(item).join('')+'</div></section><h2>Sections</h2><p class="ph">Drag a section into the page, or click to add it at the bottom.</p><div class="g2">'+Object.keys(S).filter(k=>!basics.includes(k)).map(item).join('')+'</div>';
+  const basics=['basictext','basicbutton','image','textfield','messagebox','divider'];
+  h='<section class="basics"><h2>Basics</h2><p class="ph">Simple text, buttons, images, fields and dividers.</p><div class="g2">'+basics.map(item).join('')+'</div></section><h2>Sections</h2><p class="ph">Drag a section into the page, or click to add it at the bottom.</p><div class="g2">'+Object.keys(S).filter(k=>!basics.includes(k)).map(item).join('')+'</div>';
  }
  else if(tab==='tpl')h='<h2>Templates</h2><p class="ph">Replace your page with a ready-made layout.</p><button class="ud" id="ud"'+(undo?'':' hidden')+'>Undo last template</button><div class="g1">'+T.map(x=>`<button class="it" data-t="${x.id}">${thumb(x.s.length?x.s.slice(0,3).map(mk).join(''):'<div style="padding:130px;text-align:center;font:600 56px sans-serif;color:#999">&nbsp;</div>',tth(x),130)}<span>${x.n}</span></button>`).join('')+'</div>';
  else if(tab==='pg')h='<h2>Pages</h2><p class="ph">Each page has its own sections. To link a menu or footer item, click its text and pick a page. Starter legal text is a template, so have it reviewed.</p>'+cur.pages.map((x,i)=>`<div class="pgr${i===cur.pi?' on':''}"><input data-n="${i}" value="${ea(x.n)}" aria-label="Page name"><button class="chip" data-pg="${i}">${i===cur.pi?'Editing':'Edit'}</button>${i?`<button class="chip" data-dp="${i}" aria-label="Delete page">×</button>`:''}</div>`).join('')+'<h3>Add a page</h3><div class="row2">'+PG.map(x=>`<button class="chip" data-np="${x.id}">+ ${x.n}</button>`).join('')+'</div>';
