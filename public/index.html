@@ -759,7 +759,7 @@ add('text', {}, 2)   // the empty {} keeps defaults; 2 is the position
 <li>If your markup is a single element with the class <code>s</code> (for example <code>&lt;section class="s my-hero"&gt;</code>), it is added exactly as written.</li>
 <li>Visible text is editable in place. Click it to open the font, size, weight, left/center/right alignment, text-color, fill, section-color and gradient controls. Explicit <code>contenteditable</code> regions are preserved, and nested editable regions are avoided.</li>
 <li>Anchors, buttons, role-based controls, styled button-like elements and keyboard-focusable controls can be linked to project pages. Click one in the editor to choose a destination. Its original behavior and styling remain unless you change them.</li>
-<li>Image elements and the builder's image slots can be clicked to upload, replace or remove an image. Images dropped onto those targets are also accepted. For a custom CSS background-image, add <code>data-builder-image</code> to its element to enable the same controls.</li>
+<li>Click an image element or image slot to open its menu, then add or replace an image, remove the image, or delete the container from the page. Images dropped onto those targets are also accepted. For a custom CSS background-image, add <code>data-builder-image</code> to its element to enable the same controls.</li>
 <li>Use the section's <strong>Design</strong> menu to adjust content alignment, navigation alignment, supported link/button styles, hover effects, section background and spacing. Navigation alignment appears for sections with a <code>&lt;nav&gt;</code>.</li>
 <li>Put your <code>&lt;style&gt;</code> inside the markup. Scope every rule to your own class so it cannot affect other sections.</li>
 <li>Use the theme colour variables so the section follows theme changes. <code>var(--pb)</code> is the page background and <code>var(--pm)</code> is the muted text colour. The other theme values follow the same naming as the theme list (<code>pf</code>, <code>ps</code>, <code>pa</code>, <code>pt</code>, <code>pl</code>, <code>pr</code>, <code>pfh</code>).</li>
@@ -1078,7 +1078,7 @@ const XCSS=String.raw`.kick{display:inline-block;font-size:13px;font-weight:600;
 `;
 document.head.appendChild(Object.assign(document.createElement('style'),{textContent:XCSS}));
 const MB='<button class="menubtn" aria-label="Open menu"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>';
-const prodItem=p=>`<div class="prod"><div class="im"${p.img?` style="background-image:url(${ea(p.img)})"`:''}></div><b>${ea(p.n)}</b><div class="pr"><span>${ea(p.price)}</span>${p.cmp?`<s>${ea(p.cmp)}</s>`:''}</div>${p.d?`<p class="pd">${ea(p.d)}</p>`:''}${p.stock!==''&&p.stock!=null&&+p.stock<=0?'<button class="add" disabled>Sold out</button>':'<button class="add">Add to cart</button>'}</div>`;
+const prodItem=p=>`<div class="prod">${p.hideImage?'':`<div class="im"${p.img?` style="background-image:url(${ea(p.img)})"`:''}></div>`}<b>${ea(p.n)}</b><div class="pr"><span>${ea(p.price)}</span>${p.cmp?`<s>${ea(p.cmp)}</s>`:''}</div>${p.d?`<p class="pd">${ea(p.d)}</p>`:''}${p.stock!==''&&p.stock!=null&&+p.stock<=0?'<button class="add" disabled>Sold out</button>':'<button class="add">Add to cart</button>'}</div>`;
 const S={
  header:{n:'Header',h:o=>`<header class="s hdr${o.v==='center'?' ctr':''}">${MB}<b contenteditable>${o.br||'Brand'}</b><nav>${(o.nav||['Home','About','Contact']).map(E).join('')}${o.cart?'<button class="cartlink" aria-label="Open cart"><svg viewBox="0 0 24 24"><path d="M3 4h2l2.4 11.2a1 1 0 0 0 1 .8h8.8a1 1 0 0 0 1-.8L20 8H6"/><circle cx="9.5" cy="20" r="1.3"/><circle cx="17" cy="20" r="1.3"/></svg><i class="cn">0</i></button>':''}</nav></header>`},
  hero:{n:'Hero',h:o=>hero('',o)},
@@ -1689,20 +1689,55 @@ function mnOpen(hd){
 cv.addEventListener('click',e=>{const b=e.target.closest('.menubtn');if(b)mnOpen(b.closest('.hdr'))});
 /* image boxes: click to add, click again to replace or remove, or drop a file on them */
 const SLOT='.him,.wi .im,.posts.feat .im,.cols:not(.f):not(.n) .im,img[data-builder-image],[data-builder-image]:not(img)';
-document.head.appendChild(Object.assign(document.createElement('style'),{textContent:`#cv :is(${SLOT}){cursor:pointer}#cv :is(${SLOT}):hover{outline:2px dashed var(--pa);outline-offset:-3px}.prev #cv :is(${SLOT}){outline:none!important}#ip{position:fixed;z-index:16;display:flex;gap:6px;background:var(--bg);border:1px solid var(--fg);border-radius:8px;padding:6px;box-shadow:0 4px 16px rgba(0,0,0,.2)}#ip[hidden]{display:none}#ip button{font:inherit;font-size:13px;padding:5px 10px;border-radius:6px;border:1px solid var(--line);background:var(--bg);color:var(--fg);cursor:pointer}`}));
-document.body.insertAdjacentHTML('beforeend','<div id="ip" hidden><button id="ipc">Replace image</button><button id="ipr">Remove</button><input type="file" id="ipf" accept="image/*" hidden></div>');
+document.head.appendChild(Object.assign(document.createElement('style'),{textContent:`#cv :is(${SLOT}){cursor:pointer}#cv :is(${SLOT}):hover{outline:2px dashed var(--pa);outline-offset:-3px}.prev #cv :is(${SLOT}){outline:none!important}#ip{position:fixed;z-index:16;display:flex;flex-direction:column;gap:4px;min-width:160px;background:var(--bg);border:1px solid var(--fg);border-radius:8px;padding:6px;box-shadow:0 4px 16px rgba(0,0,0,.2)}#ip[hidden],#ip [hidden]{display:none}#ip button{width:100%;font:inherit;font-size:13px;text-align:left;padding:7px 10px;border-radius:6px;border:1px solid transparent;background:var(--bg);color:var(--fg);cursor:pointer}#ip button:hover{background:var(--soft)}`}));
+document.body.insertAdjacentHTML('beforeend','<div id="ip" hidden role="menu" aria-label="Image options"><button id="ipc" type="button" role="menuitem">Add image</button><button id="ipr" type="button" role="menuitem" hidden>Remove image</button><button id="ipd" type="button" role="menuitem">Delete container</button><input type="file" id="ipf" accept="image/*" hidden></div>');
 let ipEl=null;const ip=$('ip'),ipf=$('ipf'),imgMax=el=>el.matches('.him')?1400:900;
+function imageSlotHasImage(el){
+ return el.matches('img')?!el.dataset.builderImageEmpty&&!!el.getAttribute('src'):!!el.style.backgroundImage||(el.hasAttribute('data-builder-image')&&getComputedStyle(el).backgroundImage!=='none')
+}
+function productForImageSlot(el){
+ const product=el.closest('.prod'),grid=el.closest('.prods .cols');
+ if(!product||!grid||!cur?.products)return null;
+ const index=[...grid.querySelectorAll('.prod')].indexOf(product);
+ return cur.products.filter(item=>item.st!=='draft')[index]||null
+}
+function showImageMenu(el){
+ ipEl=el;const hasImage=imageSlotHasImage(el),rect=el.getBoundingClientRect();
+ $('ipc').textContent=hasImage?'Replace image':'Add image';
+ $('ipr').hidden=!hasImage;
+ ip.hidden=false;
+ const width=ip.offsetWidth,height=ip.offsetHeight,left=Math.max(8,Math.min(innerWidth-width-8,rect.left));
+ const top=rect.bottom+height+8<=innerHeight?rect.bottom+6:Math.max(8,rect.top-height-6);
+ ip.style.left=left+'px';ip.style.top=top+'px';
+}
 const setImg=(el,d)=>{
  if(el.matches('img')){if(d){el.src=d;delete el.dataset.builderImageEmpty}else{el.src='data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';el.dataset.builderImageEmpty=''}return}
  if(d){el.style.backgroundImage=`url(${d})`;el.style.backgroundSize='cover';el.style.backgroundPosition='center'}else if(el.hasAttribute('data-builder-image')){el.style.backgroundImage='none'}else{['background-image','background-size','background-position'].forEach(k=>el.style.removeProperty(k));if(!el.getAttribute('style'))el.removeAttribute('style')}
 };
+function applyImageToSlot(el,data){
+ const product=productForImageSlot(el);
+ if(product){product.img=data;delete product.hideImage;refreshProjectProducts(cur);scheduleProductSave(cur)}
+ else{setImg(el,data);sync();scheduleProjectSave()}
+}
 const pickImg=el=>{ipEl=el;ip.hidden=true;ipf.value='';ipf.click()};
-ipf.onchange=()=>{const el=ipEl;if(el)readImg(ipf.files[0],d=>{setImg(el,d);sync();scheduleProjectSave()},imgMax(el))};
-cv.addEventListener('click',e=>{if(prev)return;const t=e.target.closest(SLOT);if(!t||!cv.contains(t)||(!t.matches('img')&&e.target.closest('[contenteditable]')))return;if(t.matches('img'))e.preventDefault();const hasImage=t.matches('img')?!t.dataset.builderImageEmpty&&!!t.getAttribute('src'):!!t.style.backgroundImage||(t.hasAttribute('data-builder-image')&&getComputedStyle(t).backgroundImage!=='none');if(!hasImage)return pickImg(t);ipEl=t;const r=t.getBoundingClientRect();ip.hidden=false;ip.style.left=Math.max(8,Math.min(innerWidth-210,r.left+r.width/2-100))+'px';ip.style.top=Math.max(8,r.top+8)+'px'});
-$('ipc').onclick=()=>pickImg(ipEl);$('ipr').onclick=()=>{setImg(ipEl,'');ip.hidden=true;sync();scheduleProjectSave()};
+ipf.onchange=()=>{
+ const el=ipEl;if(!el)return;
+ readImg(ipf.files[0],d=>applyImageToSlot(el,d),imgMax(el))
+};
+cv.addEventListener('click',e=>{if(prev)return;const t=e.target.closest(SLOT);if(!t||!cv.contains(t)||(!t.matches('img')&&e.target.closest('[contenteditable]')))return;if(t.matches('img'))e.preventDefault();showImageMenu(t)});
+$('ipc').onclick=()=>{if(ipEl)pickImg(ipEl)};
+$('ipr').onclick=()=>{if(!ipEl)return;const product=productForImageSlot(ipEl);if(product){delete product.img;delete product.hideImage;refreshProjectProducts(cur);scheduleProductSave(cur)}else{setImg(ipEl,'');sync();scheduleProjectSave()}ip.hidden=true};
+$('ipd').onclick=()=>{
+ if(!ipEl)return;
+ const product=productForImageSlot(ipEl);
+ if(product){delete product.img;product.hideImage=true;refreshProjectProducts(cur);scheduleProductSave(cur)}
+ else{ipEl.remove();sync();scheduleProjectSave()}
+ ip.hidden=true;ipEl=null;
+};
 document.addEventListener('mousedown',e=>{if(!ip.contains(e.target))ip.hidden=true});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!ip.hidden){ip.hidden=true;ipEl=null}});
 cv.addEventListener('dragover',e=>{if(!prev&&e.target.closest(SLOT)&&[...e.dataTransfer.types].includes('Files'))e.preventDefault()});
-cv.addEventListener('drop',e=>{const t=e.target.closest(SLOT);if(prev||!t||![...e.dataTransfer.types].includes('Files'))return;e.preventDefault();readImg(e.dataTransfer.files[0],d=>{setImg(t,d);sync();scheduleProjectSave()},imgMax(t))});
+cv.addEventListener('drop',e=>{const t=e.target.closest(SLOT);if(prev||!t||![...e.dataTransfer.types].includes('Files'))return;e.preventDefault();readImg(e.dataTransfer.files[0],d=>applyImageToSlot(t,d),imgMax(t))});
 
 $('mn').onclick=e=>{
  if(e.target.id==='mn')return $('mn').classList.remove('on');
@@ -1902,9 +1937,9 @@ function prRender(){const c=$('dbProducts');if(pcur!==plast){psel=0;pqs='';plast
  if(psel>=pcur.products.length)psel=Math.max(0,pcur.products.length-1);pList();pForm()}
 const dbProducts=$('dbProducts');
 dbProducts.oninput=e=>{const t=e.target;if(t.id==='pq'){pqs=t.value;return pList()}if(!t.dataset.f)return;pcur.products[psel][t.dataset.f]=t.dataset.f==='stock'?(t.value===''?'':Math.max(0,+t.value)):t.value;pList();refreshProjectProducts();scheduleProductSave()};
-dbProducts.addEventListener('change',e=>{if(e.target.id==='pfi'){const x=pcur.products[psel];readImg(e.target.files[0],d=>{x.img=d;pList();pForm();refreshProjectProducts();scheduleProductSave()})}});
+dbProducts.addEventListener('change',e=>{if(e.target.id==='pfi'){const x=pcur.products[psel];readImg(e.target.files[0],d=>{x.img=d;delete x.hideImage;pList();pForm();refreshProjectProducts();scheduleProductSave()})}});
 dbProducts.addEventListener('dragover',e=>{if(e.target.closest('#pib'))e.preventDefault()});
-dbProducts.addEventListener('drop',e=>{if(!e.target.closest('#pib'))return;e.preventDefault();const x=pcur.products[psel];readImg(e.dataTransfer.files[0],d=>{x.img=d;pList();pForm();refreshProjectProducts();scheduleProductSave()})});
+dbProducts.addEventListener('drop',e=>{if(!e.target.closest('#pib'))return;e.preventDefault();const x=pcur.products[psel];readImg(e.dataTransfer.files[0],d=>{x.img=d;delete x.hideImage;pList();pForm();refreshProjectProducts();scheduleProductSave()})});
 dbProducts.onclick=e=>{
  const ps=e.target.closest('[data-ps]');if(ps){psel=+ps.dataset.ps;pList();pForm();return}
  const t=e.target.closest('[data-pm]');if(!t)return;const k=t.dataset.pm,x=pcur.products[psel];
