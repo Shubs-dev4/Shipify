@@ -3,7 +3,9 @@
 Files:
 - `public/index.html` : the builder (project dashboards include Analytics and Products tabs, plus a tracking snippet in exports)
 - `supabase/migrations/001_init.sql` : database tables, security rules, `site_stats` function
+- `supabase/migrations/003_netlify_deployments.sql` : private Netlify deployment records
 - `supabase/functions/collect/index.ts` : the `/collect` endpoint that receives events
+- `supabase/functions/publish/index.ts` : authenticated Netlify site deployment
 - `supabase/config.toml` : Supabase CLI project and function settings
 - `.github/workflows/pages.yml` : publishes only `public/` to GitHub Pages
 
@@ -59,15 +61,21 @@ This publishes the **Shipify builder**. A separate website exported from the bui
    supabase functions deploy stripe-webhook --no-verify-jwt
    ```
    Use Stripe test keys and a test price while testing, then switch to live keys/price before charging customers. Never put Stripe secrets in `public/index.html`. The app gives each account one free project; an active Pro subscription unlocks unlimited creations. Existing projects remain saved if a subscription expires or is canceled. The database trigger enforces the limit even if a browser bypasses the UI. Pro status is synchronized from verified Stripe webhooks. Customers can open Stripe's Billing Portal from the account's plan notice to manage or cancel their subscription.
-7. **Export and host.** Click Download site, upload the folder to any static host (Netlify, Cloudflare Pages, GitHub Pages). The export now contains `track.js`.
-8. **Test.** Visit the hosted site, click around, then check Table Editor > `events` in Supabase. Rows should appear. Test Pro in Stripe test mode before enabling live charges.
+7. **Configure Netlify publishing.** Create or choose the Netlify account that will own customer sites, then create a Netlify personal access token. Apply `supabase/migrations/003_netlify_deployments.sql` in the Supabase SQL Editor. From the project folder, configure the token as a server-only secret and deploy the authenticated function:
+   ```
+   supabase secrets set NETLIFY_ACCESS_TOKEN=YOUR_NETLIFY_PERSONAL_ACCESS_TOKEN
+   supabase functions deploy publish
+   ```
+   Do not put this token in `public/index.html`, the browser, or a customer-visible repository. After deployment, open a saved project in Shipify and click **Publish**. The first publish creates one shared Netlify storefront gateway and a separate Netlify site for that project. Its public URL will look like `https://SHARED-GATEWAY.netlify.app/store-name-projectid/`; subsequent publishes update the project site and shared gateway routes while keeping that path stable. The editor toolbar provides **View site** and **Republish** controls. Static Netlify proxy redirects route each shared path to its project site. Custom-domain setup is not implemented yet; when you own a Shipify domain, configure it on the shared gateway and then add per-store domain management. The function enforces Netlify's documented limit of three deploys per minute and 100 per day for the shared account. Deleting a project in Shipify does not delete its Netlify deployment; remove that site from Netlify separately. Review your Netlify plan's site, bandwidth, and build limits before inviting customers.
+8. **Export and host manually (optional).** Click **Download site** to get a ZIP for a different host. The exported site includes `track.js` when analytics is configured.
+9. **Test.** Visit a deployed site, click around, then check Table Editor > `events` in Supabase. Rows should appear. Test Pro in Stripe test mode before enabling live charges.
 
 ## Known limits right now
 
 - The Dashboard shows **sample data** until `siteId` is set. Live dashboard data requires signing in as the Supabase Auth user who owns that site, because row-level security blocks anonymous reads. Projects are stored in Supabase and scoped to the signed-in user by row-level security; project content is not stored in localStorage.
 - Accounts get one free project; **Pro costs $25/month and allows unlimited projects**. Creating a second project requires an active Stripe subscription. Stripe checkout and the verified webhook must be deployed and configured as described above; until then, the upgrade option reports that billing is unavailable.
 - Every project card has a Dashboard that opens as a full page with a left-hand menu for Analytics and Products, regardless of template. The dashboard can be bookmarked and restored by URL, and its Back to projects button returns to the project list. Product management is always available from the dashboard. Removing the last Products section or switching to a template without products resets the catalog and removes leftover Products sections from other pages; adding a product from the dashboard then adds a Products section to the project. All Products sections show active products from the shared catalog, and dashboard edits update the editor preview immediately. Product data is saved as part of its project; Analytics uses the configured Supabase site and is not separated by local project.
-- Project cards show an Unpublished/Published badge. Clicking Publish marks the project Published in its saved project data, but Publish is still a demo and does not deploy the site.
+- Project cards show an Unpublished/Published badge after a successful shared-path Netlify deployment. Publishing and republishing require migration `003_netlify_deployments.sql`, a configured server-side Netlify token, and the deployed `publish` Edge Function. Each store's temporary path URL is stable, but custom-domain assignment and DNS verification are not implemented yet.
 - Contact and email signup sections can be connected in the editor: open the section's Design menu, enter a hosted form provider's HTTPS endpoint, and save it. Exported sites submit form data directly to that provider and show status feedback. Use a provider endpoint that permits browser CORS requests and accepts POST form data, such as a compatible Formspree endpoint. Shipify does not receive or store form submissions.
 - Buttons and other linkable text can point to another project page or a phone number. Focus a link/button in the editor, enter a phone number in the Phone number field, and save; exported sites use a `tel:` link. Phone numbers must contain 7–15 digits and may include a leading `+`, spaces, parentheses, periods, or hyphens.
 - Forms without an endpoint remain disconnected and display an editor setup message when submitted.
@@ -77,7 +85,7 @@ This publishes the **Shipify builder**. A separate website exported from the bui
 ## Build order from here
 
 1. **Accounts and saved projects** (Supabase Auth and per-user Supabase project storage): done
-2. **Publish button** (upload the export to Cloudflare Pages or Netlify via API, auto-create the `sites` row)
+2. **Publish button** (Netlify API deployment behind shared storefront paths): implemented; configure migration `003_netlify_deployments.sql`, `NETLIFY_ACCESS_TOKEN`, and the `publish` Edge Function as described above. Custom-domain controls remain to be built.
 3. Tracking + dashboard: **done** (this package)
 4. **Stripe Pro subscriptions** (one free project, unlimited on the $25/month plan): implemented; configure the Stripe product, secrets and webhook above.
 5. **Stripe Checkout + webhook** writing to `orders` / `order_items` (revenue, AOV, top products come from here)

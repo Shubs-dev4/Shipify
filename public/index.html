@@ -17,6 +17,7 @@ button{font:inherit;cursor:pointer;color:inherit}
 .btn{border:1px solid var(--fg);background:var(--fg);color:var(--bg);padding:8px 16px;border-radius:8px;font-weight:600}
 .btn.ghost{background:transparent;color:var(--fg);border-color:var(--line)}
 .btn.ghost:hover{border-color:var(--fg)}
+#liveSite[hidden]{display:none}
 #home{max-width:960px;margin:0 auto;padding:48px 24px;-webkit-user-select:none;user-select:none}
 #home h1{font-size:32px;letter-spacing:-.02em;margin:0 0 4px}
 #home p.sub{color:var(--mut);margin:0 0 32px}
@@ -1005,6 +1006,7 @@ qs('h1')  qsa('p')  print(x)  cls()  undo()  redo()  help()
     <span id="saveStatus" class="save-status" role="status" aria-live="polite"></span>
     <button class="btn ghost" id="prv">Preview</button><div class="seg"><button id="dk" class="on">Desktop</button><button id="mb">Mobile</button></div>
     <button class="btn ghost" id="dl">Download site</button>
+    <a class="btn ghost" id="liveSite" target="_blank" rel="noopener noreferrer" hidden>View site</a>
     <button class="btn" id="pub">Publish</button>
   </div>
   <div id="cmd"><span class="cp">&gt;</span><textarea id="cmdi" rows="1" spellcheck="false" autocomplete="off" aria-label="Command bar" placeholder="Run a command, like clear() or add('hero'). Type help() to see everything."></textarea><button id="cmdr" title="Run (Enter)">Run</button><button id="cmdt" title="Show or hide output" aria-label="Show or hide output">▾</button></div>
@@ -1791,8 +1793,14 @@ function editCode(b){ce=b;const c=b.querySelector('.code');$('cc').value=c.datas
 $('cs').onclick=()=>{ce.querySelector('.code').outerHTML=codeBlock($('cc').value,Math.min(1200,Math.max(40,+$('ch').value||200)));$('cm').classList.remove('on');sync();draw()};
 $('cx').onclick=()=>$('cm').classList.remove('on');
 function builderViewMotion(el,name){el.classList.remove('view-enter','view-exit');void el.offsetWidth;el.classList.add(name);el.addEventListener('animationend',()=>el.classList.remove(name),{once:true})}
+function updatePublishControls(project=cur){
+ const liveSite=$('liveSite'),url=project?.publishedUrl;
+ liveSite.hidden=!url;
+ liveSite.href=url||'#';
+ $('pub').textContent=url?'Republish':'Publish';
+}
 function open(p,{updateUrl=true}={}){
- prev=false;cart=[];undo=null;cur=p;initPages(p);historyFor(p);$('pname').value=p.name;draw();applyTheme(p.theme||0);setDev(false);updSel();historyUpdate();
+ prev=false;cart=[];undo=null;cur=p;initPages(p);historyFor(p);$('pname').value=p.name;updatePublishControls(p);draw();applyTheme(p.theme||0);setDev(false);updSel();historyUpdate();
  $('home').style.display='none';$('editor').classList.add('on');builderViewMotion($('editor'),'view-enter');panel();cmdLoad();historyRebase(p);
  if(updateUrl&&p.id)setProjectRoute(p.id);
 }
@@ -1837,7 +1845,39 @@ async function restoreProjectRoute(){
 addEventListener('popstate',()=>restoreProjectRoute());
 function setDev(m){$('mn').classList.remove('on');$('ck').classList.remove('on');cv.classList.toggle('m',m);$('editor').classList.toggle('mob',m);$('mb').classList.toggle('on',m);$('dk').classList.toggle('on',!m)}
 $('dk').onclick=()=>setDev(false);$('mb').onclick=()=>setDev(true);
-$('pub').onclick=()=>{cur.published=true;scheduleProjectSave();const t=$('toast');t.textContent='Published! (demo only, no real link yet)';t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1800)};
+async function publishCurrentProject(){
+ const project=cur,ownerId=currentUserId,button=$('pub');
+ if(!project?.id||!ownerId||!authClient){toast('Sign in before publishing this project.');return}
+ if(button.disabled)return;
+ button.disabled=true;button.textContent='Preparing…';
+ try{
+  if(!await persistCurrentProject())throw new Error('Could not save your latest project changes. Try again before publishing.');
+  const site=buildSite({forDeploy:true});
+  button.textContent='Publishing…';
+  const response=await fetch(`${BACKEND.supabaseUrl}/functions/v1/publish?project_id=${encodeURIComponent(project.id)}`,{
+   method:'POST',
+   headers:{Authorization:`Bearer ${BACKEND.token}`,apikey:BACKEND.anonKey,'Content-Type':'application/zip'},
+   body:site.blob
+  });
+  let result;
+  try{result=await response.json()}catch(error){console.error('Could not read the publishing response:',error);throw new Error('The publishing service returned an invalid response.')}
+  if(!response.ok)throw new Error(typeof result?.error==='string'?result.error:'Could not publish the site. Please try again.');
+  const liveUrl=new URL(result.url);
+  if(liveUrl.protocol!=='https:'||!liveUrl.hostname.endsWith('.netlify.app'))throw new Error('The publishing service returned an invalid Netlify URL.');
+  project.published=true;project.publishedUrl=liveUrl.href;
+  if(cur===project)updatePublishControls(project);
+  const saved=await saveProjectRecord(project,ownerId);
+  if(!saved)throw new Error(`The site is live at ${liveUrl.href}, but the published status could not be saved.`);
+  toast(result.state==='ready'?'Published! Use View site to open it.':'Deploy started. Use View site in a moment.');
+ }catch(error){
+  console.error('Could not publish project:',error);
+  toast(error instanceof Error?error.message:'Could not publish the site. Please try again.');
+ }finally{
+  button.disabled=false;
+  if(cur===project)updatePublishControls(project);
+ }
+}
+$('pub').onclick=publishCurrentProject;
 const LK='.hdr nav>span[contenteditable],.ftr span[contenteditable],span.pb[contenteditable]:not(.sb),[data-builder-button]';
 function eachLink(fn){cur.pages.forEach(p=>{p.sections=p.sections.map(h=>{const t=document.createElement('template');t.innerHTML=h;const e=t.content.firstElementChild,l=e.querySelectorAll(LK);if(!l.length)return h;l.forEach(fn);return e.outerHTML})});cur.sections=cur.pages[cur.pi].sections}
 function autoLink(){eachLink(el=>{if(el.dataset.link)return;const a=el.textContent.trim().toLowerCase();if(a.length<3)return;const m=cur.pages.find(p=>{const b=p.n.toLowerCase();return a===b||(a.length>3&&(b.includes(a)||a.includes(b)))});if(m)el.dataset.link=m.id})}
@@ -2448,11 +2488,11 @@ upd();
 })();
 `;
 
-function buildSite(){
+function buildSite({forDeploy=false}={}){
  sync();
  const name=$('pname').value.trim()||cur.name||'My site',th=TH[cur.theme||0],st=cur.st||{f:0,r:0,a:0,h:0};
  const slug=s=>s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'page';
- const enc=new TextEncoder(),files=[],root=slug(name)+'/';
+ const enc=new TextEncoder(),files=[],root=forDeploy?'':slug(name)+'/';
  const add=(n,data)=>files.push({name:root+n,data:typeof data==='string'?enc.encode(data):data});
  /* page file names */
  const used={index:1},fn={};
