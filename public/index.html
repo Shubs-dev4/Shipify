@@ -319,9 +319,9 @@ body.dragging-section{user-select:none;cursor:grabbing}
 #home{max-width:none;padding:0}.hm{max-width:960px;margin:0 auto;padding:40px 24px 48px}
 .top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 24px;position:sticky;top:0;z-index:5;--bg:var(--ibg);--fg:var(--ifg);--mut:var(--imut);--line:var(--iline);background:var(--ibg);color:var(--ifg);border-bottom:1px solid var(--iline)}
 .top .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;letter-spacing:-.02em}.top .brand small{font-weight:500;font-size:13px;color:var(--mut);letter-spacing:0}
-.top .logo{width:28px;height:28px;border-radius:8px;background:var(--fg);color:var(--bg);display:grid;place-items:center;font-size:15px}
+.top .brand-logo{box-sizing:border-box;display:block;width:150px;height:34px;object-fit:contain;padding:5px 8px;border-radius:8px;background:#000}
 #auth{display:flex;align-items:center;gap:8px}.account-control{position:relative}.account-trigger{display:flex;align-items:center;gap:8px;padding:5px 9px;border:1px solid transparent;border-radius:999px;background:transparent;color:inherit;cursor:pointer;transition:background .15s,border-color .15s}.account-trigger:hover,.account-trigger[aria-expanded=true]{background:rgba(127,127,127,.16)}.account-trigger:focus-visible{outline:2px solid currentColor;outline-offset:2px}.av{width:30px;height:30px;border-radius:50%;background:var(--ifg);color:var(--ibg);display:grid;place-items:center;font-weight:600;font-size:13px}.un{font-weight:600;font-size:14px}.account-chevron{width:14px;height:14px;transition:transform .15s}.account-trigger[aria-expanded=true] .account-chevron{transform:rotate(180deg)}.account-menu{position:absolute;top:calc(100% + 9px);right:0;z-index:10;width:260px;padding:7px;border:1px solid var(--iline);border-radius:14px;background:var(--ibg);color:var(--ifg);box-shadow:0 14px 40px rgba(0,0,0,.22)}.account-menu[hidden]{display:none}.account-summary{padding:11px 12px 13px}.account-summary strong,.account-summary span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.account-summary strong{font-size:14px}.account-summary span{margin-top:2px;color:var(--imut);font-size:12px}.account-divider{height:1px;margin:0 5px 5px;background:var(--iline)}.account-menu button{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border:0;border-radius:8px;background:transparent;color:inherit;text-align:left;font:inherit;font-size:14px;cursor:pointer}.account-menu button:hover,.account-menu button:focus-visible{outline:0;background:rgba(127,127,127,.18)}.account-menu button svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-@media(max-width:560px){.un,.top .brand small{display:none}}
+@media(max-width:560px){.un,.top .brand small{display:none}.top .brand-logo{width:126px}}
 #au{position:fixed;inset:0;background:rgba(12,14,18,.62);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px;z-index:20;opacity:0;transition:opacity .2s}#au.on{display:flex;opacity:1}#au a{color:var(--fg);font-weight:600}
 #upgrade{background:rgba(12,14,18,.62);backdrop-filter:blur(8px)}
 #upgrade .upgrade-card{position:relative;width:min(100%,460px);max-height:min(92vh,760px);overflow:auto;padding:34px;border-radius:22px;border-color:rgba(127,127,127,.22);box-shadow:0 24px 80px rgba(0,0,0,.28)}
@@ -410,8 +410,6 @@ body.dragging-section{user-select:none;cursor:grabbing}
 }
 :root{--ibg:#000;--ifg:#fff;--imut:#a8a8a8;--iline:#3a3a3a}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--ibg:#fff;--ifg:#000;--imut:#555;--iline:#ccc}}
-.top .logo{background:transparent;border:1.5px dashed var(--mut);color:var(--mut)}
-.top .logo.wide{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:auto;min-width:150px;height:34px;padding:0 14px;font-size:13px;font-weight:500;letter-spacing:0}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 #ck{display:flex;justify-content:flex-end;align-items:stretch;padding:0;visibility:hidden;opacity:0;transition:opacity .25s,visibility .25s}
 #ck.on{visibility:visible;opacity:1}
@@ -520,7 +518,7 @@ select option::checkmark{display:none}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <main id="home">
-  <header class="top"><div class="brand"><span class="logo wide" role="img" aria-label="Logo placeholder"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="1.5"/><path d="M21 16l-5-5-8 8"/></svg>Your logo</span></div><div id="auth"></div></header>
+  <header class="top"><div class="brand"><img class="brand-logo" src="logo.svg" alt="Webora"></div><div id="auth"></div></header>
   <div class="hm">
   <section class="home-intro" aria-labelledby="projectsTitle">
   <div class="home-title"><svg viewBox="0 0 64 56" fill="none" aria-hidden="true"><path d="M5 11a6 6 0 0 1 6-6h15l7 7h20a6 6 0 0 1 6 6v26a6 6 0 0 1-6 6H11a6 6 0 0 1-6-6V11Z" fill="currentColor"/><path d="M5 19a6 6 0 0 1 6-6h38a6 6 0 0 1 6 6v25a6 6 0 0 1-6 6H11a6 6 0 0 1-6-6V19Z" fill="currentColor" opacity=".82"/></svg><h1 id="projectsTitle">Projects</h1></div>
@@ -537,7 +535,7 @@ select option::checkmark{display:none}
 </main>
 
 <section id="docs" aria-label="Command bar guide">
-  <header class="top"><div class="brand"><span class="logo wide" role="img" aria-label="Logo placeholder"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="1.5"/><path d="M21 16l-5-5-8 8"/></svg>Your logo</span></div><div><button class="btn ghost" id="docsBack">Back to projects</button></div></header>
+  <header class="top"><div class="brand"><img class="brand-logo" src="logo.svg" alt="Webora"></div><div><button class="btn ghost" id="docsBack">Back to projects</button></div></header>
   <article class="dg">
 <h1>Webora Command Bar Guide</h1>
 <p class="dg-lead">How to build, restyle and rebuild a whole site by pasting a script into the command bar, using the AURA script as the worked example.</p>
