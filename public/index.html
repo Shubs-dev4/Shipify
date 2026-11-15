@@ -1904,7 +1904,7 @@ function addPage(id){sync();const k=PG.find(x=>x.id===id),h=cur.pages[0].section
 function delPage(i){sync();const r=cur.pages.splice(i,1)[0],removedProducts=hasProductsSection(r.sections||[]);eachLink(el=>{if(el.dataset.link===r.id)delete el.dataset.link});if(i<cur.pi)cur.pi--;else if(i===cur.pi)cur.pi=Math.max(0,i-1);switchPage(cur.pi,true);if(removedProducts)reconcileProjectProducts(cur);toast('Page deleted')}
 $('pn').addEventListener('click',e=>{const b=e.target.closest('[data-pg],[data-np],[data-dp],[data-rename-page],[data-save-page],[data-cancel-page]');if(!b)return;
  if(b.dataset.pg!=null)switchPage(+b.dataset.pg);else if(b.dataset.np)addPage(b.dataset.np);
- else if(b.dataset.renamePage!=null){pageNameIndex=+b.dataset.renamePage;panel();$('pn').querySelector('[data-page-name]')?.focus()}
+ else if(b.dataset.renamePage!=null){const i=+b.dataset.renamePage;if(cur.pi!==i)switchPage(i);pageNameIndex=i;panel();$('pn').querySelector('[data-page-name]')?.focus()}
  else if(b.dataset.savePage!=null){const i=+b.dataset.savePage,input=$('pn').querySelector('[data-page-name]');cur.pages[i].n=input.value.trim()||'Untitled';pageNameIndex=null;updSel();scheduleProjectSave();panel()}
  else if(b.dataset.cancelPage!=null){pageNameIndex=null;panel()}
  else if(b.dataset.arm)delPage(+b.dataset.dp);else{b.dataset.arm=1;b.textContent='Delete?';setTimeout(()=>{b.dataset.arm='';b.textContent='×'},2500)}});
