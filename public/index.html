@@ -1254,7 +1254,7 @@ function renderPlanNotice(){
   }
  }
  const add=$('add');
- if(add)add.disabled=projectLoadState!=='ready'||(user&&projects.length>=1&&planLoading);
+ if(add)add.disabled=projectLoadState==='error'||(user&&projects.length>=1&&planLoading);
 }
 function renderHome(animateProjects=false){
  projectPreviewObserver?.disconnect();
@@ -2043,7 +2043,7 @@ async function applyAuthSession(session){
  }
  currentUserId=nextId;user=session?.user?authUser(session.user):null;BACKEND.token=session?.access_token||'';hdrRender();
  if($('au').classList.contains('on')&&session)$('au').classList.remove('on');
- if(!currentUserId){projectLoadId++;projects=[];projectLoadState='ready';planStatus='unknown';planLoading=false;planError='';$('upgrade').classList.remove('on');setSaveStatus('');$('db').classList.remove('on');$('home').style.display='';renderHome();if(projectRouteId()||dashboardRouteId())restoreProjectRoute();return}
+ if(!currentUserId){projectLoadId++;projects=[];projectLoadState='ready';planStatus='unknown';planLoading=false;planError='';$('upgrade').classList.remove('on');setSaveStatus('');$('db').classList.remove('on');if(!$('docs').classList.contains('on'))$('home').style.display='';renderHome();if(projectRouteId()||dashboardRouteId())restoreProjectRoute();return}
  if(!accountChanged&&projectLoadState==='ready'){restoreProjectRoute();return}
  await loadProjects(currentUserId,++projectLoadId);
 }
