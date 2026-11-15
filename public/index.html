@@ -161,7 +161,12 @@ body.dragging-section{user-select:none;cursor:grabbing}
 .menubtn{display:none;align-items:center;justify-content:center;width:40px;height:40px;padding:0;border:0;border-radius:var(--pr);background:transparent;color:var(--pf)!important;cursor:pointer}.menubtn:hover{background:var(--ps)}.menubtn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .cartlink{position:relative;display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;padding:0;border:0;border-radius:var(--pr);background:transparent;color:var(--pf)!important;cursor:pointer}.cartlink:hover{background:var(--ps)}.cartlink svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.cartlink i{position:absolute;top:-7px;right:-7px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--pa);color:var(--pt);font-size:11px;font-weight:600;line-height:18px;font-style:normal;text-align:center}
 @container(max-width:600px){.hg,.s.ftr{grid-template-columns:1fr}.s.center{padding-top:48px;padding-bottom:48px}.plans{grid-template-columns:1fr}.s .q{font-size:22px}.s{padding:36px 22px;--ms:.7}.s h1{font-size:36px}.hdr{padding:16px 22px}.hdr nav{gap:12px;font-size:14px;margin-left:auto}.hdr{justify-content:flex-start;gap:6px}.menubtn{display:inline-flex;margin-left:-8px}.hdr nav>:is(span,a){display:none!important}.cols{grid-template-columns:1fr 1fr}.ftr{padding:24px 22px;flex-direction:column;gap:6px}}
-.tip{display:flex;gap:12px;align-items:center;justify-content:space-between;max-width:1000px;margin:0 auto 16px;padding:12px 16px;background:var(--bg);border:1px solid var(--line);border-radius:10px;font-size:14px}
+.editor-help{position:relative;display:flex;align-items:center}
+.editor-help-trigger{width:36px;height:36px;padding:0;border:1px solid var(--line);border-radius:50%;background:var(--bg);color:var(--mut);font-size:20px;font-weight:600;line-height:1}
+.editor-help-trigger:hover,.editor-help-trigger:focus-visible{border-color:var(--fg);color:var(--fg)}
+.tip{display:none;position:absolute;top:calc(100% + 8px);right:0;z-index:25;gap:12px;align-items:center;justify-content:space-between;width:min(560px,calc(100vw - 32px));margin:0;padding:12px 16px;background:var(--bg);border:1px solid var(--line);border-radius:10px;font-size:14px;line-height:1.45;box-shadow:0 8px 28px rgba(0,0,0,.16)}
+.editor-help:hover .tip,.editor-help:focus-within .tip{display:flex}
+.editor-help[data-dismissed=true] .tip{display:none}
 .tip .btn{white-space:nowrap;flex-shrink:0;padding:8px 22px}
 #cv{font-family:var(--pfb,inherit)}
 .pn h3{font-size:13px;margin:20px 0 8px;color:var(--mut);font-weight:600}.row2{display:flex;flex-wrap:wrap;gap:8px}
@@ -236,7 +241,7 @@ body.dragging-section{user-select:none;cursor:grabbing}
 #lk .phone-link{margin-top:9px;padding-top:9px;border-top:1px solid var(--line)}#lk .phone-link .btn{width:100%;margin-top:7px;padding:6px 10px;font-size:12px}#lk .phone-error{margin:4px 0 0;color:#b42318;font-size:12px}
 #lk select,.bar select{padding:5px 8px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--fg);font:inherit;font-size:13px}.bar select{max-width:150px}
 .pgr{display:flex;gap:6px;align-items:center;margin-bottom:8px;padding:6px;border:1px solid var(--line);border-radius:10px}.pgr.on{border-color:var(--fg)}.pgr input{flex:1;min-width:0;border:0;background:transparent;font:inherit;font-weight:600;color:var(--fg);padding:4px 6px;border-radius:6px}.pgr .chip{padding:4px 10px}
-#editor.pv .side,#editor.pv .tip,#editor.pv #pname,#editor.pv #pub,#editor.pv #dl,#editor.pv #back{display:none}
+#editor.pv .side,#editor.pv .editor-help,#editor.pv #pname,#editor.pv #pub,#editor.pv #dl,#editor.pv #back{display:none}
 #editor.pv .history-actions{display:none}
 #editor.pv .bar{background:#1a1a1a;color:#fff;border-bottom:0;padding:8px 16px}
 #editor.pv .bar::before{content:"Preview";font-weight:600;font-size:13px;opacity:.7}
@@ -1007,13 +1012,14 @@ qs('h1')  qsa('p')  print(x)  cls()  undo()  redo()  help()
     <button class="btn ghost" id="prv">Preview</button><div class="seg"><button id="dk" class="on">Desktop</button><button id="mb">Mobile</button></div>
     <button class="btn ghost" id="dl">Download site</button>
     <a class="btn ghost" id="liveSite" target="_blank" rel="noopener noreferrer" hidden>View site</a>
+    <div class="editor-help" id="editorHelp"><button class="editor-help-trigger" id="editorHelpTrigger" type="button" aria-label="Editing help" aria-controls="tip" title="Editing help">?</button><div class="tip" id="tip"><span><b>How to edit:</b> click text to change its style, buttons to assign page links, or images to replace them. Drag a basic item or section from the left panel into the page; drag a section’s Drag handle to move it. Use a section’s Design menu for section-wide options. Need custom interactions? Add a Custom code section.</span><button class="btn ghost" id="tipx" type="button">Got it</button></div></div>
     <button class="btn" id="pub">Publish</button>
   </div>
   <div id="cmd"><span class="cp">&gt;</span><textarea id="cmdi" rows="1" spellcheck="false" autocomplete="off" aria-label="Command bar" placeholder="Run a command, like clear() or add('hero'). Type help() to see everything."></textarea><button id="cmdr" title="Run (Enter)">Run</button><button id="cmdt" title="Show or hide output" aria-label="Show or hide output">▾</button></div>
   <div id="cmdo" hidden><div class="ch"><button id="cmdc">Clear output</button><button id="cmdx">Hide</button></div><div id="cmdl"></div></div>
   <div class="work">
     <aside class="side"><nav class="rail" id="rail"><button data-tab="sec" class="on"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="7" rx="1.5"/><rect x="3" y="14" width="18" height="7" rx="1.5"/></svg><span>Sections</span></button><button data-tab="pg"><svg viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/></svg><span>Pages</span></button><button data-tab="tpl"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg><span>Templates</span></button><button data-tab="col"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="8.5" cy="10" r="1"/><circle cx="12" cy="7.5" r="1"/><circle cx="15.5" cy="10" r="1"/></svg><span>Colors</span></button><button data-tab="sty"><svg viewBox="0 0 24 24"><text x="1" y="17" font-size="15" font-weight="700" fill="currentColor" stroke="none">Aa</text></svg><span>Style</span></button></nav><div class="pn" id="pn"></div></aside>
-    <div class="stage"><div class="tip" id="tip"><span><b>How to edit:</b> click text to change its style, buttons to assign page links, or images to replace them. Drag a basic item or section from the left panel into the page; drag a section’s Drag handle to move it. Use a section’s Design menu for section-wide options. Need custom interactions? Add a Custom code section.</span><button class="btn ghost" id="tipx">Got it</button></div><div id="cv"></div></div>
+    <div class="stage"><div id="cv"></div></div>
   </div>
 </section>
 <div id="cm" role="dialog" aria-modal="true" aria-label="Edit custom code"><div class="card"><h2>Custom code</h2><p>Write HTML, CSS and JavaScript. Your code runs in its own box, so it can’t break the rest of your page.</p><textarea id="cc" spellcheck="false" aria-label="Code"></textarea><p class="hint">Box height in pixels <input id="ch" type="number" min="40" max="1200" style="width:80px"></p><div style="margin-top:16px;display:flex;gap:8px;justify-content:flex-end"><button class="btn ghost" id="cx">Cancel</button><button class="btn" id="cs">Save code</button></div></div></div>
@@ -1553,7 +1559,10 @@ $('pn').onclick=e=>{
  else if(b.dataset.t){const t=T.find(x=>x.id===b.dataset.t);sync();undo={s:cur.sections.slice(),pg:cur.pages?JSON.parse(JSON.stringify(cur.pages)):null,pi:cur.pi,th:cur.theme,st:JSON.parse(JSON.stringify(cur.st||{})),pr:JSON.parse(JSON.stringify(cur.products||[])),tpl:cur.tpl};cur.sections=t.s.map(mk);cur.tpl=t.n;cur.st={f:0,r:0,a:0,h:0,...(t.st||{})};if(cur.pages){cur.pages[cur.pi].sections=cur.sections;if(!hasProductsSection(cur.sections)){cur.pages.forEach((page,index)=>{if(index!==cur.pi)page.sections=(page.sections||[]).filter(section=>!hasProductsSection([section]))});cur.products=[]}}draw();applyTheme(t.th);toast('Template applied')}
  else if(undo){cur.pages=undo.pg;cur.pi=undo.pi||0;cur.sections=cur.pages?cur.pages[cur.pi].sections:undo.s;if(undo.tpl!==undefined)cur.tpl=undo.tpl;if(undo.st)cur.st=undo.st;if(undo.pr)cur.products=undo.pr;const th=undo.th;undo=null;draw();updSel();applyTheme(th)}
 };
-$('tipx').onclick=()=>$('tip').style.display='none';
+$('editorHelp').addEventListener('pointerenter',()=>$('editorHelp').removeAttribute('data-dismissed'));
+$('editorHelp').addEventListener('focusin',()=>$('editorHelp').removeAttribute('data-dismissed'));
+$('editorHelp').addEventListener('focusout',e=>{if(!$('editorHelp').contains(e.relatedTarget))$('editorHelp').removeAttribute('data-dismissed')});
+$('tipx').onclick=()=>$('editorHelp').dataset.dismissed='true';
 
 function sync(){cur.sections=[...cv.querySelectorAll('.blk>.s')].map(e=>e.outerHTML);if(cur.pages)cur.pages[cur.pi].sections=cur.sections}
 function draw(){
