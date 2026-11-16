@@ -55,12 +55,12 @@ button{font:inherit;cursor:pointer;color:inherit}
 #db .db-nav svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 #db .db-main{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column}
 #db .db-head{padding:28px 30px 20px;border-bottom:1px solid var(--line)}
-#db:has(#dbTabProducts.on) .db-head{display:none}
+#db:has(#dbTabProducts.on) .db-head,#db:has(#dbTabDigitalProducts.on) .db-head{display:none}
 #db .db-head h2{margin:0;font-size:24px}
 #db .db-head p{margin:0;color:var(--mut)}
 #db .db-panel[hidden]{display:none}
 #db .db-analytics{flex:1;min-height:0;overflow:auto;padding:22px 30px}
-#db .db-products:not([hidden]){display:flex;flex:1;min-height:0;flex-direction:column;overflow:hidden}
+#db .db-products:not([hidden]),#db .db-digital-products:not([hidden]){display:flex;flex:1;min-height:0;flex-direction:column;overflow:hidden}
 #db .dh{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-bottom:14px}#db .dh h2{margin:0}
 #db .dr{display:flex;flex-wrap:wrap;gap:6px;align-items:center}#db .dr input[type=date]{padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);font:inherit;font-size:13px}
 #db .tag{font-size:12px;padding:3px 9px;border-radius:99px;background:var(--soft);color:var(--mut);border:1px solid var(--line);font-weight:400}
@@ -159,6 +159,7 @@ body.dragging-section{user-select:none;cursor:grabbing}
 .ftr b{display:block;color:var(--pf);margin-bottom:8px}.ftr span{display:block;margin-bottom:6px}.ftr p{margin:0;max-width:30ch}
 .cols.p{row-gap:32px}.prod span{display:block}
 .add{margin-top:10px;width:100%;padding:10px;border:1px solid var(--pa);background:transparent;color:var(--pa);border-radius:var(--pr);font:inherit;font-weight:600;cursor:pointer}.add:hover{background:var(--pa);color:var(--pt)}
+.digital-download{display:block;margin-top:10px;width:100%;padding:10px;border:1px solid var(--pa);background:var(--pa);color:var(--pt);border-radius:var(--pr);font:inherit;font-weight:600;text-align:center;text-decoration:none}.digital-download:hover{filter:brightness(.92)}.digital-download:disabled{opacity:.55;cursor:not-allowed}
 .menubtn{display:none;align-items:center;justify-content:center;width:40px;height:40px;padding:0;border:0;border-radius:var(--pr);background:transparent;color:var(--pf)!important;cursor:pointer}.menubtn:hover{background:var(--ps)}.menubtn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .cartlink{position:relative;display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;padding:0;border:0;border-radius:var(--pr);background:transparent;color:var(--pf)!important;cursor:pointer}.cartlink:hover{background:var(--ps)}.cartlink svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.cartlink i{position:absolute;top:-7px;right:-7px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--pa);color:var(--pt);font-size:11px;font-weight:600;line-height:18px;font-style:normal;text-align:center}
 @container(max-width:600px){.hg,.s.ftr{grid-template-columns:1fr}.s.center{padding-top:48px;padding-bottom:48px}.plans{grid-template-columns:1fr}.s .q{font-size:22px}.s{padding:36px 22px;--ms:.7}.s h1{font-size:36px}.hdr{padding:16px 22px}.hdr nav{gap:12px;font-size:14px;margin-left:auto}.hdr{justify-content:flex-start;gap:6px}.menubtn{display:inline-flex;margin-left:-8px}.hdr nav>:is(span,a){display:none!important}.cols{grid-template-columns:1fr 1fr}.ftr{padding:24px 22px;flex-direction:column;gap:6px}}
@@ -299,11 +300,11 @@ body.dragging-section{user-select:none;cursor:grabbing}
 .prr{display:flex;gap:8px;margin-bottom:8px}.prr input{flex:1;min-width:0;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);font:inherit}
 #pm{position:fixed;z-index:25;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:4px;min-width:160px;max-height:calc(100vh - 16px);overflow:auto;box-shadow:0 8px 28px rgba(0,0,0,.2)}#pm[hidden]{display:none}#pm button{display:block;width:100%;text-align:left;border:0;background:transparent;padding:8px 12px;border-radius:6px}#pm button:hover{background:var(--soft)}#pm button[data-m=del]{color:#c0392b}
 .s .pe{grid-column:1/-1;color:var(--pm)}
-#db .db-products .pmh{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:18px 22px;border-bottom:1px solid var(--line);flex-shrink:0}
-#db .db-products .pmh h2{margin:0}
-#db .db-products .pmh p{margin:2px 0 0}
+#db .db-products .pmh,#db .db-digital-products .pmh{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:18px 22px;border-bottom:1px solid var(--line);flex-shrink:0}
+#db .db-products .pmh h2,#db .db-digital-products .pmh h2{margin:0}
+#db .db-products .pmh p,#db .db-digital-products .pmh p{margin:2px 0 0}
 .pmh{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:18px 22px;border-bottom:1px solid var(--line)}.pmh h2{margin:0}.pmh p{margin:2px 0 0}
-#db .db-products .pmb{flex:1;display:flex;min-height:0}
+#db .db-products .pmb,#db .db-digital-products .pmb{flex:1;display:flex;min-height:0}
 .pml{width:320px;border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0;flex-shrink:0}
 .pml .tb{padding:12px;display:flex;flex-direction:column;gap:8px;border-bottom:1px solid var(--line)}.pll{flex:1;overflow:auto;padding:6px}
 .pml input,.pme input,.pme textarea,.pme select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);font:inherit}
@@ -313,6 +314,10 @@ body.dragging-section{user-select:none;cursor:grabbing}
 .pme{flex:1;overflow:auto;padding:22px;min-width:0}.pme label{display:block;font-size:13px;font-weight:600;margin:0 0 6px}.pme .f{margin-bottom:16px}.pme .f2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.pme textarea{min-height:110px;resize:vertical}
 .pimgb{width:180px;height:180px;border:1.5px dashed var(--mut);border-radius:14px;background:var(--soft) center/cover no-repeat;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--mut);font-size:13px;padding:10px}.pimgb.has{border-style:solid;border-color:var(--line)}
 .pe0{text-align:center;padding:80px 20px;color:var(--mut)}.pe0 h3{color:var(--fg);margin:0 0 6px}
+.digital-file-name{margin:8px 0;color:var(--mut);font-size:13px;overflow-wrap:anywhere}
+.digital-free-toggle{display:flex!important;align-items:center;gap:9px;padding:12px;border:1px solid var(--line);border-radius:8px;background:var(--soft);cursor:pointer}
+.digital-free-toggle input{width:auto;accent-color:var(--fg)}
+.digital-note{margin:0 0 12px!important;font-size:13px}
 @media(max-width:720px){#db .db-card{height:100dvh;min-height:100dvh;flex-direction:column;overflow:auto}#db .db-sidebar{width:100%;gap:12px;padding:14px 16px;border-right:0;border-bottom:1px solid var(--line)}#db .db-project{display:none}#db .db-nav{display:flex;gap:6px;overflow-x:auto}#db .db-nav button{width:auto;white-space:nowrap}#db .db-head{padding:18px 16px}#db .db-analytics{padding:16px}.pmb{flex-direction:column}.pml{width:100%;max-height:38%;border-right:0;border-bottom:1px solid var(--line)}}
 .prod .im{background-size:cover;background-position:center}.prod .pr{display:flex;gap:8px;align-items:baseline}.prod .pr s{color:var(--pm);font-size:13px}
 .s .prod .pd{font-size:14px;color:var(--pm);margin:4px 0 0;max-width:none;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.add:disabled{opacity:.5;cursor:not-allowed}.add:disabled:hover{background:transparent;color:var(--pa)}
@@ -712,7 +717,7 @@ sections()
 <pre><code class="language-js">add('hero', {t: 'Title', p: 'Paragraph text', b: 'Button label'})
 add('text', {}, 2)   // the empty {} keeps defaults; 2 is the position
 </code></pre>
-<p>The available section types are <code>header</code>, <code>hero</code>, <code>herocenter</code>, <code>products</code>, <code>posts</code>, <code>menu</code>, <code>features</code>, <code>team</code>, <code>gallery</code>, <code>pricing</code>, <code>quote</code>, <code>text</code>, <code>cta</code>, <code>contact</code>, <code>signup</code>, <code>legal</code>, <code>code</code>, <code>footer</code>, <code>basictext</code>, <code>basicbutton</code>, <code>image</code>, <code>textfield</code>, <code>messagebox</code> and <code>divider</code>.</p>
+<p>The available section types are <code>header</code>, <code>hero</code>, <code>herocenter</code>, <code>products</code>, <code>digitalproducts</code>, <code>posts</code>, <code>menu</code>, <code>features</code>, <code>team</code>, <code>gallery</code>, <code>pricing</code>, <code>quote</code>, <code>text</code>, <code>cta</code>, <code>contact</code>, <code>signup</code>, <code>legal</code>, <code>code</code>, <code>footer</code>, <code>basictext</code>, <code>basicbutton</code>, <code>image</code>, <code>textfield</code>, <code>messagebox</code> and <code>divider</code>.</p>
 <p>Options that are understood:</p>
 <div class="dg-t"><table>
 <thead>
@@ -1028,10 +1033,11 @@ qs('h1')  qsa('p')  print(x)  cls()  undo()  redo()  help()
 <div id="dm"><div class="card"></div></div>
 <div id="pr" role="dialog" aria-modal="true" aria-label="Project options"><div class="card" style="max-width:460px"></div></div>
 <section id="db" aria-label="Project dashboard"><div class="card db-card">
-  <aside class="db-sidebar"><div class="db-project"><p class="db-eyebrow">PROJECT DASHBOARD</p><h2 id="dbTitle">Dashboard</h2></div><button class="btn ghost db-back" type="button" data-db-close>← Back to projects</button><nav class="db-nav" aria-label="Dashboard sections"><button class="db-tab on" type="button" id="dbTabAnalytics" aria-controls="dbAnalytics" aria-current="page" data-db-tab="analytics"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h17"/><path d="m7 15 4-4 3 2 6-7"/></svg>Analytics</button><button class="db-tab" type="button" id="dbTabProducts" aria-controls="dbProducts" data-db-tab="products"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 8 8-4 8 4-8 4-8-4Z"/><path d="m4 12 8 4 8-4M4 16l8 4 8-4"/></svg>Products</button></nav></aside>
+  <aside class="db-sidebar"><div class="db-project"><p class="db-eyebrow">PROJECT DASHBOARD</p><h2 id="dbTitle">Dashboard</h2></div><button class="btn ghost db-back" type="button" data-db-close>← Back to projects</button><nav class="db-nav" aria-label="Dashboard sections"><button class="db-tab on" type="button" id="dbTabAnalytics" aria-controls="dbAnalytics" aria-current="page" data-db-tab="analytics"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h17"/><path d="m7 15 4-4 3 2 6-7"/></svg>Analytics</button><button class="db-tab" type="button" id="dbTabProducts" aria-controls="dbProducts" data-db-tab="products"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 8 8-4 8 4-8 4-8-4Z"/><path d="m4 12 8 4 8-4M4 16l8 4 8-4"/></svg>Products</button><button class="db-tab" type="button" id="dbTabDigitalProducts" aria-controls="dbDigitalProducts" data-db-tab="digital-products"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l5 5v13H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path d="M14 3v6h6M9 14h6M9 17h6"/></svg>Digital products</button></nav></aside>
   <div class="db-main"><header class="db-head"><div><h2 id="dbContentTitle">Analytics</h2><p id="dbSubtitle">Analytics and products for this project</p></div></header>
   <section class="db-panel db-analytics" id="dbAnalytics" aria-labelledby="dbTabAnalytics"></section>
   <section class="db-panel db-products" id="dbProducts" aria-labelledby="dbTabProducts" hidden></section>
+  <section class="db-panel db-digital-products" id="dbDigitalProducts" aria-labelledby="dbTabDigitalProducts" hidden></section>
   </div>
 </div></section>
 <div id="au" role="dialog" aria-modal="true" aria-label="Account"><div class="card auth-card"></div></div>
@@ -1087,11 +1093,13 @@ const XCSS=String.raw`.kick{display:inline-block;font-size:13px;font-weight:600;
 document.head.appendChild(Object.assign(document.createElement('style'),{textContent:XCSS}));
 const MB='<button class="menubtn" aria-label="Open menu"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>';
 const prodItem=p=>`<div class="prod">${p.hideImage?'':`<div class="im"${p.img?` style="background-image:url(${ea(p.img)})"`:''}></div>`}<b>${ea(p.n)}</b><div class="pr"><span>${ea(p.price)}</span>${p.cmp?`<s>${ea(p.cmp)}</s>`:''}</div>${p.d?`<p class="pd">${ea(p.d)}</p>`:''}${p.stock!==''&&p.stock!=null&&+p.stock<=0?'<button class="add" disabled>Sold out</button>':'<button class="add">Add to cart</button>'}</div>`;
+const digitalItem=(p,includeDownload=false)=>`<div class="prod digital-prod"><b>${ea(p.n||'Untitled')}</b><div class="pr"><span>${p.free?'Free':ea(p.price||'$0.00')}</span></div>${p.d?`<p class="pd">${ea(p.d)}</p>`:''}${p.free?(includeDownload&&p.download?`<a class="digital-download" href="${ea(p.download)}" download="${ea(p.fileName||'download')}">Download free</a>`:'<button class="digital-download" type="button" disabled>'+(p.fileData?'Free download':'Upload a file to enable downloads')+'</button>'):'<button class="add">Add to cart</button>'}</div>`;
 const S={
  header:{n:'Header',h:o=>`<header class="s hdr${o.v==='center'?' ctr':''}">${MB}<b contenteditable>${o.br||'Brand'}</b><nav>${(o.nav||['Home','About','Contact']).map(E).join('')}${o.cart?'<button class="cartlink" aria-label="Open cart"><svg viewBox="0 0 24 24"><path d="M3 4h2l2.4 11.2a1 1 0 0 0 1 .8h8.8a1 1 0 0 0 1-.8L20 8H6"/><circle cx="9.5" cy="20" r="1.3"/><circle cx="17" cy="20" r="1.3"/></svg><i class="cn">0</i></button>':''}</nav></header>`},
  hero:{n:'Hero',h:o=>hero('',o)},
  herocenter:{n:'Centered hero',h:o=>hero(' center'+(o.g?' glow':''),o)},
  products:{n:'Products',h:o=>`<section class="s prods"><h2 contenteditable>Featured products</h2><div class="cols p">${SAMPLE.map(prodItem).join('')}</div></section>`},
+ digitalproducts:{n:'Digital products',h:o=>`<section class="s dprods"><h2 contenteditable>Digital products</h2><div class="cols p dproducts"></div></section>`},
  posts:{n:'Blog posts',h:o=>`<section class="s"><h2 contenteditable>Latest posts</h2><div class="posts${o.v==='feat'?' feat':''}">${[['Mar 12, 2026','Five things I learned this year','A short summary of the post goes here so readers know what to expect.'],['Feb 20, 2026','How I plan my week','A short summary of the post goes here so readers know what to expect.'],['Jan 28, 2026','Notes from a small trip','A short summary of the post goes here so readers know what to expect.']].map(p=>`<article>${o.v==='feat'?'<div class="im"></div>':''}<div><span class="d" contenteditable>${p[0]}</span><h3 contenteditable>${p[1]}</h3><p contenteditable>${p[2]}</p></div></article>`).join('')}</div></section>`},
  menu:{n:'Menu / price list',h:o=>`<section class="s"><h2 contenteditable>Our menu</h2>${[['Margherita pizza','Tomato, mozzarella, basil','$14'],['House salad','Greens, lemon, olive oil','$9'],['Pasta of the day','Ask your server','$16'],['Tiramisu','Made fresh each morning','$8']].map(m=>`<div class="row"><div><b contenteditable>${m[0]}</b><span contenteditable>${m[1]}</span></div><b contenteditable>${m[2]}</b></div>`).join('')}</section>`},
  features:{n:'Features',h:o=>cols('f',o.i||[['Fast shipping','Orders leave in 24 hours.'],['Easy returns','30 days, no questions.'],['Real support','Talk to a person.']])},
@@ -1306,6 +1314,9 @@ function projectPreviewDoc(project){
    grid.innerHTML=(project.products||[]).filter(product=>product.st!=='draft').map(prodItem).join('');
    grid.querySelectorAll('[style]').forEach(el=>{if(/url\(["']?data:image\//i.test(el.getAttribute('style')||''))el.style.removeProperty('background-image')});
   });
+  section.querySelectorAll('.dprods .dproducts').forEach(grid=>{
+   grid.innerHTML=(project.digitalProducts||[]).filter(product=>product.st!=='draft').map(product=>digitalItem(product)).join('');
+  });
   return `<div class="blk${section.classList.contains('hdr')?' hd':''}">${section.outerHTML}</div>`;
  }).join('');
  const state=project.st||{};
@@ -1427,12 +1438,22 @@ function projectError(err,action){
 function hasProductsSection(sections=[]){
  return sections.some(html=>{const template=document.createElement('template');template.innerHTML=html;return !!template.content.querySelector('.prods')});
 }
+function hasDigitalProductsSection(sections=[]){
+ return sections.some(html=>{const template=document.createElement('template');template.innerHTML=html;return !!template.content.querySelector('.dprods')});
+}
 function reconcileProjectProducts(project=cur){
  if(!project)return false;
  const pages=Array.isArray(project.pages)&&project.pages.length?project.pages:[{sections:project.sections||[]}];
  const hasProducts=pages.some(page=>hasProductsSection(page.sections||[]));
  if(!hasProducts)project.products=[];
  return hasProducts;
+}
+function reconcileProjectDigitalProducts(project=cur){
+ if(!project)return false;
+ const pages=Array.isArray(project.pages)&&project.pages.length?project.pages:[{sections:project.sections||[]}];
+ const hasDigitalProducts=pages.some(page=>hasDigitalProductsSection(page.sections||[]));
+ if(!hasDigitalProducts)project.digitalProducts=[];
+ return hasDigitalProducts;
 }
 async function loadProjects(ownerId,loadId){
  projectLoadState='loading';renderHome();
@@ -1554,8 +1575,8 @@ $('pn').onclick=e=>{
  else if(b.dataset.s){const q=b.dataset.s.split(':');cur.st[q[0]]=+q[1];applyTheme(cur.theme||0);if(prev)setPrev();scheduleProjectSave()}
  else if(b.id==='pa'){prev=true;setPrev()}
  else if(b.id==='pp'){prev=true;setPrev();pageTrans(()=>{})}
- else if(b.dataset.t){const t=T.find(x=>x.id===b.dataset.t);sync();undo={s:cur.sections.slice(),pg:cur.pages?JSON.parse(JSON.stringify(cur.pages)):null,pi:cur.pi,th:cur.theme,st:JSON.parse(JSON.stringify(cur.st||{})),pr:JSON.parse(JSON.stringify(cur.products||[])),tpl:cur.tpl};cur.sections=t.s.map(mk);cur.tpl=t.n;cur.st={f:0,r:0,a:0,h:0,...(t.st||{})};if(cur.pages){cur.pages[cur.pi].sections=cur.sections;if(!hasProductsSection(cur.sections)){cur.pages.forEach((page,index)=>{if(index!==cur.pi)page.sections=(page.sections||[]).filter(section=>!hasProductsSection([section]))});cur.products=[]}}draw();applyTheme(t.th);toast('Template applied')}
- else if(undo){cur.pages=undo.pg;cur.pi=undo.pi||0;cur.sections=cur.pages?cur.pages[cur.pi].sections:undo.s;if(undo.tpl!==undefined)cur.tpl=undo.tpl;if(undo.st)cur.st=undo.st;if(undo.pr)cur.products=undo.pr;const th=undo.th;undo=null;draw();updSel();applyTheme(th)}
+ else if(b.dataset.t){const t=T.find(x=>x.id===b.dataset.t);sync();undo={s:cur.sections.slice(),pg:cur.pages?JSON.parse(JSON.stringify(cur.pages)):null,pi:cur.pi,th:cur.theme,st:JSON.parse(JSON.stringify(cur.st||{})),pr:JSON.parse(JSON.stringify(cur.products||[])),dig:JSON.parse(JSON.stringify(cur.digitalProducts||[])),tpl:cur.tpl};cur.sections=t.s.map(mk);cur.tpl=t.n;cur.st={f:0,r:0,a:0,h:0,...(t.st||{})};if(cur.pages){cur.pages[cur.pi].sections=cur.sections;if(!hasProductsSection(cur.sections)){cur.pages.forEach((page,index)=>{if(index!==cur.pi)page.sections=(page.sections||[]).filter(section=>!hasProductsSection([section]))});cur.products=[]}if(!hasDigitalProductsSection(cur.sections)){cur.pages.forEach((page,index)=>{if(index!==cur.pi)page.sections=(page.sections||[]).filter(section=>!hasDigitalProductsSection([section]))});cur.digitalProducts=[]}}draw();applyTheme(t.th);toast('Template applied')}
+ else if(undo){cur.pages=undo.pg;cur.pi=undo.pi||0;cur.sections=cur.pages?cur.pages[cur.pi].sections:undo.s;if(undo.tpl!==undefined)cur.tpl=undo.tpl;if(undo.st)cur.st=undo.st;if(undo.pr)cur.products=undo.pr;if(undo.dig)cur.digitalProducts=undo.dig;const th=undo.th;undo=null;draw();updSel();applyTheme(th)}
 };
 function sync(){cur.sections=[...cv.querySelectorAll('.blk>.s')].map(e=>e.outerHTML);if(cur.pages)cur.pages[cur.pi].sections=cur.sections}
 function draw(){
@@ -1582,10 +1603,10 @@ $('pname').addEventListener('change',async()=>{if(!cur)return;const name=$('pnam
 cv.onclick=e=>{
  const a=e.target.dataset&&e.target.dataset.a;if(!a)return;
  if(a==='drag')return;
- sync();const i=+e.target.closest('.blk').dataset.i,s=cur.sections,removedProducts=a==='x'&&hasProductsSection([s[i]]);
+ sync();const i=+e.target.closest('.blk').dataset.i,s=cur.sections,removedProducts=a==='x'&&hasProductsSection([s[i]]),removedDigitalProducts=a==='x'&&hasDigitalProductsSection([s[i]]);
  if(a==='e')return editCode(e.target.closest('.blk'));if(a==='s')return design(e.target.closest('.blk'));if(a==='c')s.splice(i+1,0,codeBlock(CODE0,200));else if(a==='x')s.splice(i,1);
  else{const j=a==='u'?i-1:i+1;if(j<0||j>=s.length)return;[s[i],s[j]]=[s[j],s[i]]}
- draw();if(removedProducts)reconcileProjectProducts(cur);
+ draw();if(removedProducts)reconcileProjectProducts(cur);if(removedDigitalProducts)reconcileProjectDigitalProducts(cur);
 };
 function sectionDropIndex(y){
  const blocks=[...cv.querySelectorAll('.blk')];
@@ -1688,7 +1709,7 @@ function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');setTi
 function updCart(){const n=cart.reduce((a,c)=>a+c.q,0);cv.querySelectorAll('.cn').forEach(e=>{e.textContent=n;e.style.display=n?'':'none'})}
 function setPrev(){cv.classList.toggle('prev',prev);cv.querySelectorAll('[contenteditable]:not(.add)').forEach(e=>e.contentEditable=!prev);$('prv').textContent=prev?'✕ Exit preview':'Preview';$('editor').classList.toggle('pv',prev);if(prev&&document.activeElement&&document.activeElement.blur)document.activeElement.blur();$('lk').hidden=true;$('tb').hidden=true;runAnim()}
 $('prv').onclick=()=>{prev=!prev;setPrev()};
-const _d=draw;draw=function(){_d();cv.querySelectorAll('.hdr').forEach(h=>{if(!h.querySelector('.menubtn'))h.insertAdjacentHTML('afterbegin',MB)});fillProds();updCart();if(prev)setPrev()};
+const _d=draw;draw=function(){_d();cv.querySelectorAll('.hdr').forEach(h=>{if(!h.querySelector('.menubtn'))h.insertAdjacentHTML('afterbegin',MB)});fillProds();fillDigitalProducts();updCart();if(prev)setPrev()};
 cv.addEventListener('click',e=>{
  const customButton=e.target.closest('[data-builder-button]');
  if(customButton&&!prev){if(e.target.closest('img[data-builder-image]'))return;customButton.focus();if(customButton.matches('a,button'))e.preventDefault();lkShow(customButton)}
@@ -1894,7 +1915,7 @@ function updSel(){$('pgsel').innerHTML=cur.pages.map((p,i)=>`<option value="${i}
 function switchPage(i,skip){if(!skip)sync();pageNameIndex=null;cur.pi=i;cur.sections=cur.pages[i].sections;undo=null;$('lk').hidden=true;draw();updSel();panel();cv.parentElement.scrollTop=0}
 function addPage(id){sync();const k=PG.find(x=>x.id===id),h=cur.pages[0].sections;let n=k.n,c=2;while(cur.pages.some(p=>p.n===n))n=k.n+' '+c++;
  cur.pages.push({id:'p'+(cur.nid++),n,sections:[...h.filter(x=>x.includes('s hdr')),...k.s.map(mk),...h.filter(x=>x.includes('s ftr'))]});autoLink();switchPage(cur.pages.length-1,true);toast(n+' page added')}
-function delPage(i){sync();const r=cur.pages.splice(i,1)[0],removedProducts=hasProductsSection(r.sections||[]);eachLink(el=>{if(el.dataset.link===r.id)delete el.dataset.link});if(i<cur.pi)cur.pi--;else if(i===cur.pi)cur.pi=Math.max(0,i-1);switchPage(cur.pi,true);if(removedProducts)reconcileProjectProducts(cur);toast('Page deleted')}
+function delPage(i){sync();const r=cur.pages.splice(i,1)[0],removedProducts=hasProductsSection(r.sections||[]),removedDigitalProducts=hasDigitalProductsSection(r.sections||[]);eachLink(el=>{if(el.dataset.link===r.id)delete el.dataset.link});if(i<cur.pi)cur.pi--;else if(i===cur.pi)cur.pi=Math.max(0,i-1);switchPage(cur.pi,true);if(removedProducts)reconcileProjectProducts(cur);if(removedDigitalProducts)reconcileProjectDigitalProducts(cur);toast('Page deleted')}
 $('pn').addEventListener('click',e=>{const b=e.target.closest('[data-pg],[data-np],[data-dp],[data-rename-page],[data-save-page],[data-cancel-page]');if(!b)return;
  if(b.dataset.pg!=null)switchPage(+b.dataset.pg);else if(b.dataset.np)addPage(b.dataset.np);
  else if(b.dataset.renamePage!=null){const i=+b.dataset.renamePage;if(cur.pi!==i)switchPage(i);pageNameIndex=i;panel();$('pn').querySelector('[data-page-name]')?.focus()}
@@ -1924,6 +1945,7 @@ function design(b){dEl=b.querySelector('.s');dmr();$('dm').classList.add('on')}
 $('dm').onclick=e=>{const o=e.target.closest('[data-o]')?.dataset.o;if(!o)return;if(o==='done')return $('dm').classList.remove('on');if(o==='form-save'){const input=$('formEndpoint'),value=input.value.trim(),endpoint=value?validFormEndpoint(value):'';if(value&&!endpoint){$('formEndpointError').textContent='Enter a valid HTTPS endpoint from your form provider.';input.focus();return}if(endpoint)dEl.dataset.formAction=endpoint;else delete dEl.dataset.formAction;sync();historySchedule(cur);scheduleProjectSave();toast(endpoint?'Form endpoint saved':'Form endpoint removed');dmr();return}const q=o.split(':');if(q[1])dEl.dataset[q[0]]=q[1];else delete dEl.dataset[q[0]];sync();scheduleProjectSave();dmr()};
 addEventListener('keydown',e=>{if(e.key==='Escape')$('dm').classList.remove('on')});
 function fillProds(){if(!cur||!cur.products)return;cv.querySelectorAll('.prods .cols').forEach(g=>g.innerHTML=cur.products.some(x=>x.st!=='draft')?cur.products.filter(x=>x.st!=='draft').map(prodItem).join(''):'<p class="pe">No products yet. Add some from the project dashboard.</p>')}
+function fillDigitalProducts(){if(!cur)return;const products=cur.digitalProducts||[];cv.querySelectorAll('.dprods .dproducts').forEach(g=>g.innerHTML=products.some(x=>x.st!=='draft')?products.filter(x=>x.st!=='draft').map(x=>digitalItem(x)).join(''):'<p class="pe">No digital products yet. Add some from the project dashboard.</p>')}
 let pcur=null,menuProject=null,deletingProject=null;
 function projectCardPositions(){
  return new Map([...$('grid').querySelectorAll('.proj')].map(card=>[projects[+card.dataset.i]?.id,card.getBoundingClientRect()]).filter(([id])=>id));
@@ -2004,6 +2026,19 @@ function ensureProductsSection(project=pcur){
  project.sections=project.sections||[];
  if(!hasProductsSection(project.sections))project.sections.push(S.products.h({}));
 }
+function ensureDigitalProductsSection(project=pcur){
+ if(!project)return;
+ if(Array.isArray(project.pages)&&project.pages.length){
+  const index=Number.isInteger(project.pi)&&project.pi>=0&&project.pi<project.pages.length?project.pi:0,page=project.pages[index];
+  if(hasDigitalProductsSection(page.sections||[]))return;
+  page.sections=[...(page.sections||[]),S.digitalproducts.h({})];
+  if(index===(project.pi||0))project.sections=page.sections;
+  if(cur===project&&index===cur.pi){cur.sections=page.sections;if($('editor').classList.contains('on'))draw()}
+  return;
+ }
+ project.sections=project.sections||[];
+ if(!hasDigitalProductsSection(project.sections))project.sections.push(S.digitalproducts.h({}));
+}
 const uid=()=>'i'+Math.random().toString(36).slice(2,8);
 const stk=x=>x.stock===''||x.stock==null?'':(+x.stock<=0?'Out of stock':x.stock+' in stock');
 function readImg(f,cb,m){if(!f||!/^image\//.test(f.type))return;const r=new FileReader();r.onload=()=>{const i=new Image();i.onload=()=>{const s=Math.min(1,(m||700)/Math.max(i.width,i.height)),c=document.createElement('canvas'),x=c.getContext('2d');c.width=Math.round(i.width*s);c.height=Math.round(i.height*s);x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(i,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',.82))};i.src=r.result};r.readAsDataURL(f)}
@@ -2034,6 +2069,74 @@ dbProducts.onclick=e=>{
  else if(k==='img')$('pfi').click();
  else if(k==='rimg'){delete x.img;pList();pForm();refreshProjectProducts();scheduleProductSave()}
  else if(k==='del'){if(!t.dataset.arm){t.dataset.arm=1;t.textContent='Click to confirm';return}pcur.products.splice(psel,1);psel=Math.max(0,psel-1);prRender();refreshProjectProducts();scheduleProductSave()}};
+let dsel=0,dqs='',dlast=null;
+function digitalList(){
+ const products=pcur.digitalProducts||[],query=dqs.toLowerCase(),list=products.map((item,index)=>[item,index]).filter(([item])=>(item.n||'').toLowerCase().includes(query));
+ $('dll').innerHTML=list.length?list.map(([item,index])=>`<button class="pri${index===dsel?' on':''}" data-ds="${index}"><div class="pth"></div><div class="tx"><b>${ea(item.n||'Untitled')}</b><span>${item.free?'Free download':ea(item.price||'$0.00')}${item.fileName?' · '+ea(item.fileName):''}</span></div><span class="bdg${item.st==='draft'?'':' g'}">${item.st==='draft'?'Draft':item.free?'Free':'Paid'}</span></button>`).join(''):'<p style="padding:12px;color:var(--mut);font-size:13px">No digital products found.</p>';
+}
+function digitalForm(){
+ const item=pcur.digitalProducts[dsel],form=$('dpe');
+ if(!item){form.innerHTML='<div class="pe0"><h3>No digital products yet</h3><p>Upload a file to offer it as a free download or digital product.</p><button class="btn" data-dm="add">+ Add digital product</button></div>';return}
+ const size=item.fileSize?` · ${(item.fileSize/1024/1024).toFixed(2)} MB`:'';
+ form.innerHTML=`<div class="f"><label>Digital file</label><p class="digital-note">Upload a file up to 8 MB. Free files are included in your exported site.</p><div class="digital-file-name">${item.fileName?ea(item.fileName)+size:'No file uploaded'}</div><div style="display:flex;gap:8px"><button class="btn ghost" type="button" data-dm="file">${item.fileData?'Replace file':'Upload file'}</button>${item.fileData?'<button class="btn ghost" type="button" data-dm="remove-file">Remove file</button>':''}</div><input type="file" id="digitalFileInput" hidden></div>
+ <div class="f"><label for="df-n">Title</label><input id="df-n" data-df="n" value="${ea(item.n||'')}" placeholder="e.g. Starter guide"></div>
+ <div class="f"><label for="df-d">Description</label><textarea id="df-d" data-df="d" placeholder="Describe this digital product">${ea(item.d||'')}</textarea></div>
+ <div class="f"><label for="df-price">Price</label><input id="df-price" data-df="price" value="${ea(item.price||'')}" placeholder="$0.00" ${item.free?'disabled':''}>${item.free?'<p class="digital-note">Free products are available for direct download.</p>':''}</div>
+ <div class="f"><label class="digital-free-toggle"><input type="checkbox" data-df="free"${item.free?' checked':''}> Offer this item as a free download</label></div>
+ <div class="f"><label for="df-status">Status</label><select id="df-status" data-df="st"><option value="active"${item.st!=='draft'?' selected':''}>Active (shown on your site)</option><option value="draft"${item.st==='draft'?' selected':''}>Draft (hidden)</option></select></div>
+ <div style="display:flex;justify-content:flex-end"><button class="btn ghost" type="button" data-dm="del">Delete digital product</button></div>`;
+}
+function digitalRender(){
+ const panel=$('dbDigitalProducts');
+ if(pcur!==dlast){dsel=0;dqs='';dlast=pcur}
+ pcur.digitalProducts=pcur.digitalProducts||[];
+ panel.innerHTML='<div class="pmh"><div><h2>Digital products</h2><p>Upload files, set prices, and offer free items as direct downloads.</p></div></div><div class="pmb"><aside class="pml"><div class="tb"><input id="dq" placeholder="Search digital products" aria-label="Search digital products" value="'+ea(dqs)+'"><button class="btn" type="button" data-dm="add">+ Add digital product</button></div><div class="pll" id="dll"></div></aside><section class="pme" id="dpe"></section></div><p class="digital-note" style="padding:0 22px 14px">Paid digital-file delivery is not enabled yet: checkout is currently a demo. Paid files are kept out of public site exports.</p>';
+ if(dsel>=pcur.digitalProducts.length)dsel=Math.max(0,pcur.digitalProducts.length-1);
+ digitalList();digitalForm();
+}
+function readDigitalFile(file,callback){
+ if(!file)return;
+ if(file.size>8*1024*1024){toast('Digital files must be 8 MB or smaller.');return}
+ const reader=new FileReader();
+ reader.onload=()=>{if(typeof reader.result!=='string'){toast('Could not read the selected file.');return}callback(reader.result,file)};
+ reader.onerror=()=>{console.error('Could not read the selected digital product file:',reader.error);toast('Could not read the file. Please try another one.')};
+ reader.readAsDataURL(file);
+}
+const dbDigitalProducts=$('dbDigitalProducts');
+dbDigitalProducts.oninput=e=>{
+ const target=e.target;
+ if(target.id==='dq'){dqs=target.value;return digitalList()}
+ if(!target.dataset.df||target.type==='checkbox')return;
+ pcur.digitalProducts[dsel][target.dataset.df]=target.value;
+ digitalList();fillDigitalProducts();scheduleProductSave();
+};
+dbDigitalProducts.addEventListener('change',e=>{
+ const target=e.target,item=pcur.digitalProducts[dsel];
+ if(target.id==='digitalFileInput')return readDigitalFile(target.files[0],(data,file)=>{
+  item.fileData=data;item.fileName=file.name;item.fileType=file.type;item.fileSize=file.size;
+  digitalRender();fillDigitalProducts();scheduleProductSave();
+ });
+ if(target.dataset.df==='free'){item.free=target.checked;digitalList();digitalForm();fillDigitalProducts();scheduleProductSave()}
+ else if(target.dataset.df==='st'){item.st=target.value;digitalList();fillDigitalProducts();scheduleProductSave()}
+});
+dbDigitalProducts.onclick=e=>{
+ const selected=e.target.closest('[data-ds]');
+ if(selected){dsel=+selected.dataset.ds;digitalList();digitalForm();return}
+ const button=e.target.closest('[data-dm]');
+ if(!button)return;
+ const action=button.dataset.dm,item=pcur.digitalProducts[dsel];
+ if(action==='add'){
+  pcur.digitalProducts.push({id:uid(),n:'New digital product',price:'$0.00',st:'active',free:false});
+  ensureDigitalProductsSection(pcur);dsel=pcur.digitalProducts.length-1;dqs='';digitalRender();fillDigitalProducts();$('df-n').select();scheduleProductSave();
+ }else if(action==='file')$('digitalFileInput').click();
+ else if(action==='remove-file'){
+  delete item.fileData;delete item.fileName;delete item.fileType;delete item.fileSize;
+  digitalRender();fillDigitalProducts();scheduleProductSave();
+ }else if(action==='del'){
+  if(!button.dataset.arm){button.dataset.arm=1;button.textContent='Click to confirm';return}
+  pcur.digitalProducts.splice(dsel,1);dsel=Math.max(0,dsel-1);digitalRender();fillDigitalProducts();scheduleProductSave();
+ }
+};
 function authUser(u){const email=u.email||'';return{name:u.user_metadata?.full_name||u.user_metadata?.name||email.split('@')[0]||'Account',email}}
 function hdrRender(){$('auth').innerHTML='<button class="dlink" data-nav="docs">Docs</button>'+(user?`<div class="account-control"><button class="account-trigger" type="button" data-account-menu aria-label="Open account menu for ${ea(user.name)}" aria-haspopup="true" aria-controls="accountMenu" aria-expanded="false"><span class="av" aria-hidden="true">${ea(user.name.charAt(0).toUpperCase())}</span><span class="un">${ea(user.name)}</span><svg class="account-chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="account-menu" id="accountMenu" hidden><div class="account-summary"><strong>${ea(user.name)}</strong><span>${ea(user.email)}</span></div><div class="account-divider"></div><button type="button" data-au="out"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8 3H4.5A1.5 1.5 0 0 0 3 4.5v11A1.5 1.5 0 0 0 4.5 17H8M12 6l4 4-4 4m4-4H7"/></svg><span>Log out</span></button></div></div>`:'<button class="btn ghost" data-au="in">Log in</button><button class="btn" data-au="up">Sign up</button>')}
 function auOpen(m){const up=m==='up',card=$('au').firstElementChild;card.innerHTML=`<button class="auth-close" type="button" data-au="x" aria-label="Close dialog">×</button><div class="auth-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="9" cy="9" r="1.5"/><path d="M21 16l-5-5-8 8"/></svg></div><p class="auth-eyebrow">${up?'Get started':'Your workspace'}</p><h2 id="authTitle">${up?'Create your account':'Welcome back'}</h2><p class="auth-intro">${up?'Create an account to start building and manage your projects.':'Sign in to continue to your projects.'}</p><div class="auth-fields">${up?'<div class="auth-field"><label for="a1">Full name</label><input id="a1" name="name" placeholder="Your name" autocomplete="name" required></div>':''}<div class="auth-field"><label for="a2">Email address</label><input id="a2" name="email" type="email" placeholder="you@example.com" autocomplete="email" required></div><div class="auth-field"><label for="a3">Password</label><input id="a3" name="password" type="password" placeholder="${up?'At least 6 characters':'Enter your password'}" autocomplete="${up?'new-password':'current-password'}" minlength="${up?6:1}" required></div></div><p class="auth-message" id="ae" role="status" aria-live="polite"></p><button class="btn auth-submit" type="button" data-au="go">${up?'Create account':'Sign in'}</button><p class="auth-switch">${up?'Already have an account? <a href="#" data-au="in">Sign in</a>':'New to Webora? <a href="#" data-au="up">Create an account</a>'}</p><p class="auth-secure"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="4" y="8" width="12" height="9" rx="2"/><path d="M7 8V5a3 3 0 0 1 6 0v3"/></svg>Secure sign-in powered by Supabase</p>`;$('au').classList.add('on');$(up?'a1':'a2').focus()}
@@ -2191,6 +2294,7 @@ function cmdClear(keep){
   const before=cur.sections.length;cur.sections=keep?cur.sections.filter(persistent):[];removed=before-cur.sections.length;
  }
  cur.products=[];
+ cur.digitalProducts=[];
  draw();
  return 'Cleared '+removed+' section'+(removed===1?'':'s')+' across the project';
 }
@@ -2200,7 +2304,7 @@ function cmdHTML(h,at){const t=document.createElement('template');t.innerHTML=St
  if(!e){e=document.createElement('section');e.className='s';e.append(t.content);e.querySelectorAll('h1,h2,h3,h4,h5,h6,p,li,blockquote').forEach(x=>x.setAttribute('contenteditable',''))}
  return 'Added HTML section at position '+cmdPut(e.outerHTML,'html',at)}
 function cmdCode(c,h,at){return 'Added custom code at position '+cmdPut(codeBlock(String(c),Math.min(1200,Math.max(40,+h||300))),'code',at)}
-function cmdRemove(i){sync();const a=cur.sections;if(!(i>=0&&i<a.length))throw new Error('No section at position '+i+' (there are '+a.length+')');const removedProducts=hasProductsSection([a[i]]);a.splice(i,1);draw();if(removedProducts)reconcileProjectProducts(cur);return 'Removed section '+i}
+function cmdRemove(i){sync();const a=cur.sections;if(!(i>=0&&i<a.length))throw new Error('No section at position '+i+' (there are '+a.length+')');const removedProducts=hasProductsSection([a[i]]),removedDigitalProducts=hasDigitalProductsSection([a[i]]);a.splice(i,1);draw();if(removedProducts)reconcileProjectProducts(cur);if(removedDigitalProducts)reconcileProjectDigitalProducts(cur);return 'Removed section '+i}
 function cmdMove(i,j){sync();const a=cur.sections;if(!(i>=0&&i<a.length&&j>=0&&j<a.length))throw new Error('Positions must be between 0 and '+(a.length-1));a.splice(j,0,a.splice(i,1)[0]);draw();return 'Moved section '+i+' to '+j}
 function cmdSections(){sync();const N={hdr:'header',ftr:'footer',prods:'products'};
  return cur.sections.map((x,i)=>{const m=/class="s([^"]*)"/.exec(x),k=m&&m[1].trim().split(' ')[0]||'section',t=document.createElement('template');t.innerHTML=x;
@@ -2334,6 +2438,7 @@ button.pb{border:0;font:inherit;font-weight:600;cursor:pointer}
 .ftr b{display:block;color:var(--pf);margin-bottom:8px}.ftr ${F}{display:block;margin-bottom:6px}.ftr p{margin:0;max-width:30ch}
 .cols.p{row-gap:32px}.prod span{display:block}
 .add{margin-top:10px;width:100%;padding:10px;border:1px solid var(--pa);background:transparent;color:var(--pa);border-radius:var(--pr);font:inherit;font-weight:600;cursor:pointer}.add:hover{background:var(--pa);color:var(--pt)}
+.digital-download{display:block;margin-top:10px;width:100%;padding:10px;border:1px solid var(--pa);background:var(--pa);color:var(--pt);border-radius:var(--pr);font:inherit;font-weight:600;text-align:center;text-decoration:none}.digital-download:hover{filter:brightness(.92)}.digital-download:disabled{opacity:.55;cursor:not-allowed}
 .menubtn{display:none;align-items:center;justify-content:center;width:40px;height:40px;padding:0;border:0;border-radius:var(--pr);background:transparent;color:var(--pf)!important;cursor:pointer}.menubtn:hover{background:var(--ps)}.menubtn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .cartlink{position:relative;display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;padding:0;border:0;border-radius:var(--pr);background:transparent;color:var(--pf)!important;cursor:pointer}.cartlink:hover{background:var(--ps)}.cartlink svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.cartlink i{position:absolute;top:-7px;right:-7px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--pa);color:var(--pt);font-size:11px;font-weight:600;line-height:18px;font-style:normal;text-align:center}
 .center{text-align:center}.center h1,.center p{margin-left:auto;margin-right:auto}.center h1{max-width:18ch}
@@ -2509,12 +2614,26 @@ function buildSite({forDeploy=false}={}){
   if(m){const bin=atob(m[2]),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
    y.img='images/product-'+(++ic)+'.'+(m[1]==='jpeg'?'jpg':m[1]);add(y.img,u)}
   return y});
+ let dc=0;
+ const digitalProducts=(cur.digitalProducts||[]).filter(x=>x.st!=='draft').map(x=>{
+  const y={...x};delete y.fileData;delete y.download;
+  if(x.free&&typeof x.fileData==='string'){
+   const match=/^data:[^;]+;base64,([\s\S]*)$/.exec(x.fileData);
+   if(!match)throw new Error('A digital product file could not be exported.');
+   const binary=atob(match[1].replace(/\s/g,'')),bytes=new Uint8Array(binary.length);
+   for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+   const filename=String(x.fileName||'download').split(/[\\/]/).pop().replace(/[^\w.-]+/g,'-').replace(/^[.-]+|[.-]+$/g,'')||'download';
+   y.download='downloads/digital-'+(++dc)+'-'+filename;add(y.download,bytes);
+  }
+  return y;
+ });
  const clean=s=>{
    const formEndpoint=validFormEndpoint(s.dataset.formAction);
    s.querySelectorAll('[contenteditable]').forEach(e=>e.removeAttribute('contenteditable'));
   s.querySelectorAll('[data-builder-button],[data-builder-image],[data-builder-image-empty],[data-builder-position]').forEach(e=>{e.removeAttribute('data-builder-button');e.removeAttribute('data-builder-image');e.removeAttribute('data-builder-image-empty');e.removeAttribute('data-builder-position')});
   s.removeAttribute('contenteditable');s.classList.remove('in');s.removeAttribute('data-code');s.removeAttribute('data-h');
   s.querySelectorAll('.prods .cols').forEach(g=>g.innerHTML=prods.map(prodItem).join(''));
+  s.querySelectorAll('.dprods .dproducts').forEach(g=>g.innerHTML=digitalProducts.map(product=>digitalItem(product,true)).join(''));
   s.querySelectorAll('[data-phone]').forEach(e=>{
    const phone=normalizePhone(e.dataset.phone);if(!phone){e.removeAttribute('data-phone');return}
    if(e.tagName==='A'){e.href='tel:'+phone;e.removeAttribute('data-phone');return}
@@ -2545,7 +2664,7 @@ function buildSite({forDeploy=false}={}){
  add('style.css',siteCss(th,st));
  add('site.js',SITE_JS);
  if(TRACK.key)add('track.js',trackJs(TRACK.url,TRACK.key));
- add('README.txt',name+'\n'+'='.repeat(name.length)+'\n\nOpen index.html in a browser to view the site. Every page is its own .html file and they all share style.css and site.js. Product photos are in the images folder.\n\nTo put it online, upload this whole folder to any static host (Netlify, GitHub Pages, Cloudflare Pages, and so on).\n\nGood to know:\n- Contact and email signup forms can be connected in the builder: open the section Design menu, enter the HTTPS form endpoint from a hosted provider such as Formspree, and save it. The provider must allow browser submissions (CORS) and accept POST form data with an HTTP success response. Form submissions go directly to that provider, not Webora.\n- Forms without a saved endpoint do not send submissions and show a setup message.\n- Checkout is a demo and takes no payment. To accept real payments, replace it with a Stripe or PayPal button.\n- The cart is remembered in the visitor\'s browser. Some browsers do not share it between pages when files are opened straight from disk, but it works once the site is hosted or served from a local server.\n- Review the starter Terms of Service and Privacy Policy text with a professional before you publish.\n');
+ add('README.txt',name+'\n'+'='.repeat(name.length)+'\n\nOpen index.html in a browser to view the site. Every page is its own .html file and they all share style.css and site.js. Product photos are in the images folder.\n\nTo put it online, upload this whole folder to any static host (Netlify, GitHub Pages, Cloudflare Pages, and so on).\n\nGood to know:\n- Free digital product files are included in the downloads folder. Paid digital files are not included in public exports.\n- Checkout is a demo and takes no payment; paid digital downloads are not delivered until real payments and secure file delivery are implemented.\n- Contact and email signup forms can be connected in the builder: open the section Design menu, enter the HTTPS form endpoint from a hosted provider such as Formspree, and save it. The provider must allow browser submissions (CORS) and accept POST form data with an HTTP success response. Form submissions go directly to that provider, not Webora.\n- Forms without a saved endpoint do not send submissions and show a setup message.\n- The cart is remembered in the visitor\'s browser. Some browsers do not share it between pages when files are opened straight from disk, but it works once the site is hosted or served from a local server.\n- Review the starter Terms of Service and Privacy Policy text with a professional before you publish.\n');
  return{blob:makeZip(files),name:slug(name)+'.zip'}}
 $('dl').onclick=()=>{
  try{const r=buildSite(),a=document.createElement('a');a.href=URL.createObjectURL(r.blob);a.download=r.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),5000);toast('Site downloaded as '+r.name)}
@@ -2603,8 +2722,17 @@ async function dbRender(){
  <div class="pn" style="margin-bottom:12px"><h3>Visitors per day</h3><div class="bars" role="img" aria-label="Visitors per day">${s.daily.map(x=>`<u style="height:${Math.round(x.visitors/mx*100)}%" title="${x.d}: ${x.visitors}"></u>`).join('')}</div></div>
  <div class="gr"><div class="pn"><h3>Funnel</h3>${dbRows(fn,'n','v')}</div><div class="pn"><h3>Top pages</h3>${dbRows(s.top_pages,'path','views')}</div><div class="pn"><h3>Top products</h3>${dbRows(s.top_products,'name','revenue_cents',x=>dbMoney(x.revenue_cents))}</div><div class="pn"><h3>Traffic sources</h3>${dbRows(s.sources,'name','n')}</div><div class="pn"><h3>Devices</h3>${dbRows(s.devices,'name','n')}</div></div>
  ${o.live?'':'<p class="hint">This is made-up sample data. Fill in the BACKEND settings in the code to see real numbers.</p>'}`}
-function dbSetTab(tab){const products=tab==='products';$('dbTabAnalytics').classList.toggle('on',!products);if(products)$('dbTabAnalytics').removeAttribute('aria-current');else $('dbTabAnalytics').setAttribute('aria-current','page');$('dbTabProducts').classList.toggle('on',products);if(products)$('dbTabProducts').setAttribute('aria-current','page');else $('dbTabProducts').removeAttribute('aria-current');$('dbContentTitle').textContent=products?'Products':'Analytics';$('dbAnalytics').hidden=products;$('dbProducts').hidden=!products;if(products)prRender();else dbRender()}
-function dbOpen(p,{updateUrl=true}={}){dbProject=p;pcur=p;historyFor(p);p.products=p.products||[];$('dbTitle').textContent=p.name;$('dbSubtitle').textContent='Analytics for your configured Supabase site · products for this project';if(!DB.f)dbRange(30);$('home').style.display='none';$('editor').classList.remove('on','view-enter','view-exit');$('db').classList.add('on');if(updateUrl&&p.id)setDashboardRoute(p.id);dbSetTab('analytics')}
+function dbSetTab(tab){
+ const active=tab==='products'?'products':tab==='digital-products'?'digital-products':'analytics';
+ [['dbTabAnalytics','analytics'],['dbTabProducts','products'],['dbTabDigitalProducts','digital-products']].forEach(([id,name])=>{
+  const button=$(id),selected=name===active;button.classList.toggle('on',selected);
+  if(selected)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');
+ });
+ $('dbContentTitle').textContent=active==='products'?'Products':active==='digital-products'?'Digital products':'Analytics';
+ $('dbAnalytics').hidden=active!=='analytics';$('dbProducts').hidden=active!=='products';$('dbDigitalProducts').hidden=active!=='digital-products';
+ if(active==='products')prRender();else if(active==='digital-products')digitalRender();else dbRender();
+}
+function dbOpen(p,{updateUrl=true}={}){dbProject=p;pcur=p;historyFor(p);p.products=p.products||[];p.digitalProducts=p.digitalProducts||[];$('dbTitle').textContent=p.name;$('dbSubtitle').textContent='Analytics for your configured Supabase site · products for this project';if(!DB.f)dbRange(30);$('home').style.display='none';$('editor').classList.remove('on','view-enter','view-exit');$('db').classList.add('on');if(updateUrl&&p.id)setDashboardRoute(p.id);dbSetTab('analytics')}
 function dbClose({updateUrl=true}={}){
  const id=dashboardRouteId();
  if(updateUrl&&id){
